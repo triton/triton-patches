@@ -1,8 +1,8 @@
 http://www.pixelbeat.org/programming/oss_bug_flow.html
 https://bugs.gentoo.org/349339
 
---- bc/storage.c
-+++ bc/storage.c
+--- a/bc/storage.c
++++ b/bc/storage.c
 @@ -99,6 +99,7 @@
      {
        f = &functions[indx];
