@@ -1,8 +1,8 @@
 diff --git a/src/Makefile-env.am b/src/Makefile-env.am
-index e176596..384e230 100644
+index bbf991a..fd7e067 100644
 --- a/src/Makefile-env.am
 +++ b/src/Makefile-env.am
-@@ -40,7 +40,7 @@ check_SCRIPTS =
+@@ -41,7 +41,7 @@ check_SCRIPTS =
  export VERBOSE = true
  
  # python unit tests need to know where the scripts are located
@@ -12,10 +12,10 @@ index e176596..384e230 100644
  # when doing a debug build, make sure to make the targets
  if WITH_DEBUG
 diff --git a/src/ceph-detect-init/Makefile.am b/src/ceph-detect-init/Makefile.am
-index 3e5ad03..66d6683 100644
+index 932f755..262a1b9 100644
 --- a/src/ceph-detect-init/Makefile.am
 +++ b/src/ceph-detect-init/Makefile.am
-@@ -64,9 +64,10 @@ install-data-local::
+@@ -64,12 +64,13 @@ ceph-detect-init-install-data:
  	if test "$(DESTDIR)" ; then \
  		if lsb_release -si | grep --quiet 'Ubuntu\|Debian\|Devuan' ; then \
  			options=--install-layout=deb ; \
@@ -29,3 +29,6 @@ index 3e5ad03..66d6683 100644
 +		prefix="--prefix=$(prefix)" ; \
 +	fi ; \
 +	python setup.py install $$prefix $$root $$options
+ 
+ LOCAL_ALL += ceph-detect-init-all
+ LOCAL_CLEAN += ceph-detect-init-clean
