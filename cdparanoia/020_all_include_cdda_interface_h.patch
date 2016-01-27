@@ -16,7 +16,7 @@ diff -ur cdparanoia-III-10.2.orig/paranoia/cdda_paranoia.h cdparanoia-III-10.2/p
  #endif
  
  #include <stdio.h>
-+#include "../interface/cdda_interface.h"
++#include <cdda_interface.h>
  
  extern char *paranoia_version();
  extern cdrom_paranoia *paranoia_init(cdrom_drive *d);
