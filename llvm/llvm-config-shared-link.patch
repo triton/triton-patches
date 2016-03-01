@@ -1,8 +1,8 @@
 diff --git a/tools/llvm-config/llvm-config.cpp b/tools/llvm-config/llvm-config.cpp
-index 879b9ab..533c53a 100644
+index 879b9ab..073b876 100644
 --- a/tools/llvm-config/llvm-config.cpp
 +++ b/tools/llvm-config/llvm-config.cpp
-@@ -349,25 +349,12 @@ int main(int argc, char **argv) {
+@@ -349,25 +349,14 @@ int main(int argc, char **argv) {
                               /*IncludeNonInstalled=*/IsInDevelopmentTree);
  
      if (PrintLibs || PrintLibNames || PrintLibFiles) {
@@ -26,11 +26,13 @@ index 879b9ab..533c53a 100644
 -          OS << ActiveLibDir << '/' << Lib;
 -        }
 +      if (PrintLibNames) {
-+        OS << "libLLVM.so";
++        OS << "libLLVM.so libLTO.so";
 +      } else if (PrintLibFiles) {
 +        OS << ActiveLibDir << '/' << "libLLVM.so";
++        OS << " ";
++        OS << ActiveLibDir << '/' << "libLTO.so";
 +      } else if (PrintLibs) {
-+        OS << "-lLLVM";
++        OS << "-lLLVM -lLTO";
        }
        OS << '\n';
      }
