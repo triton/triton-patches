@@ -1,0 +1,47 @@
+Index: ChangeLog
+===================================================================
+--- ChangeLog	(revision 1636)
++++ ChangeLog	(revision 1637)
+@@ -53,15 +53,19 @@
+ 13. A pattern that included (*ACCEPT) in the middle of a sufficiently deeply
+     nested set of parentheses of sufficient size caused an overflow of the
+     compiling workspace (which was diagnosed, but of course is not desirable).
+-    
+-14. And yet another buffer overflow bug involving duplicate named groups, this 
+-    time nested, with a nested back reference. Yet again, I have just allowed 
+-    for more memory, because anything more needs all the refactoring that has 
++
++14. And yet another buffer overflow bug involving duplicate named groups, this
++    time nested, with a nested back reference. Yet again, I have just allowed
++    for more memory, because anything more needs all the refactoring that has
+     been done for PCRE2. An example pattern that provoked this bug is:
+-    /((?J)(?'R'(?'R'(?'R'(?'R'(?'R'(?|(\k'R'))))))))/ and the bug was 
+-    registered as CVE-2016-1283. 
++    /((?J)(?'R'(?'R'(?'R'(?'R'(?'R'(?|(\k'R'))))))))/ and the bug was
++    registered as CVE-2016-1283.
+ 
++15. pcretest went into a loop if global matching was requested with an ovector
++    size less than 2. It now gives an error message. This bug was found by
++    afl-fuzz.
+ 
++
+ Version 8.38 23-November-2015
+ -----------------------------
+ 
+Index: pcretest.c
+===================================================================
+--- pcretest.c	(revision 1636)
++++ pcretest.c	(revision 1637)
+@@ -5617,6 +5617,12 @@
+         break;
+         }
+ 
++      if (use_size_offsets < 2)
++        {
++        fprintf(outfile, "Cannot do global matching with an ovector size < 2\n");
++        break;
++        }
++
+       /* If we have matched an empty string, first check to see if we are at
+       the end of the subject. If so, the /g loop is over. Otherwise, mimic what
+       Perl's /g options does. This turns out to be rather cunning. First we set
