@@ -1,0 +1,22 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 46f5bd1..3f7dc4d 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -686,17 +686,9 @@ if(WITH_SPDK)
+   endforeach()
+ endif(WITH_SPDK)
+ 
+-# make rocksdb statically
+-add_custom_target(build_rocksdb
+-    COMMAND
+-    PORTABLE=1 $(MAKE) static_lib EXTRA_CXXFLAGS='-fPIC -Wno-unused-variable'
+-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/rocksdb
+-    COMMENT "rocksdb building")
+-
+ # add a imported library for librocksdb.a
+ add_library(rocksdb STATIC IMPORTED)
+ set_property(TARGET rocksdb PROPERTY IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/src/rocksdb/librocksdb.a")
+-add_dependencies(rocksdb build_rocksdb)
+ set(ROCKSDB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/rocksdb/include)
+ 
+ add_subdirectory(kv)

@@ -1,0 +1,55 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2a079e3..2d746fe 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -156,6 +156,12 @@ find_package(xfs)
+ set(HAVE_XFS ${XFS_FOUND})
+ endif(${WITH_XFS})
+ 
++option(WITH_ZFS "ZFS is here" ON)
++if(${WITH_ZFS})
++find_package(zfs)
++set(HAVE_ZFS ${ZFS_FOUND})
++endif(${WITH_ZFS})
++
+ option(WITH_SPDK "Enable SPDK" OFF)
+ if(WITH_SPDK)
+   find_package(pciaccess REQUIRED)
+diff --git a/cmake/modules/Findzfs.cmake b/cmake/modules/Findzfs.cmake
+new file mode 100644
+index 0000000..5c96ae5
+--- /dev/null
++++ b/cmake/modules/Findzfs.cmake
+@@ -0,0 +1,32 @@
++# Try to find zfs
++# Once done, this will define
++#
++# ZFS_FOUND - system has Profiler
++# ZFS_INCLUDE_DIR - the Profiler include directories
++# ZFS_LIBRARIES - link these to use Profiler
++
++if(ZFS_INCLUDE_DIR AND ZFS_LIBRARIES)
++	set(ZFS_FIND_QUIETLY TRUE)
++endif(ZFS_INCLUDE_DIR AND ZFS_LIBRARIES)
++
++INCLUDE(CheckCXXSymbolExists)
++
++# include dir
++
++find_path(ZFS_INCLUDE_DIR libzfs.h NO_DEFAULT_PATH PATHS
++  /usr/include
++  /opt/local/include
++  /usr/local/include
++)
++
++
++# finally the library itself
++find_library(LIBZFS NAMES zfs)
++set(ZFS_LIBRARIES ${LIBZFS})
++
++# handle the QUIETLY and REQUIRED arguments and set ZFS_FOUND to TRUE if
++# all listed variables are TRUE
++include(FindPackageHandleStandardArgs)
++find_package_handle_standard_args(xfs DEFAULT_MSG ZFS_LIBRARIES ZFS_INCLUDE_DIR)
++
++mark_as_advanced(ZFS_LIBRARIES ZFS_INCLUDE_DIR)
