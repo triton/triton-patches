@@ -20,3 +20,17 @@ index 46f5bd1..3f7dc4d 100644
  set(ROCKSDB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/rocksdb/include)
  
  add_subdirectory(kv)
+diff --git a/src/yasm-wrapper b/src/yasm-wrapper
+index 9500d2f..8f4b26d 100755
+--- a/src/yasm-wrapper
++++ b/src/yasm-wrapper
+@@ -24,6 +24,9 @@ while [ -n "$*" ]; do
+ 	    shift
+ 	    shift
+ 	    ;;
++	-MMD )
++	    shift
++	    ;;
+ 	-MF )
+ 	    shift
+ 	    touch="$1"
