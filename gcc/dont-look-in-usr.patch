@@ -1,0 +1,17 @@
+diff --git a/gcc/gcc.c b/gcc/gcc.c
+index d956c36..1ba357a 100644
+--- a/gcc/gcc.c
++++ b/gcc/gcc.c
+@@ -1261,10 +1261,10 @@ static const char *gcc_libexec_prefix;
+ /* Default prefixes to attach to command names.  */
+ 
+ #ifndef STANDARD_STARTFILE_PREFIX_1
+-#define STANDARD_STARTFILE_PREFIX_1 "/lib/"
++#define STANDARD_STARTFILE_PREFIX_1 "/no-such-path/"
+ #endif
+ #ifndef STANDARD_STARTFILE_PREFIX_2
+-#define STANDARD_STARTFILE_PREFIX_2 "/usr/lib/"
++#define STANDARD_STARTFILE_PREFIX_2 "/no-such-path/"
+ #endif
+ 
+ #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
