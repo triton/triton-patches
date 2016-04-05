@@ -1,0 +1,50 @@
+From 57d96d8d443f35a16e7aee138232d9b3c99d81ff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fran=C3=A7ois=20Pinard?= <pinard@iro.umontreal.ca>
+Date: Mon, 27 Jan 2014 00:48:23 -0500
+Subject: Revert: [PATCH] Site overhaul in progress.
+
+---
+ .gitignore  |  1 +
+ Makefile.am | 20 ++++++++++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index fe49182..676a888 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -7,7 +7,6 @@ Makefile
+ /config.h
+ /config.log
+ /config.status
+-html/
+ /lib/.deps/
+ /libtool
+ /src/.deps/
+diff --git a/Makefile.am b/Makefile.am
+index 93113d0..e6f7dc1 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -68,23 +68,3 @@ synchro: local
+ 	du -s --si $(top_srcdir)/.git
+ 	find $(top_srcdir) -name '*~' | xargs rm -fv
+ 	synchro -PD alcyon entretien
+-
+-ifneq "$(wildcard ~/etc/mes-sites/site.mk)" ""
+-
+-site: site-all
+-
+-package_name = recode
+-mgp_base = http://pinard.progiciels-bpi.ca/fp-etc/dist/mgp
+-margin_color = "\#ff896c"
+-caption_color = "\#ffffb7"
+-
+-LOGOURL = "/logo.gif"
+-GOALS = $(wildcard manual/*.html)
+-
+-include ~/etc/mes-sites/site.mk
+-
+-$(htmldir)/manual/%.html: manual/%.html
+-	@[ -d $(htmldir)/manual ] || mkdir -v $(htmldir)/manual
+-	@$(xsl-html)
+-
+-endif
