@@ -1,0 +1,26 @@
+diff --git a/src/create.c b/src/create.c
+index e2f4ede..5c36a31 100644
+--- a/src/create.c
++++ b/src/create.c
+@@ -515,8 +515,6 @@ start_private_header (const char *name, size_t size, time_t t)
+   TIME_TO_CHARS (t < 0 ? 0 : min (t, MAX_OCTAL_VAL (header->header.mtime)),
+ 		 header->header.mtime);
+   MODE_TO_CHARS (S_IFREG|S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH, header->header.mode);
+-  UID_TO_CHARS (0, header->header.uid);
+-  GID_TO_CHARS (0, header->header.gid);
+   strncpy (header->header.magic, TMAGIC, TMAGLEN);
+   strncpy (header->header.version, TVERSION, TVERSLEN);
+   return header;
+@@ -544,12 +542,6 @@ write_gnu_long_link (struct tar_stat_info *st, const char *p, char type)
+   char *tmpname;
+ 
+   header = start_private_header ("././@LongLink", size, 0);
+-  uid_to_uname (0, &tmpname);
+-  UNAME_TO_CHARS (tmpname, header->header.uname);
+-  free (tmpname);
+-  gid_to_gname (0, &tmpname);
+-  GNAME_TO_CHARS (tmpname, header->header.gname);
+-  free (tmpname);
+ 
+   strcpy (header->buffer + offsetof (struct posix_header, magic),
+ 	  OLDGNU_MAGIC);
