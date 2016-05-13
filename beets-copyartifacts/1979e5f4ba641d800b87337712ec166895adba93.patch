@@ -1,0 +1,209 @@
+From 1979e5f4ba641d800b87337712ec166895adba93 Mon Sep 17 00:00:00 2001
+From: mried <mried@users.noreply.github.com>
+Date: Thu, 24 Dec 2015 22:15:22 +0100
+Subject: [PATCH] Files which might belong to another album are not touched
+ Added a testcase for the new function
+
+---
+ beetsplug/copyartifacts.py    | 73 +++++++++++++++++++++++++++++-------------
+ tests/test_nesteddirectory.py | 74 +++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 123 insertions(+), 24 deletions(-)
+
+diff --git a/beetsplug/copyartifacts.py b/beetsplug/copyartifacts.py
+index 2900562..7fd6319 100644
+--- a/beetsplug/copyartifacts.py
++++ b/beetsplug/copyartifacts.py
+@@ -108,26 +108,42 @@ def import_event(self, task, session):
+         except TypeError:
+             source_path = os.path.dirname(task.old_paths[0])
+ 
++        if os.path.isfile(source_path):
++            source_path = os.path.dirname(source_path)
++
+         # Check if this path has already been processed
+         if source_path in self._dirs_seen:
+             return
+ 
+         non_handled_files = []
++        stop_paths = []
+         for root, dirs, files in beets.util.sorted_walk(
+                     source_path, ignore=config['ignore'].as_str_seq()):
+-            for filename in files:
+-                source_file = os.path.join(root, filename)
+-
+-                # Skip file, usually reimports to same dir
+-                if album_path == os.path.dirname(source_file):
+-                    continue
+-
+-                # Skip any files extensions handled by beets
+-                file_ext = os.path.splitext(filename)[1]
+-                if len(file_ext) > 1 and file_ext[1:] in TYPES:
+-                    continue
+-
+-                non_handled_files.append(source_file)
++            for stop_path in stop_paths:
++                if root.startswith(stop_path):
++                    break
++            else:
++                non_handled_files_of_dir = []
++                found_file_handled_by_beets = False
++                for filename in files:
++                    source_file = os.path.join(root, filename)
++
++                    # Skip file, usually reimports to same dir
++                    if album_path == os.path.dirname(source_file):
++                        continue
++
++                    # Skip any files extensions handled by beets
++                    file_ext = os.path.splitext(filename)[1]
++                    if len(file_ext) > 1 and file_ext[1:] in TYPES:
++                        if root == source_path:
++                            continue
++                        found_file_handled_by_beets = True
++                        stop_paths.append(root)
++                        break
++
++                    non_handled_files_of_dir.append(source_file)
++                if not found_file_handled_by_beets:
++                    non_handled_files.extend(non_handled_files_of_dir)
+ 
+         if task.replaced_items[imported_item]:
+             # these will be reimports when dir has changed
+@@ -150,17 +166,30 @@ def move_event(self, item, source, destination):
+             return
+ 
+         non_handled_files = []
++        stop_paths = []
+         for root, dirs, files in beets.util.sorted_walk(
+                     source_path, ignore=config['ignore'].as_str_seq()):
+-            for filename in files:
+-                source_file = os.path.join(root, filename)
+-
+-                # Skip any files extensions handled by beets
+-                file_ext = os.path.splitext(filename)[1]
+-                if len(file_ext) > 1 and file_ext[1:] in TYPES:
+-                    continue
+-
+-                non_handled_files.append(source_file)
++            for stop_path in stop_paths:
++                if root.startswith(stop_path):
++                    break
++            else:
++                non_handled_files_of_dir = []
++                found_file_handled_by_beets = False
++                for filename in files:
++                    source_file = os.path.join(root, filename)
++
++                    # Skip any files extensions handled by beets
++                    file_ext = os.path.splitext(filename)[1]
++                    if len(file_ext) > 1 and file_ext[1:] in TYPES:
++                        if root == source_path:
++                            continue
++                        found_file_handled_by_beets = True
++                        stop_paths.append(root)
++                        break
++
++                    non_handled_files_of_dir.append(source_file)
++                if not found_file_handled_by_beets:
++                    non_handled_files.extend(non_handled_files_of_dir)
+ 
+         self._process_queue.extend([{
+             'files': non_handled_files,
+diff --git a/tests/test_nesteddirectory.py b/tests/test_nesteddirectory.py
+index af515d3..81aa6df 100644
+--- a/tests/test_nesteddirectory.py
++++ b/tests/test_nesteddirectory.py
+@@ -25,7 +25,6 @@
+ 
+ from testsupport import CopyArtifactsTestCase
+ from beets import plugins
+-from beets import config
+ 
+ import beetsplug
+ 
+@@ -33,13 +32,84 @@
+ beetsplug.__path__.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'beetsplug')))
+ plugins.load_plugins(['copyartifacts'])
+ 
++
+ class CopyArtifactsFromNestedDirectoryTest(CopyArtifactsTestCase):
+     """
+     Tests to check that copyartifacts copies or moves artifact files from a nested directory
+     structure. i.e. songs in an album are imported from two directories corresponding to
+     disc numbers or flat option is used
+     """
++    def setUp(self):
++        super(CopyArtifactsFromNestedDirectoryTest, self).setUp()
++
++    def test_dont_copy_wrong_artifacts(self):
++        """
++        Test if artifacts in sub folders containing files handled by beets aren't copied.
++        Setup a test structure:
++          the_album/
++            track_1.mp3
++            artifact.file
++            artifact.file2
++            sub_folder/
++              sub_artifact.file
++          top_sub_folder/
++            top_sub_artifact.file
++          singleton.mp3
++          top_artifact.file
++
++        After importing the singleton and the album, the files should have the following layout:
++          Tag Artist/
++            Tag Album/
++              artifact.file
++              artifact.file2
++              Tag Title 1.mp3
++              sub_folder/
++                sub_artifact.file
++          singletons/
++            top_sub_folder/
++              top_sub_artifact.file
++            Tag Title 1.mp3
++            top_artifact.file
++        """
++        self._create_flat_import_dir()
++
++        album_path = os.path.join(self.import_dir, 'the_album')
++        sub_folder_path = os.path.join(album_path, 'sub_folder')
++        top_sub_folder_path = os.path.join(self.import_dir, 'top_sub_folder')
++        os.makedirs(sub_folder_path)
++        os.makedirs(top_sub_folder_path)
++
++        open(os.path.join(sub_folder_path, 'sub_artifact.file'), 'a').close()
++        open(os.path.join(top_sub_folder_path, 'top_sub_artifact.file'), 'a').close()
++        open(os.path.join(self.import_dir, 'top_artifact.file'), 'a').close()
++
++        singleton_path = os.path.join(self.import_dir, 'singleton.mp3')
++        self._create_medium(singleton_path, 'full.mp3')
++
++        self._setup_import_session(autotag=False, singletons=True, import_dir=singleton_path)
++        self._run_importer()
++
++        self.assert_in_lib_dir('singletons', 'top_artifact.file')
++        self.assert_in_lib_dir('singletons', 'top_sub_folder', 'top_sub_artifact.file')
++        self.assert_not_in_lib_dir('singletons', 'the_album', 'artifact.file')
++        self.assert_not_in_lib_dir('singletons', 'the_album', 'artifact.file2')
++        self.assert_not_in_lib_dir('singletons', 'the_album', 'sub_folder', 'sub_artifact.file')
++        self.assert_not_in_lib_dir('singletons', 'Tag Artist', 'Tag Album', 'artifact.file')
++        self.assert_not_in_lib_dir('singletons', 'Tag Artist', 'Tag Album', 'artifact.file2')
++        self.assert_not_in_lib_dir('singletons', 'Tag Artist', 'Tag Album', 'sub_folder', 'sub_artifact.file')
++
++        self._setup_import_session(autotag=False, import_dir=album_path)
++        self._run_importer()
++
++        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file')
++        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'artifact.file2')
++        self.assert_in_lib_dir('Tag Artist', 'Tag Album', 'sub_folder', 'sub_artifact.file')
++        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'top_sub_folder', 'top_sub_artifact.file')
++        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'top_artifact.file')
++        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'the_album', 'artifact.file')
++        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'the_album', 'artifact.file2')
++        self.assert_not_in_lib_dir('Tag Artist', 'Tag Album', 'the_album', 'sub_folder', 'sub_artifact.file')
++
+ 
+ if __name__ == '__main__':
+     unittest.main()
+-
