@@ -1,0 +1,193 @@
+diff -ruN NVIDIA-Linux-x86_64-364.15/kernel/nvidia/os-mlock.c NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia/os-mlock.c
+--- NVIDIA-Linux-x86_64-364.15/kernel/nvidia/os-mlock.c 2016-04-03 05:07:03.000000000 +0200
++++ NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia/os-mlock.c 2016-04-19 17:23:58.000000000 +0200
+@@ -13,6 +13,7 @@
+ 
+ #include "os-interface.h"
+ #include "nv-linux.h"
++#include <linux/version.h>
+ 
+ NV_STATUS NV_API_CALL os_lookup_user_io_memory(
+     void   *address,
+@@ -116,8 +117,13 @@
+     }
+ 
+     down_read(&mm->mmap_sem);
++    #if LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0)
+     ret = get_user_pages(current, mm, (unsigned long)address,
+             page_count, write, force, user_pages, NULL);
++    #else
++    ret = get_user_pages((unsigned long)address,
++            page_count, write, force, user_pages, NULL);
++    #endif
+     up_read(&mm->mmap_sem);
+     pinned = ret;
+ 
+@@ -129,7 +135,11 @@
+     else if (pinned < page_count)
+     {
+         for (i = 0; i < pinned; i++)
++            #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
+             page_cache_release(user_pages[i]);
++            #else
++            put_page(user_pages[i]);
++            #endif
+         os_free_mem(user_pages);
+         return NV_ERR_INVALID_ADDRESS;
+     }
+@@ -156,7 +166,11 @@
+     {
+         if (write)
+             set_page_dirty_lock(user_pages[i]);
++        #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
+         page_cache_release(user_pages[i]);
++        #else
++        put_page(user_pages[i]);
++        #endif
+     }
+ 
+     os_free_mem(user_pages);
+diff -ruN NVIDIA-Linux-x86_64-364.15/kernel/nvidia-drm/nvidia-drm-fb.c NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-drm/nvidia-drm-fb.c
+--- NVIDIA-Linux-x86_64-364.15/kernel/nvidia-drm/nvidia-drm-fb.c  2016-04-03 05:05:22.000000000 +0200
++++ NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-drm/nvidia-drm-fb.c  2016-04-06 21:27:00.000000000 +0200
+@@ -29,7 +29,7 @@
+ #include "nvidia-drm-fb.h"
+ #include "nvidia-drm-utils.h"
+ #include "nvidia-drm-gem.h"
+-
++#include <linux/version.h>
+ #include <drm/drm_crtc_helper.h>
+ 
+ static void nvidia_framebuffer_destroy(struct drm_framebuffer *fb)
+@@ -199,7 +199,12 @@
+ struct drm_framebuffer *nvidia_drm_framebuffer_create
+ (
+     struct drm_device *dev,
++    #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
+     struct drm_file *file, struct drm_mode_fb_cmd2 *cmd
++    #else
++    struct drm_file *file,
++    const struct drm_mode_fb_cmd2 *cmd
++    #endif
+ )
+ {
+     return internal_framebuffer_create(dev, file, cmd, 0, 0);
+diff -ruN NVIDIA-Linux-x86_64-364.15/kernel/nvidia-drm/nvidia-drm-fb.h NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-drm/nvidia-drm-fb.h
+--- NVIDIA-Linux-x86_64-364.15/kernel/nvidia-drm/nvidia-drm-fb.h  2016-04-03 05:05:22.000000000 +0200
++++ NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-drm/nvidia-drm-fb.h  2016-04-06 21:27:00.000000000 +0200
+@@ -24,7 +24,7 @@
+ #define __NVIDIA_DRM_FB_H__
+ 
+ #include "conftest.h"
+-
++#include <linux/version.h>
+ #if defined(NV_DRM_ATOMIC_MODESET_AVAILABLE)
+ 
+ #include <drm/drmP.h>
+@@ -45,7 +45,12 @@
+ struct drm_framebuffer *nvidia_drm_framebuffer_create
+ (
+     struct drm_device *dev,
++    #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
+     struct drm_file *file, struct drm_mode_fb_cmd2 *cmd
++    #else
++    struct drm_file *file,
++    const struct drm_mode_fb_cmd2 *cmd
++    #endif
+ );
+ 
+ int nvidia_drm_add_nvkms_fb(
+diff -ruN NVIDIA-Linux-x86_64-364.15/kernel/nvidia-drm/nvidia-drm-linux.c NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-drm/nvidia-drm-linux.c
+--- NVIDIA-Linux-x86_64-364.15/kernel/nvidia-drm/nvidia-drm-linux.c 2016-04-03 05:05:22.000000000 +0200
++++ NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-drm/nvidia-drm-linux.c 2016-04-19 17:26:14.000000000 +0200
+@@ -28,6 +28,7 @@
+ #include "nvidia-drm.h"
+ 
+ #include "conftest.h"
++#include <linux/version.h>
+ 
+ #if defined(NV_DRM_AVAILABLE)
+ 
+@@ -121,9 +122,14 @@
+ 
+     down_read(&mm->mmap_sem);
+ 
++    #if LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0)
+     pages_pinned = get_user_pages(current, mm,
+                                   address, pages_count, write, force,
+                                   user_pages, NULL);
++    #else
++    pages_pinned = get_user_pages(address, pages_count, write, force,
++                                  user_pages, NULL);
++    #endif
+     up_read(&mm->mmap_sem);
+ 
+     if (pages_pinned < 0 || (unsigned)pages_pinned < pages_count)
+diff -ruN NVIDIA-Linux-x86_64-364.15/kernel/nvidia-uvm/uvm8_tools.c NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-uvm/uvm8_tools.c
+--- NVIDIA-Linux-x86_64-364.15/kernel/nvidia-uvm/uvm8_tools.c 2016-04-03 05:08:49.000000000 +0200
++++ NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-uvm/uvm8_tools.c 2016-04-19 17:28:33.000000000 +0200
+@@ -27,6 +27,7 @@
+ #include "uvm8_api.h"
+ #include "uvm8_hal_types.h"
+ #include "uvm8_va_block.h"
++#include <linux/version.h>
+ 
+ // We limit the number of times a page can be retained by the kernel
+ // to prevent the user from maliciously passing UVM tools the same page
+@@ -158,7 +159,11 @@
+     }
+ 
+     down_read(&current->mm->mmap_sem);
++    #if LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0)
+     ret = get_user_pages(current, current->mm, user_va, num_pages, 1, 0, *pages, NULL);
++    #else
++    ret = get_user_pages(user_va, num_pages, 1, 0, *pages, NULL);
++    #endif
+     up_read(&current->mm->mmap_sem);
+     if (ret != num_pages) {
+         status = NV_ERR_INVALID_ARGUMENT;
+diff -ruN NVIDIA-Linux-x86_64-364.15/kernel/nvidia-uvm/uvm_full_fault_handler.c NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-uvm/uvm_full_fault_handler.c
+--- NVIDIA-Linux-x86_64-364.15/kernel/nvidia-uvm/uvm_full_fault_handler.c 2016-04-03 05:08:49.000000000 +0200
++++ NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-uvm/uvm_full_fault_handler.c 2016-04-06 21:26:59.000000000 +0200
+@@ -32,6 +32,7 @@
+ #include "uvm_full_fault_buffer.h"
+ #include "uvm_full_identity_map.h"
+ #include "uvm_full_perf.h"
++#include <linux/version.h>
+ 
+ #define FAULTS_PER_ITER    4
+ 
+diff -ruN NVIDIA-Linux-x86_64-364.15/kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c
+--- NVIDIA-Linux-x86_64-364.15/kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c  2016-04-03 05:08:49.000000000 +0200
++++ NVIDIA-Linux-x86_64-364.15.patched/kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c  2016-04-19 17:30:30.000000000 +0200
+@@ -31,6 +31,7 @@
+ #include "uvm_full_ctx_mgmt.h"
+ #include "uvm_hashmap.h"
+ #include "uvm_full_fault_handler.h"
++#include <linux/version.h>
+ 
+ #define UVM_PUSHBUFFER_INLINE_REGION_SIZE_MAX     (((1 << 13) - 1) * 4)
+ #define UVM_MEMSET_BUFFER_SIZE_MAX                64
+@@ -2909,7 +2910,11 @@
+ 
+         // get userPA for this range
+         down_read(&current->mm->mmap_sem);
++        #if LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0)
+         returnVal = get_user_pages(current, current->mm, (unsigned long)(UVM_ALIGN_ADDR(userCopyBuffer, PAGE_SIZE_4K)),
++        #else
++        returnVal = get_user_pages( (unsigned long)(UVM_ALIGN_ADDR(userCopyBuffer, PAGE_SIZE_4K)),
++        #endif
+             userPagesReq, 1, 0, tempUserPageArray, NULL);
+         up_read(&current->mm->mmap_sem);
+ 
+@@ -2939,7 +2944,11 @@
+                     set_page_dirty_lock(tempUserPageArray[i]);
+ 
+             UVM_PANIC_ON(tempUserPageArray[i] == 0);
++            #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
+             page_cache_release(tempUserPageArray[i]);
++            #else
++            put_page(tempUserPageArray[i]);
++            #endif
+             tempUserPageArray[i] = 0;
+         }
