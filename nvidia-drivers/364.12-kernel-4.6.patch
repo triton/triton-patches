@@ -1,6 +1,6 @@
 diff -rup kernel/nvidia/os-mlock.c kernel/nvidia/os-mlock.c
---- kernel/nvidia/os-mlock.c	2016-03-17 03:58:29.000000000 +0100
-+++ kernel/nvidia/os-mlock.c	2016-04-06 13:21:12.324092924 +0200
+--- a/kernel/nvidia/os-mlock.c	2016-03-17 03:58:29.000000000 +0100
++++ b/kernel/nvidia/os-mlock.c	2016-04-06 13:21:12.324092924 +0200
 @@ -156,7 +156,7 @@ NV_STATUS NV_API_CALL os_unlock_user_pag
      {
          if (write)
@@ -11,8 +11,8 @@ diff -rup kernel/nvidia/os-mlock.c kernel/nvidia/os-mlock.c
  
      os_free_mem(user_pages);
 diff -rup kernel/nvidia-drm/nvidia-drm-fb.c kernel/nvidia-drm/nvidia-drm-fb.c
---- kernel/nvidia-drm/nvidia-drm-fb.c	2016-03-17 03:57:24.000000000 +0100
-+++ kernel/nvidia-drm/nvidia-drm-fb.c	2016-04-06 13:18:19.324089271 +0200
+--- a/kernel/nvidia-drm/nvidia-drm-fb.c	2016-03-17 03:57:24.000000000 +0100
++++ b/kernel/nvidia-drm/nvidia-drm-fb.c	2016-04-06 13:18:19.324089271 +0200
 @@ -199,7 +199,8 @@ failed_fb_create:
  struct drm_framebuffer *nvidia_drm_framebuffer_create
  (
@@ -24,8 +24,8 @@ diff -rup kernel/nvidia-drm/nvidia-drm-fb.c kernel/nvidia-drm/nvidia-drm-fb.c
  {
      return internal_framebuffer_create(dev, file, cmd, 0, 0);
 diff -rup kernel/nvidia-drm/nvidia-drm-fb.h kernel/nvidia-drm/nvidia-drm-fb.h
---- kernel/nvidia-drm/nvidia-drm-fb.h	2016-03-17 03:57:24.000000000 +0100
-+++ kernel/nvidia-drm/nvidia-drm-fb.h	2016-04-06 13:18:39.812089704 +0200
+--- a/kernel/nvidia-drm/nvidia-drm-fb.h	2016-03-17 03:57:24.000000000 +0100
++++ b/kernel/nvidia-drm/nvidia-drm-fb.h	2016-04-06 13:18:39.812089704 +0200
 @@ -45,7 +45,8 @@ struct nvidia_drm_framebuffer
  struct drm_framebuffer *nvidia_drm_framebuffer_create
  (
@@ -37,8 +37,8 @@ diff -rup kernel/nvidia-drm/nvidia-drm-fb.h kernel/nvidia-drm/nvidia-drm-fb.h
  
  int nvidia_drm_add_nvkms_fb(
 diff -rup kernel/nvidia-uvm/uvm_full_fault_handler.c kernel/nvidia-uvm/uvm_full_fault_handler.c
---- kernel/nvidia-uvm/uvm_full_fault_handler.c	2016-03-17 03:59:59.000000000 +0100
-+++ kernel/nvidia-uvm/uvm_full_fault_handler.c	2016-04-06 13:16:27.132086903 +0200
+--- a/kernel/nvidia-uvm/uvm_full_fault_handler.c	2016-03-17 03:59:59.000000000 +0100
++++ b/kernel/nvidia-uvm/uvm_full_fault_handler.c	2016-04-06 13:16:27.132086903 +0200
 @@ -3095,7 +3095,7 @@ retry:
          pg = pfn_to_page(cpuPfn);
          UVM_PANIC_ON(!pg);
@@ -49,8 +49,8 @@ diff -rup kernel/nvidia-uvm/uvm_full_fault_handler.c kernel/nvidia-uvm/uvm_full_
  
      // Update the gpu state for the given cpu fault only if we have some GPU
 diff -rup kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c
---- kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c	2016-03-17 03:59:59.000000000 +0100
-+++ kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c	2016-04-06 13:20:09.928091607 +0200
+--- a/kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c	2016-03-17 03:59:59.000000000 +0100
++++ b/kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c	2016-04-06 13:20:09.928091607 +0200
 @@ -2939,7 +2939,7 @@ cleanup_vadesc:
                      set_page_dirty_lock(tempUserPageArray[i]);
  
@@ -61,8 +61,8 @@ diff -rup kernel/nvidia-uvm/uvm_full_pagetbl_mgmt.c kernel/nvidia-uvm/uvm_full_p
          }
  
 diff -rup kernel/nvidia-uvm/uvm_lite.c kernel/nvidia-uvm/uvm_lite.c
---- kernel/nvidia-uvm/uvm_lite.c	2016-03-17 03:59:59.000000000 +0100
-+++ kernel/nvidia-uvm/uvm_lite.c	2016-04-06 13:17:09.128087789 +0200
+--- a/kernel/nvidia-uvm/uvm_lite.c	2016-03-17 03:59:59.000000000 +0100
++++ b/kernel/nvidia-uvm/uvm_lite.c	2016-04-06 13:17:09.128087789 +0200
 @@ -1283,7 +1283,7 @@ int _fault_common(struct vm_area_struct
          // If we already have the page, then we must have earlier copied in the
          // data from the GPU. Therefore, avoid migrating.
