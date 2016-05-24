@@ -9,8 +9,8 @@ nss-enable-pem.patch
 
 Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 
---- nss-3.15.4/nss/lib/ckfw/manifest.mn
-+++ nss-3.15.4/nss/lib/ckfw/manifest.mn
+--- nss-3.15.4/lib/ckfw/manifest.mn
++++ nss-3.15.4/lib/ckfw/manifest.mn
 @@ -5,7 +5,7 @@
  
  CORE_DEPTH = ../..
@@ -20,8 +20,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
  
  PRIVATE_EXPORTS = \
  	ck.h		  \
---- nss-3.15.4/nss/lib/ckfw/pem/anchor.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/anchor.c
+--- nss-3.15.4/lib/ckfw/pem/anchor.c
++++ nss-3.15.4/lib/ckfw/pem/anchor.c
 @@ -0,0 +1,50 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -73,8 +73,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +#define MODULE_NAME pem
 +#define INSTANCE_NAME (NSSCKMDInstance *)&pem_mdInstance
 +#include "nssck.api"
---- nss-3.15.4/nss/lib/ckfw/pem/ckpem.h
-+++ nss-3.15.4/nss/lib/ckfw/pem/ckpem.h
+--- nss-3.15.4/lib/ckfw/pem/ckpem.h
++++ nss-3.15.4/lib/ckfw/pem/ckpem.h
 @@ -0,0 +1,264 @@
 +#ifndef CKPEM_H
 +#define CKPEM_H
@@ -340,8 +340,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +void plog(const char *fmt, ...);
 +
 +#endif /* CKPEM_H */
---- nss-3.15.4/nss/lib/ckfw/pem/ckpemver.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/ckpemver.c
+--- nss-3.15.4/lib/ckfw/pem/ckpemver.c
++++ nss-3.15.4/lib/ckfw/pem/ckpemver.c
 @@ -0,0 +1,59 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -402,8 +402,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +const char __nss_ckcapi_sccsid[] = "@(#)NSS Access to Flag Files in PEM format "
 +        NSS_CKPEM_LIBRARY_VERSION _DEBUG_STRING
 +        "  " __DATE__ " " __TIME__;
---- nss-3.15.4/nss/lib/ckfw/pem/config.mk
-+++ nss-3.15.4/nss/lib/ckfw/pem/config.mk
+--- nss-3.15.4/lib/ckfw/pem/config.mk
++++ nss-3.15.4/lib/ckfw/pem/config.mk
 @@ -0,0 +1,71 @@
 +# 
 +# ***** BEGIN LICENSE BLOCK *****
@@ -476,8 +476,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +MKSHLIB += -R '$$ORIGIN'
 +endif
 +
---- nss-3.15.4/nss/lib/ckfw/pem/constants.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/constants.c
+--- nss-3.15.4/lib/ckfw/pem/constants.c
++++ nss-3.15.4/lib/ckfw/pem/constants.c
 @@ -0,0 +1,77 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -556,8 +556,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +
 +NSS_IMPLEMENT_DATA const NSSUTF8 *
 +pem_TokenSerialNumber = (NSSUTF8 *) "1";
---- nss-3.15.4/nss/lib/ckfw/pem/Makefile
-+++ nss-3.15.4/nss/lib/ckfw/pem/Makefile
+--- nss-3.15.4/lib/ckfw/pem/Makefile
++++ nss-3.15.4/lib/ckfw/pem/Makefile
 @@ -0,0 +1,107 @@
 +# 
 +# ***** BEGIN LICENSE BLOCK *****
@@ -666,8 +666,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +endif 
 +
 +
---- nss-3.15.4/nss/lib/ckfw/pem/manifest.mn
-+++ nss-3.15.4/nss/lib/ckfw/pem/manifest.mn
+--- nss-3.15.4/lib/ckfw/pem/manifest.mn
++++ nss-3.15.4/lib/ckfw/pem/manifest.mn
 @@ -0,0 +1,68 @@
 +# 
 +# ***** BEGIN LICENSE BLOCK *****
@@ -737,8 +737,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +LIBRARY_NAME = nsspem
 +
 +#EXTRA_SHARED_LIBS = -L$(DIST)/lib -lnssckfw -lnssb -lplc4 -lplds4
---- nss-3.15.4/nss/lib/ckfw/pem/nsspem.def
-+++ nss-3.15.4/nss/lib/ckfw/pem/nsspem.def
+--- nss-3.15.4/lib/ckfw/pem/nsspem.def
++++ nss-3.15.4/lib/ckfw/pem/nsspem.def
 @@ -0,0 +1,58 @@
 +;+#
 +;+# ***** BEGIN LICENSE BLOCK *****
@@ -798,8 +798,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +;+    local:
 +;+*;
 +;+};
---- nss-3.15.4/nss/lib/ckfw/pem/nsspem.h
-+++ nss-3.15.4/nss/lib/ckfw/pem/nsspem.h
+--- nss-3.15.4/lib/ckfw/pem/nsspem.h
++++ nss-3.15.4/lib/ckfw/pem/nsspem.h
 @@ -0,0 +1,75 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -876,8 +876,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +#define NSS_CKPEM_FIRMWARE_VERSION_MINOR 0
 +
 +#endif /* NSSCKBI_H */
---- nss-3.15.4/nss/lib/ckfw/pem/pargs.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/pargs.c
+--- nss-3.15.4/lib/ckfw/pem/pargs.c
++++ nss-3.15.4/lib/ckfw/pem/pargs.c
 @@ -0,0 +1,162 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -1041,8 +1041,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    PR_Free((void *) instrings);
 +    return PR_TRUE;
 +}
---- nss-3.15.4/nss/lib/ckfw/pem/pfind.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/pfind.c
+--- nss-3.15.4/lib/ckfw/pem/pfind.c
++++ nss-3.15.4/lib/ckfw/pem/pfind.c
 @@ -0,0 +1,435 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -1479,8 +1479,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    }
 +    return (NSSCKMDFindObjects *) NULL;
 +}
---- nss-3.15.4/nss/lib/ckfw/pem/pinst.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/pinst.c
+--- nss-3.15.4/lib/ckfw/pem/pinst.c
++++ nss-3.15.4/lib/ckfw/pem/pinst.c
 @@ -0,0 +1,751 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -2233,8 +2233,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    NULL, /* WaitForSlotEvent */
 +    (void *) NULL /* null terminator */
 +};
---- nss-3.15.4/nss/lib/ckfw/pem/pobject.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/pobject.c
+--- nss-3.15.4/lib/ckfw/pem/pobject.c
++++ nss-3.15.4/lib/ckfw/pem/pobject.c
 @@ -0,0 +1,1236 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -3472,8 +3472,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    }
 +    return pem_CreateMDObject(NULL, listObj, pError);
 +}
---- nss-3.15.4/nss/lib/ckfw/pem/prsa.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/prsa.c
+--- nss-3.15.4/lib/ckfw/pem/prsa.c
++++ nss-3.15.4/lib/ckfw/pem/prsa.c
 @@ -0,0 +1,699 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -4174,8 +4174,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    NULL, /* DeriveKey - default errs */
 +    (void *) NULL /* null terminator */
 +};
---- nss-3.15.4/nss/lib/ckfw/pem/psession.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/psession.c
+--- nss-3.15.4/lib/ckfw/pem/psession.c
++++ nss-3.15.4/lib/ckfw/pem/psession.c
 @@ -0,0 +1,388 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -4565,8 +4565,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +
 +    return rv;
 +}
---- nss-3.15.4/nss/lib/ckfw/pem/pslot.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/pslot.c
+--- nss-3.15.4/lib/ckfw/pem/pslot.c
++++ nss-3.15.4/lib/ckfw/pem/pslot.c
 @@ -0,0 +1,182 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -4750,8 +4750,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    pem_mdSlot_GetToken,
 +    (void *) NULL /* null terminator */
 +};
---- nss-3.15.4/nss/lib/ckfw/pem/ptoken.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/ptoken.c
+--- nss-3.15.4/lib/ckfw/pem/ptoken.c
++++ nss-3.15.4/lib/ckfw/pem/ptoken.c
 @@ -0,0 +1,333 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -5086,8 +5086,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    (void *) NULL               /* null terminator */
 +};
 +#endif
---- nss-3.15.4/nss/lib/ckfw/pem/rsawrapr.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/rsawrapr.c
+--- nss-3.15.4/lib/ckfw/pem/rsawrapr.c
++++ nss-3.15.4/lib/ckfw/pem/rsawrapr.c
 @@ -0,0 +1,823 @@
 +/*
 + * PKCS#1 encoding and decoding functions.
@@ -5912,8 +5912,8 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    return SECFailure;
 +}
 +#endif
---- nss-3.15.4/nss/lib/ckfw/pem/util.c
-+++ nss-3.15.4/nss/lib/ckfw/pem/util.c
+--- nss-3.15.4/lib/ckfw/pem/util.c
++++ nss-3.15.4/lib/ckfw/pem/util.c
 @@ -0,0 +1,312 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
