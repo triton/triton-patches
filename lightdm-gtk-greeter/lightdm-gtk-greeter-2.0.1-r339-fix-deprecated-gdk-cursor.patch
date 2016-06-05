@@ -1,0 +1,13 @@
+=== modified file 'src/lightdm-gtk-greeter.c'
+--- a/src/lightdm-gtk-greeter.c	2015-05-18 03:25:42 +0000
++++ b/src/lightdm-gtk-greeter.c	2015-11-18 05:00:06 +0000
+@@ -2680,7 +2680,7 @@
+         return EXIT_FAILURE;
+ 
+     /* Set default cursor */
+-    gdk_window_set_cursor (gdk_get_default_root_window (), gdk_cursor_new (GDK_LEFT_PTR));
++    gdk_window_set_cursor (gdk_get_default_root_window (), gdk_cursor_new_for_display (gdk_display_get_default (), GDK_LEFT_PTR));
+ 
+     /* Make the greeter behave a bit more like a screensaver if used as un/lock-screen by blanking the screen */
+     if (lightdm_greeter_get_lock_hint (greeter))
+
