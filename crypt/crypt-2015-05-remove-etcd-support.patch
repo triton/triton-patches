@@ -1,0 +1,163 @@
+diff --git a/backend/etcd/etcd.go b/backend/etcd/etcd.go
+deleted file mode 100644
+index 472d6cf..0000000
+--- a/backend/etcd/etcd.go
++++ /dev/null
+@@ -1,84 +0,0 @@
+-package etcd
+-
+-import (
+-	"errors"
+-	"time"
+-
+-	"github.com/xordataexchange/crypt/backend"
+-
+-	goetcd "github.com/coreos/go-etcd/etcd"
+-)
+-
+-type Client struct {
+-	client    *goetcd.Client
+-	waitIndex uint64
+-}
+-
+-func New(machines []string) (*Client, error) {
+-	return &Client{goetcd.NewClient(machines), 0}, nil
+-}
+-
+-func (c *Client) Get(key string) ([]byte, error) {
+-	resp, err := c.client.Get(key, false, false)
+-	if err != nil {
+-		return nil, err
+-	}
+-	return []byte(resp.Node.Value), nil
+-}
+-
+-func addKVPairs(node *goetcd.Node, list backend.KVPairs) backend.KVPairs {
+-	if node.Dir {
+-		for _, n := range node.Nodes {
+-			list = addKVPairs(n, list)
+-		}
+-		return list
+-	}
+-	return append(list, &backend.KVPair{Key: node.Key, Value: []byte(node.Value)})
+-}
+-
+-func (c *Client) List(key string) (backend.KVPairs, error) {
+-	resp, err := c.client.Get(key, false, true)
+-	if err != nil {
+-		return nil, err
+-	}
+-	if !resp.Node.Dir {
+-		return nil, errors.New("key is not a directory")
+-	}
+-	list := addKVPairs(resp.Node, nil)
+-	return list, nil
+-}
+-
+-func (c *Client) Set(key string, value []byte) error {
+-	_, err := c.client.Set(key, string(value), 0)
+-	return err
+-}
+-
+-func (c *Client) Watch(key string, stop chan bool) <-chan *backend.Response {
+-	respChan := make(chan *backend.Response, 0)
+-	go func() {
+-		for {
+-			var resp *goetcd.Response
+-			var err error
+-			// if c.waitIndex == 0 {
+-			// 	resp, err = c.client.Get(key, false, false)
+-			// 	if err != nil {
+-			// 		respChan <- &backend.Response{nil, err}
+-			// 		time.Sleep(time.Second * 5)
+-			// 		continue
+-			// 	}
+-			// 	c.waitIndex = resp.EtcdIndex
+-			// 	respChan <- &backend.Response{[]byte(resp.Node.Value), nil}
+-			// }
+-			// resp, err = c.client.Watch(key, c.waitIndex+1, false, nil, stop)
+-			resp, err = c.client.Watch(key, 0, false, nil, stop)
+-			if err != nil {
+-				respChan <- &backend.Response{nil, err}
+-				time.Sleep(time.Second * 5)
+-				continue
+-			}
+-			c.waitIndex = resp.Node.ModifiedIndex
+-			respChan <- &backend.Response{[]byte(resp.Node.Value), nil}
+-		}
+-	}()
+-	return respChan
+-}
+diff --git a/bin/crypt/cmd.go b/bin/crypt/cmd.go
+index 63c84aa..fa80e84 100644
+--- a/bin/crypt/cmd.go
++++ b/bin/crypt/cmd.go
+@@ -10,7 +10,6 @@ import (
+ 
+ 	"github.com/xordataexchange/crypt/backend"
+ 	"github.com/xordataexchange/crypt/backend/consul"
+-	"github.com/xordataexchange/crypt/backend/etcd"
+ 	"github.com/xordataexchange/crypt/encoding/secconf"
+ )
+ 
+@@ -205,14 +204,10 @@ func getBackendStore(provider string, endpoint string) (backend.Store, error) {
+ 		switch provider {
+ 		case "consul":
+ 			endpoint = "127.0.0.1:8500"
+-		case "etcd":
+-			endpoint = "http://127.0.0.1:4001"
+ 		}
+ 	}
+ 	machines := []string{endpoint}
+ 	switch provider {
+-	case "etcd":
+-		return etcd.New(machines)
+ 	case "consul":
+ 		return consul.New(machines)
+ 	default:
+diff --git a/config/config.go b/config/config.go
+index 30864ae..e5d6033 100644
+--- a/config/config.go
++++ b/config/config.go
+@@ -7,7 +7,6 @@ import (
+ 
+ 	"github.com/xordataexchange/crypt/backend"
+ 	"github.com/xordataexchange/crypt/backend/consul"
+-	"github.com/xordataexchange/crypt/backend/etcd"
+ 	"github.com/xordataexchange/crypt/encoding/secconf"
+ )
+ 
+@@ -46,16 +45,6 @@ func NewConfigManager(client backend.Store, keystore io.Reader) (ConfigManager,
+ 	return configManager{bytes, client}, nil
+ }
+ 
+-// NewStandardEtcdConfigManager returns a new ConfigManager backed by etcd.
+-func NewStandardEtcdConfigManager(machines []string) (ConfigManager, error) {
+-	store, err := etcd.New(machines)
+-	if err != nil {
+-		return nil, err
+-	}
+-
+-	return NewStandardConfigManager(store)
+-}
+-
+ // NewStandardConsulConfigManager returns a new ConfigManager backed by consul.
+ func NewStandardConsulConfigManager(machines []string) (ConfigManager, error) {
+ 	store, err := consul.New(machines)
+@@ -65,16 +54,6 @@ func NewStandardConsulConfigManager(machines []string) (ConfigManager, error) {
+ 	return NewStandardConfigManager(store)
+ }
+ 
+-// NewEtcdConfigManager returns a new ConfigManager backed by etcd.
+-// Data will be encrypted.
+-func NewEtcdConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
+-	store, err := etcd.New(machines)
+-	if err != nil {
+-		return nil, err
+-	}
+-	return NewConfigManager(store, keystore)
+-}
+-
+ // NewConsulConfigManager returns a new ConfigManager backed by consul.
+ // Data will be encrypted.
+ func NewConsulConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
