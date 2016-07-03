@@ -1,5 +1,6 @@
 #!/bin/sh
 cd "$(dirname "$0")"
+echo
 for file in $(find $1 -type f); do
   echo "    (fetchTritonPatch {"
   echo "      rev = \"$(git rev-parse HEAD)\";"
