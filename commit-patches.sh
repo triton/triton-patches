@@ -66,7 +66,7 @@ commit_patches() {
     [ -n "${Value}" ]
 
     if [ "${Key##*.}" != 'patch' ] ; then
-      echo "WARNING: file is not a patch ${Value}, not commiting"
+      echo "WARNING: file is not a patch ${Key}, not commiting"
     else
       ChangeList+=(
         ["${Key}"]="${Value}"
