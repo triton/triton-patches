@@ -44,7 +44,6 @@ commit_patches() {
             print $(i)
         }'
     )"
-    echo "mkkey; ${key}"
     [ -n "${key}" ]
 
     value="$(
