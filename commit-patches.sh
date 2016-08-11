@@ -28,6 +28,7 @@ commit_patches() {
   local File
   local GitStatusFile
   local -a GitStatusList
+  local GitUntrackedFile
   local Key
   local Value
 
@@ -73,6 +74,13 @@ commit_patches() {
       )
     fi
   done
+
+  # Untracked files are not prefixed in git status
+  while read GitUntrackedFile ; do
+    ChangeList+=(
+      ["${GitUntrackedFile}"]='add'
+    )
+  done < <(git ls-files --others --exclude-standard)
 
   for Change in "${!ChangeList[@]}" ; do
     git add "${Change}"
