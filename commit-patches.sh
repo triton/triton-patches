@@ -22,11 +22,14 @@ if [ -n "$(git diff --cached 2> /dev/null)" ] ; then
 fi
 
 commit_patches() {
-  local -A ChangeList
   local Change
+  local -A ChangeList
   local Dir
   local File
+  local GitStatusFile
   local -a GitStatusList
+  local Key
+  local Value
 
   eval $(
     git status | grep -E 'deleted:|modified:|untracked:' |
@@ -37,36 +40,36 @@ commit_patches() {
 
   # Uses file name as key and change type as value
   for File in "${GitStatusList[@]}" ; do
-    key="$(
+    Key="$(
       echo "${File}" |
         awk '{
           for(i=2;i<=NF;i++)
             print $(i)
         }'
     )"
-    [ -n "${key}" ]
+    [ -n "${Key}" ]
 
-    value="$(
+    Value="$(
       echo "${File}" |
         awk '{print $1 ; exit}'
     )"
-    if [ "${value}" == 'deleted:' ] ; then
-      value='remove'
-    elif [ "${value}" == 'modified:' ] ; then
-      value='update'
-    elif [ "${value}" == 'untracked:'] ; then
-      value='add'
+    if [ "${Value}" == 'deleted:' ] ; then
+      Value='remove'
+    elif [ "${Value}" == 'modified:' ] ; then
+      Value='update'
+    elif [ "${Value}" == 'untracked:'] ; then
+      Value='add'
     else
-      echo "ERROR: invalid value: $value"
+      echo "ERROR: invalid value: $Value"
       return 1
     fi
-    [ -n "${value}" ]
+    [ -n "${Value}" ]
 
-    if [ "${key##*.}" != 'patch' ] ; then
-      echo "WARNING: file is not a patch ${value}, not commiting"
+    if [ "${Key##*.}" != 'patch' ] ; then
+      echo "WARNING: file is not a patch ${Value}, not commiting"
     else
       ChangeList+=(
-        ["${key}"]="${value}"
+        ["${Key}"]="${Value}"
       )
     fi
   done
