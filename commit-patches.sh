@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-type -P 'git' > /dev/null 2>&1 || exit 1
+set -o errexit
+set -o pipefail
+
+type -P 'git' > /dev/null 2>&1
 
 rootDir="$(dirname "$(readlink -f "${0}")")"
 userInput="${1}"
@@ -18,121 +21,64 @@ if [ -n "$(git diff --cached 2> /dev/null)" ] ; then
   exit 1
 fi
 
-file_modified() {
-
-  local file
-
-  file="${1}"
-
-  if [ -n "$(git ls-files --others --exclude-standard ${file} 2> /dev/null)" ] ; then
-    echo 'untracked'
-  elif [ -n "$(git ls-files --deleted ${file} 2> /dev/null)" ] ; then
-    echo 'removed'
-  elif [ -n "$(git ls-files --modified ${file} 2> /dev/null)" ] ; then
-    echo 'modified'
-  else
-    echo 'ignore'
-  fi
-
-  return 0
-
-}
-
-commit_file() {
-
-  local file
-  local dir
-  local fullPath
-  local status
-
-  file="$(basename ${1})"
-  dir="$(basename "$(dirname "${1}")")"
-  fullPath="${1}"
-  status="$(file_modified "${fullPath}")"
-
-  if [ "${status}" == 'untracked' ] || \
-     [ "${status}" == 'modified' ] || \
-     [ "${status}" == 'removed' ] ; then
-    echo "git add \"${fullPath}\""
-    git add "${fullPath}"
-  fi
-
-  if [ "${status}" == 'untracked' ] ; then
-    echo "git commit -m \"${dir}: add ${file}\""
-    git commit -m "${dir}: add ${file}"
-  elif [ "${status}" == 'modified' ] ; then
-    echo "git commit -m \"${dir}: updated ${file}\""
-    git commit -m "${dir}: updated ${file}"
-  elif [ "${status}" == 'removed' ] ; then
-    echo "git commit -m \"${dir}: remove ${file}\""
-    git commit -m "${dir}: remove ${file}"
-  elif [ "${status}" == 'ignore' ] ; then
-    return 0
-  else
-    return 1
-  fi
-
-  return 0
-
-}
-
 commit_patches() {
+  local -A ChangeList
+  local Change
+  local Dir
+  local File
+  local -a GitStatusList
 
-  local file
-  local dir
-  local del
-  local pid
+  eval $(
+    git status | grep -E 'deleted:|modified:|untracked:' |
+      while read GitStatusFile ; do
+        echo "GitStatusList+=(\"${GitStatusFile}\")"
+      done
+  )
 
-  dir="${1}"
+  # Uses file name as key and change type as value
+  for File in "${GitStatusList[@]}" ; do
+    key="$(
+      echo "${File}" |
+        awk '{
+          for(i=2;i<=NF;i++)
+            print $(i)
+        }'
+    )"
+    echo "mkkey; ${key}"
+    [ -n "${key}" ]
 
-  if [ ! -d "${dir}" ] ; then
-    return 1
-  fi
-
-  # Make sure we ignore the top level directory
-  if [ "${rootDir}" == "${dir}" ] ; then
-    return 1
-  fi
-
-  # TODO: look for .patch extension
-  for file in $(find ${dir} -type f) ; do
-    commit_file "${file}"
-    pid=$!
-    wait ${pid}
-  done
-
-  # Remove deleted files
-  for del in $(git ls-files --deleted) ; do
-    commit_file "${del}" || {
-      echo "ERROR: failed to remove: ${del}"
+    value="$(
+      echo "${File}" |
+        awk '{print $1 ; exit}'
+    )"
+    if [ "${value}" == 'deleted:' ] ; then
+      value='remove'
+    elif [ "${value}" == 'modified:' ] ; then
+      value='update'
+    elif [ "${value}" == 'untracked:'] ; then
+      value='add'
+    else
+      echo "ERROR: invalid value: $value"
       return 1
-    }
+    fi
+    [ -n "${value}" ]
+
+    if [ "${key##*.}" != 'patch' ] ; then
+      echo "WARNING: file is not a patch ${value}, not commiting"
+    else
+      ChangeList+=(
+        ["${key}"]="${value}"
+      )
+    fi
   done
 
-  return 0
-
+  for Change in "${!ChangeList[@]}" ; do
+    git add "${Change}"
+    git commit -m "$(dirname "${Change}"): ${ChangeList[$Change]} $(basename ${Change})"
+  done
 }
 
-if [ -z "${userInput}" ] ; then
-  patchsDir="${rootDir}"
-elif [ -d "${rootDir}/${userInput}" ] ; then
-  patchsDir="${rootDir}/${userInput}"
-else
-  echo "ERROR: invalid directory: ${userInput}"
-  exit 1
-fi
-
-if [ "${rootDir}" == "${patchsDir}" ] ; then
-  # TODO: use find to list dirs
-  for dir in $(find ${patchsDir} -type d -not -iwholename '*.git*') ; do
-    # Make sure we ignore the top level directory
-    [ "${dir}" == "${rootDir}" ] && continue
-    echo -e "\e[32m${dir}\e[0m"
-    commit_patches "${dir}" || true
-  done
-else
-  commit_patches "${patchsDir}" || true
-fi
+commit_patches
 
 git push
 
