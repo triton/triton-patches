@@ -30,11 +30,11 @@ color_term() {
 
 commit_patches() {
   local SkipFile=false
-  local Change
   local -A ChangeList
   local File
   local GitCommitMessage
   local GitDeletedFile
+  local -a GitDeletedFiles
   local GitModifiedFile
   local GitUntrackedFile
 
