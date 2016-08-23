@@ -4,8 +4,8 @@
          {
            "name" : "NamedVertexAttributesApplyDivisor",
            "settings" : [ "GL23cd0e", 1 ]
--        }
-+        },
+-        },
++        }
      ],
      "rules" : [
          {
