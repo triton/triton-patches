@@ -1,6 +1,6 @@
-diff -ru -x '*~' openssl-1.0.1r-orig/crypto/cryptlib.h openssl-1.0.1r/crypto/cryptlib.h
---- openssl-1.0.1r-orig/crypto/cryptlib.h	2016-01-28 14:38:30.000000000 +0100
-+++ openssl-1.0.1r/crypto/cryptlib.h	2016-02-03 12:54:29.193165176 +0100
+diff -ru -x '*~' openssl-1.0.1r-orig/crypto/include/internal/cryptlib.h openssl-1.0.1r/crypto/include/internal/cryptlib.h
+--- openssl-1.0.1r-orig/crypto/include/internal/cryptlib.h	2016-01-28 14:38:30.000000000 +0100
++++ openssl-1.0.1r/crypto/include/internal/cryptlib.h	2016-02-03 12:54:29.193165176 +0100
 @@ -81,8 +81,8 @@
  
  # ifndef OPENSSL_SYS_VMS
