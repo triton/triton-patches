@@ -70,7 +70,7 @@ commit_patches() {
     # Only commit files with a .patch extension
     if [ "${File##*.}" == 'patch' ] ; then
       git add "${File}"
-      GitCommitMessage="$(dirname "${File}"): ${ChangeList[$File]} $(basename ${File})"
+      GitCommitMessage="$(basename $(dirname "${File}")): ${ChangeList[$File]} $(basename ${File})"
       echo -e "$(color_term "${ChangeList[$File]}")${GitCommitMessage}\e[0m"
       git commit -m "${GitCommitMessage}" > /dev/null
     else
