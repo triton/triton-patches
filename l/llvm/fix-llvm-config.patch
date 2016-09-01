@@ -1,21 +1,27 @@
 diff --git a/tools/llvm-config/CMakeLists.txt b/tools/llvm-config/CMakeLists.txt
-index edbd8c9..d5839e4 100644
+index d458771..86cf9d5 100644
 --- a/tools/llvm-config/CMakeLists.txt
 +++ b/tools/llvm-config/CMakeLists.txt
-@@ -10,8 +10,15 @@ add_llvm_tool(llvm-config
+@@ -10,6 +10,7 @@ add_llvm_tool(llvm-config
  
  # Compute the substitution values for various items.
  get_property(LLVM_SYSTEM_LIBS_LIST TARGET LLVMSupport PROPERTY LLVM_SYSTEM_LIBS)
 +set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS 0)
  foreach(l ${LLVM_SYSTEM_LIBS_LIST})
--  set(SYSTEM_LIBS ${SYSTEM_LIBS} "-l${l}")
-+  message(STATUS "LIB: ${l}")
-+  find_library(ABSOLUTE_LIB "${l}")
-+  message(STATUS "ABSOLUTE_LIB: ${ABSOLUTE_LIB}")
-+  get_filename_component(LIBDIR "${ABSOLUTE_LIB}" DIRECTORY)
-+  message(STATUS "LIBDIR: ${LIBDIR}")
-+  set(SYSTEM_LIBS ${SYSTEM_LIBS} "-L${LIBDIR} -l${l}")
-+  unset(ABSOLUTE_LIB CACHE)
+   if(MSVC)
+     set(SYSTEM_LIBS ${SYSTEM_LIBS} "${l}.lib")
+@@ -19,7 +20,13 @@ foreach(l ${LLVM_SYSTEM_LIBS_LIST})
+       set(SYSTEM_LIBS ${SYSTEM_LIBS} "${l}")
+     else()
+       # Otherwise assume it's a library name we need to link with.
+-      set(SYSTEM_LIBS ${SYSTEM_LIBS} "-l${l}")
++      message(STATUS "LIB: ${l}")
++      find_library(ABSOLUTE_LIB "${l}")
++      message(STATUS "ABSOLUTE_LIB: ${ABSOLUTE_LIB}")
++      get_filename_component(LIBDIR "${ABSOLUTE_LIB}" DIRECTORY)
++      message(STATUS "LIBDIR: ${LIBDIR}")
++      set(SYSTEM_LIBS ${SYSTEM_LIBS} "-L${LIBDIR} -l${l}")
++      unset(ABSOLUTE_LIB CACHE)
+     endif()
+   endif()
  endforeach()
- string(REPLACE ";" " " SYSTEM_LIBS "${SYSTEM_LIBS}")
- 
