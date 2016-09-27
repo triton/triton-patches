@@ -1,7 +1,17 @@
 #!/bin/sh
 cd "$(dirname "$0")"
+
+if [ -d "$1" ] ; then
+  directory="$1"
+elif [ -d "${1:0:1}/$1" ] ; then
+  directory="${1:0:1}/$1"
+else
+  echo "Not a directory"
+  exit 1
+fi
+
 echo
-for file in $(find "${1:0:1}/$1" -type f); do
+for file in $(find "$directory" -type f); do
   echo "    (fetchTritonPatch {"
   echo "      rev = \"$(git rev-parse HEAD)\";"
   echo "      file = \"$file\";"
