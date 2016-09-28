@@ -1,8 +1,20 @@
+From 3131050c4737cb689673b72cf6f86ebb3781258c Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Wed, 28 Sep 2016 12:25:50 -0700
+Subject: [PATCH 2/2] Fix sharedlib loading
+
+---
+ cmd/shlibsign/shlibsign.c |  2 ++
+ coreconf/config.mk        |  3 +++
+ lib/pk11wrap/pk11load.c   |  7 +++++++
+ lib/util/secload.c        | 16 +++++++++++++++-
+ 4 files changed, 27 insertions(+), 1 deletion(-)
+
 diff --git a/cmd/shlibsign/shlibsign.c b/cmd/shlibsign/shlibsign.c
-index 63a4836..a128c1d 100644
+index 6e0a8a6..4e263d3 100644
 --- a/cmd/shlibsign/shlibsign.c
 +++ b/cmd/shlibsign/shlibsign.c
-@@ -862,6 +862,8 @@ int main(int argc, char **argv)
+@@ -871,6 +871,8 @@ main(int argc, char **argv)
      libname = PR_GetLibraryName(NULL, "softokn3");
      assert(libname != NULL);
      lib = PR_LoadLibrary(libname);
@@ -12,19 +24,16 @@ index 63a4836..a128c1d 100644
      PR_FreeLibraryName(libname);
  
 diff --git a/coreconf/config.mk b/coreconf/config.mk
-index 61d757b..ae3d198 100644
+index e359153..41442dd 100644
 --- a/coreconf/config.mk
 +++ b/coreconf/config.mk
-@@ -198,6 +198,9 @@ DEFINES += -DSSL_DISABLE_DEPRECATED_CIPHER_SUITE_NAMES
- # So we add a NSS_SSL_ENABLE_ZLIB variable to allow Mozilla to turn this off.
- NSS_SSL_ENABLE_ZLIB = 1
- 
+@@ -217,3 +217,6 @@ NSS_SSL_ENABLE_ZLIB = 1
+ ifdef NSS_NO_PKCS11_BYPASS
+ DEFINES += -DNO_PKCS11_BYPASS
+ endif
++
 +# Nix specific stuff.
 +DEFINES += -DNIX_NSS_LIBDIR=\"$(out)/lib/\"
-+
- # Allow build-time configuration of TLS 1.3 (Experimental)
- ifdef NSS_ENABLE_TLS_1_3
- ifdef NSS_DISABLE_ECC
 diff --git a/lib/pk11wrap/pk11load.c b/lib/pk11wrap/pk11load.c
 index 5c5d2ca..026e528 100644
 --- a/lib/pk11wrap/pk11load.c
@@ -44,10 +53,10 @@ index 5c5d2ca..026e528 100644
  
  	if (library == NULL) {
 diff --git a/lib/util/secload.c b/lib/util/secload.c
-index eb8a9ec..f94f67d 100644
+index 12efd2f..0c5001f 100644
 --- a/lib/util/secload.c
 +++ b/lib/util/secload.c
-@@ -69,9 +69,14 @@ loader_LoadLibInReferenceDir(const char *referencePath, const char *name)
+@@ -70,9 +70,14 @@ loader_LoadLibInReferenceDir(const char* referencePath, const char* name)
  
      /* Remove the trailing filename from referencePath and add the new one */
      c = strrchr(referencePath, PR_GetDirectorySeparator());
@@ -58,12 +67,12 @@ index eb8a9ec..f94f67d 100644
 +    }
      if (c) {
          size_t referencePathSize = 1 + c - referencePath;
--        fullName = (char*) PORT_Alloc(strlen(name) + referencePathSize + 1);
-+        fullName = (char*) PORT_Alloc(strlen(name) + referencePathSize + 5);
+-        fullName = (char*)PORT_Alloc(strlen(name) + referencePathSize + 1);
++        fullName = (char*)PORT_Alloc(strlen(name) + referencePathSize + 5);
          if (fullName) {
              memcpy(fullName, referencePath, referencePathSize);
-             strcpy(fullName + referencePathSize, name); 
-@@ -81,6 +86,11 @@ loader_LoadLibInReferenceDir(const char *referencePath, const char *name)
+             strcpy(fullName + referencePathSize, name);
+@@ -82,6 +87,11 @@ loader_LoadLibInReferenceDir(const char* referencePath, const char* name)
  #endif
              libSpec.type = PR_LibSpec_Pathname;
              libSpec.value.pathname = fullName;
@@ -74,9 +83,9 @@ index eb8a9ec..f94f67d 100644
 +            strcpy(fullName + referencePathSize, name);
              dlh = PR_LoadLibraryWithFlags(libSpec, PR_LD_NOW | PR_LD_LOCAL
  #ifdef PR_LD_ALT_SEARCH_PATH
-             /* allow library's dependencies to be found in the same directory
-@@ -88,6 +98,10 @@ loader_LoadLibInReferenceDir(const char *referencePath, const char *name)
-                                           | PR_LD_ALT_SEARCH_PATH 
+                                                        /* allow library's dependencies to be found in the same directory
+@@ -89,6 +99,10 @@ loader_LoadLibInReferenceDir(const char* referencePath, const char* name)
+                                                        | PR_LD_ALT_SEARCH_PATH
  #endif
                                            );
 +            if (! dlh) {
@@ -86,3 +95,6 @@ index eb8a9ec..f94f67d 100644
              PORT_Free(fullName);
          }
      }
+-- 
+2.8.0.rc3.226.g39d4020
+

@@ -1,16 +1,54 @@
-Sources taken from https://git.fedorahosted.org/git/nss-pem.git
-Patches taken from http://pkgs.fedoraproject.org/cgit/nss.git/
+From f062769ebd31cfff8c8bb39f7f30065057b2750e Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Wed, 28 Sep 2016 12:25:04 -0700
+Subject: [PATCH 1/2] Add pem support
 
-Following patches were applied in that order:
+---
+ lib/ckfw/manifest.mn     |    2 +-
+ lib/ckfw/pem/Makefile    |  107 ++++
+ lib/ckfw/pem/anchor.c    |   50 ++
+ lib/ckfw/pem/ckpem.h     |  264 ++++++++++
+ lib/ckfw/pem/ckpemver.c  |   59 +++
+ lib/ckfw/pem/config.mk   |   71 +++
+ lib/ckfw/pem/constants.c |   77 +++
+ lib/ckfw/pem/manifest.mn |   68 +++
+ lib/ckfw/pem/nsspem.def  |   58 +++
+ lib/ckfw/pem/nsspem.h    |   75 +++
+ lib/ckfw/pem/pargs.c     |  162 ++++++
+ lib/ckfw/pem/pfind.c     |  435 ++++++++++++++++
+ lib/ckfw/pem/pinst.c     |  751 ++++++++++++++++++++++++++++
+ lib/ckfw/pem/pobject.c   | 1236 ++++++++++++++++++++++++++++++++++++++++++++++
+ lib/ckfw/pem/prsa.c      |  699 ++++++++++++++++++++++++++
+ lib/ckfw/pem/psession.c  |  388 +++++++++++++++
+ lib/ckfw/pem/pslot.c     |  182 +++++++
+ lib/ckfw/pem/ptoken.c    |  333 +++++++++++++
+ lib/ckfw/pem/rsawrapr.c  |  823 ++++++++++++++++++++++++++++++
+ lib/ckfw/pem/util.c      |  312 ++++++++++++
+ 20 files changed, 6151 insertions(+), 1 deletion(-)
+ create mode 100644 lib/ckfw/pem/Makefile
+ create mode 100644 lib/ckfw/pem/anchor.c
+ create mode 100644 lib/ckfw/pem/ckpem.h
+ create mode 100644 lib/ckfw/pem/ckpemver.c
+ create mode 100644 lib/ckfw/pem/config.mk
+ create mode 100644 lib/ckfw/pem/constants.c
+ create mode 100644 lib/ckfw/pem/manifest.mn
+ create mode 100644 lib/ckfw/pem/nsspem.def
+ create mode 100644 lib/ckfw/pem/nsspem.h
+ create mode 100644 lib/ckfw/pem/pargs.c
+ create mode 100644 lib/ckfw/pem/pfind.c
+ create mode 100644 lib/ckfw/pem/pinst.c
+ create mode 100644 lib/ckfw/pem/pobject.c
+ create mode 100644 lib/ckfw/pem/prsa.c
+ create mode 100644 lib/ckfw/pem/psession.c
+ create mode 100644 lib/ckfw/pem/pslot.c
+ create mode 100644 lib/ckfw/pem/ptoken.c
+ create mode 100644 lib/ckfw/pem/rsawrapr.c
+ create mode 100644 lib/ckfw/pem/util.c
 
-nss-enable-pem.patch
-0039-Sync-up-with-nss-3.15.4-changes-in-freebl-and-softok.patch
-
-
-Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
-
---- nss-3.15.4/lib/ckfw/manifest.mn
-+++ nss-3.15.4/lib/ckfw/manifest.mn
+diff --git a/lib/ckfw/manifest.mn b/lib/ckfw/manifest.mn
+index 20bebeb..4f10563 100644
+--- a/lib/ckfw/manifest.mn
++++ b/lib/ckfw/manifest.mn
 @@ -5,7 +5,7 @@
  
  CORE_DEPTH = ../..
@@ -20,8 +58,124 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
  
  PRIVATE_EXPORTS = \
  	ck.h		  \
---- nss-3.15.4/lib/ckfw/pem/anchor.c
-+++ nss-3.15.4/lib/ckfw/pem/anchor.c
+diff --git a/lib/ckfw/pem/Makefile b/lib/ckfw/pem/Makefile
+new file mode 100644
+index 0000000..aec3bbd
+--- /dev/null
++++ b/lib/ckfw/pem/Makefile
+@@ -0,0 +1,107 @@
++# 
++# ***** BEGIN LICENSE BLOCK *****
++# Version: MPL 1.1/GPL 2.0/LGPL 2.1
++#
++# The contents of this file are subject to the Mozilla Public License Version
++# 1.1 (the "License"); you may not use this file except in compliance with
++# the License. You may obtain a copy of the License at
++# http://www.mozilla.org/MPL/
++#
++# Software distributed under the License is distributed on an "AS IS" basis,
++# WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
++# for the specific language governing rights and limitations under the
++# License.
++#
++# The Original Code is the Netscape security libraries.
++#
++# The Initial Developer of the Original Code is
++# Netscape Communications Corporation.
++# Portions created by the Initial Developer are Copyright (C) 1994-2000
++# the Initial Developer. All Rights Reserved.
++#
++# Contributor(s):
++#
++# Alternatively, the contents of this file may be used under the terms of
++# either the GNU General Public License Version 2 or later (the "GPL"), or
++# the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
++# in which case the provisions of the GPL or the LGPL are applicable instead
++# of those above. If you wish to allow use of your version of this file only
++# under the terms of either the GPL or the LGPL, and not to allow others to
++# use your version of this file under the terms of the MPL, indicate your
++# decision by deleting the provisions above and replace them with the notice
++# and other provisions required by the GPL or the LGPL. If you do not delete
++# the provisions above, a recipient may use your version of this file under
++# the terms of any one of the MPL, the GPL or the LGPL.
++#
++# ***** END LICENSE BLOCK *****
++MAKEFILE_CVS_ID = "@(#) $RCSfile: Makefile,v $ $Revision: 1.5 $ $Date: 2007/05/09 00:09:37 $"
++
++include manifest.mn
++include $(CORE_DEPTH)/coreconf/config.mk
++include config.mk
++
++EXTRA_LIBS = \
++	$(DIST)/lib/$(LIB_PREFIX)nssckfw.$(LIB_SUFFIX) \
++	$(DIST)/lib/$(LIB_PREFIX)nssb.$(LIB_SUFFIX) \
++	$(DIST)/lib/$(LIB_PREFIX)freebl.$(LIB_SUFFIX) \
++	$(DIST)/lib/$(LIB_PREFIX)nssutil.$(LIB_SUFFIX) \
++	$(NULL)
++
++# can't do this in manifest.mn because OS_TARGET isn't defined there.
++ifeq (,$(filter-out WIN%,$(OS_TARGET)))
++
++ifdef NS_USE_GCC
++EXTRA_LIBS += \
++	-L$(NSPR_LIB_DIR) \
++	-lplc4 \
++	-lplds4 \
++	-lnspr4 \
++	$(NULL)
++else 
++EXTRA_SHARED_LIBS += \
++        $(NSPR_LIB_DIR)/$(NSPR31_LIB_PREFIX)plc4.lib \
++        $(NSPR_LIB_DIR)/$(NSPR31_LIB_PREFIX)plds4.lib \
++        $(NSPR_LIB_DIR)/$(NSPR31_LIB_PREFIX)nspr4.lib \
++        crypt32.lib \
++	advapi32.lib \
++	rpcrt4.lib \
++        $(NULL)
++endif # NS_USE_GCC
++else
++
++EXTRA_LIBS += \
++	-L$(NSPR_LIB_DIR) \
++	-lplc4 \
++	-lplds4 \
++	-lnspr4 \
++	$(NULL)
++endif
++
++
++include $(CORE_DEPTH)/coreconf/rules.mk
++
++# Generate certdata.c.
++generate:
++	$(PERL) certdata.perl < certdata.txt
++
++# This'll need some help from a build person.
++
++
++ifeq ($(OS_TARGET)$(OS_RELEASE), AIX4.1)
++DSO_LDOPTS              = -bM:SRE -bh:4 -bnoentry
++EXTRA_DSO_LDOPTS        = -lc
++MKSHLIB                 = xlC $(DSO_LDOPTS)
++
++$(SHARED_LIBRARY): $(OBJS)
++	@$(MAKE_OBJDIR)
++	rm -f $@
++	$(MKSHLIB) -o $@ $(OBJS) $(EXTRA_LIBS) $(EXTRA_DSO_LDOPTS)
++	chmod +x $@
++
++endif
++
++ifeq ($(OS_TARGET)$(OS_RELEASE), AIX4.2)
++LD      += -G
++endif 
++
++
+diff --git a/lib/ckfw/pem/anchor.c b/lib/ckfw/pem/anchor.c
+new file mode 100644
+index 0000000..621f919
+--- /dev/null
++++ b/lib/ckfw/pem/anchor.c
 @@ -0,0 +1,50 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -73,8 +227,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +#define MODULE_NAME pem
 +#define INSTANCE_NAME (NSSCKMDInstance *)&pem_mdInstance
 +#include "nssck.api"
---- nss-3.15.4/lib/ckfw/pem/ckpem.h
-+++ nss-3.15.4/lib/ckfw/pem/ckpem.h
+diff --git a/lib/ckfw/pem/ckpem.h b/lib/ckfw/pem/ckpem.h
+new file mode 100644
+index 0000000..720525e
+--- /dev/null
++++ b/lib/ckfw/pem/ckpem.h
 @@ -0,0 +1,264 @@
 +#ifndef CKPEM_H
 +#define CKPEM_H
@@ -340,8 +497,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +void plog(const char *fmt, ...);
 +
 +#endif /* CKPEM_H */
---- nss-3.15.4/lib/ckfw/pem/ckpemver.c
-+++ nss-3.15.4/lib/ckfw/pem/ckpemver.c
+diff --git a/lib/ckfw/pem/ckpemver.c b/lib/ckfw/pem/ckpemver.c
+new file mode 100644
+index 0000000..76ab5df
+--- /dev/null
++++ b/lib/ckfw/pem/ckpemver.c
 @@ -0,0 +1,59 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -402,8 +562,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +const char __nss_ckcapi_sccsid[] = "@(#)NSS Access to Flag Files in PEM format "
 +        NSS_CKPEM_LIBRARY_VERSION _DEBUG_STRING
 +        "  " __DATE__ " " __TIME__;
---- nss-3.15.4/lib/ckfw/pem/config.mk
-+++ nss-3.15.4/lib/ckfw/pem/config.mk
+diff --git a/lib/ckfw/pem/config.mk b/lib/ckfw/pem/config.mk
+new file mode 100644
+index 0000000..ff6cd9a
+--- /dev/null
++++ b/lib/ckfw/pem/config.mk
 @@ -0,0 +1,71 @@
 +# 
 +# ***** BEGIN LICENSE BLOCK *****
@@ -476,8 +639,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +MKSHLIB += -R '$$ORIGIN'
 +endif
 +
---- nss-3.15.4/lib/ckfw/pem/constants.c
-+++ nss-3.15.4/lib/ckfw/pem/constants.c
+diff --git a/lib/ckfw/pem/constants.c b/lib/ckfw/pem/constants.c
+new file mode 100644
+index 0000000..0ceb443
+--- /dev/null
++++ b/lib/ckfw/pem/constants.c
 @@ -0,0 +1,77 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -556,118 +722,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +
 +NSS_IMPLEMENT_DATA const NSSUTF8 *
 +pem_TokenSerialNumber = (NSSUTF8 *) "1";
---- nss-3.15.4/lib/ckfw/pem/Makefile
-+++ nss-3.15.4/lib/ckfw/pem/Makefile
-@@ -0,0 +1,107 @@
-+# 
-+# ***** BEGIN LICENSE BLOCK *****
-+# Version: MPL 1.1/GPL 2.0/LGPL 2.1
-+#
-+# The contents of this file are subject to the Mozilla Public License Version
-+# 1.1 (the "License"); you may not use this file except in compliance with
-+# the License. You may obtain a copy of the License at
-+# http://www.mozilla.org/MPL/
-+#
-+# Software distributed under the License is distributed on an "AS IS" basis,
-+# WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
-+# for the specific language governing rights and limitations under the
-+# License.
-+#
-+# The Original Code is the Netscape security libraries.
-+#
-+# The Initial Developer of the Original Code is
-+# Netscape Communications Corporation.
-+# Portions created by the Initial Developer are Copyright (C) 1994-2000
-+# the Initial Developer. All Rights Reserved.
-+#
-+# Contributor(s):
-+#
-+# Alternatively, the contents of this file may be used under the terms of
-+# either the GNU General Public License Version 2 or later (the "GPL"), or
-+# the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
-+# in which case the provisions of the GPL or the LGPL are applicable instead
-+# of those above. If you wish to allow use of your version of this file only
-+# under the terms of either the GPL or the LGPL, and not to allow others to
-+# use your version of this file under the terms of the MPL, indicate your
-+# decision by deleting the provisions above and replace them with the notice
-+# and other provisions required by the GPL or the LGPL. If you do not delete
-+# the provisions above, a recipient may use your version of this file under
-+# the terms of any one of the MPL, the GPL or the LGPL.
-+#
-+# ***** END LICENSE BLOCK *****
-+MAKEFILE_CVS_ID = "@(#) $RCSfile: Makefile,v $ $Revision: 1.5 $ $Date: 2007/05/09 00:09:37 $"
-+
-+include manifest.mn
-+include $(CORE_DEPTH)/coreconf/config.mk
-+include config.mk
-+
-+EXTRA_LIBS = \
-+	$(DIST)/lib/$(LIB_PREFIX)nssckfw.$(LIB_SUFFIX) \
-+	$(DIST)/lib/$(LIB_PREFIX)nssb.$(LIB_SUFFIX) \
-+	$(DIST)/lib/$(LIB_PREFIX)freebl.$(LIB_SUFFIX) \
-+	$(DIST)/lib/$(LIB_PREFIX)nssutil.$(LIB_SUFFIX) \
-+	$(NULL)
-+
-+# can't do this in manifest.mn because OS_TARGET isn't defined there.
-+ifeq (,$(filter-out WIN%,$(OS_TARGET)))
-+
-+ifdef NS_USE_GCC
-+EXTRA_LIBS += \
-+	-L$(NSPR_LIB_DIR) \
-+	-lplc4 \
-+	-lplds4 \
-+	-lnspr4 \
-+	$(NULL)
-+else 
-+EXTRA_SHARED_LIBS += \
-+        $(NSPR_LIB_DIR)/$(NSPR31_LIB_PREFIX)plc4.lib \
-+        $(NSPR_LIB_DIR)/$(NSPR31_LIB_PREFIX)plds4.lib \
-+        $(NSPR_LIB_DIR)/$(NSPR31_LIB_PREFIX)nspr4.lib \
-+        crypt32.lib \
-+	advapi32.lib \
-+	rpcrt4.lib \
-+        $(NULL)
-+endif # NS_USE_GCC
-+else
-+
-+EXTRA_LIBS += \
-+	-L$(NSPR_LIB_DIR) \
-+	-lplc4 \
-+	-lplds4 \
-+	-lnspr4 \
-+	$(NULL)
-+endif
-+
-+
-+include $(CORE_DEPTH)/coreconf/rules.mk
-+
-+# Generate certdata.c.
-+generate:
-+	$(PERL) certdata.perl < certdata.txt
-+
-+# This'll need some help from a build person.
-+
-+
-+ifeq ($(OS_TARGET)$(OS_RELEASE), AIX4.1)
-+DSO_LDOPTS              = -bM:SRE -bh:4 -bnoentry
-+EXTRA_DSO_LDOPTS        = -lc
-+MKSHLIB                 = xlC $(DSO_LDOPTS)
-+
-+$(SHARED_LIBRARY): $(OBJS)
-+	@$(MAKE_OBJDIR)
-+	rm -f $@
-+	$(MKSHLIB) -o $@ $(OBJS) $(EXTRA_LIBS) $(EXTRA_DSO_LDOPTS)
-+	chmod +x $@
-+
-+endif
-+
-+ifeq ($(OS_TARGET)$(OS_RELEASE), AIX4.2)
-+LD      += -G
-+endif 
-+
-+
---- nss-3.15.4/lib/ckfw/pem/manifest.mn
-+++ nss-3.15.4/lib/ckfw/pem/manifest.mn
+diff --git a/lib/ckfw/pem/manifest.mn b/lib/ckfw/pem/manifest.mn
+new file mode 100644
+index 0000000..8de27d1
+--- /dev/null
++++ b/lib/ckfw/pem/manifest.mn
 @@ -0,0 +1,68 @@
 +# 
 +# ***** BEGIN LICENSE BLOCK *****
@@ -737,8 +796,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +LIBRARY_NAME = nsspem
 +
 +#EXTRA_SHARED_LIBS = -L$(DIST)/lib -lnssckfw -lnssb -lplc4 -lplds4
---- nss-3.15.4/lib/ckfw/pem/nsspem.def
-+++ nss-3.15.4/lib/ckfw/pem/nsspem.def
+diff --git a/lib/ckfw/pem/nsspem.def b/lib/ckfw/pem/nsspem.def
+new file mode 100644
+index 0000000..4978252
+--- /dev/null
++++ b/lib/ckfw/pem/nsspem.def
 @@ -0,0 +1,58 @@
 +;+#
 +;+# ***** BEGIN LICENSE BLOCK *****
@@ -798,8 +860,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +;+    local:
 +;+*;
 +;+};
---- nss-3.15.4/lib/ckfw/pem/nsspem.h
-+++ nss-3.15.4/lib/ckfw/pem/nsspem.h
+diff --git a/lib/ckfw/pem/nsspem.h b/lib/ckfw/pem/nsspem.h
+new file mode 100644
+index 0000000..1547bf4
+--- /dev/null
++++ b/lib/ckfw/pem/nsspem.h
 @@ -0,0 +1,75 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -876,8 +941,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +#define NSS_CKPEM_FIRMWARE_VERSION_MINOR 0
 +
 +#endif /* NSSCKBI_H */
---- nss-3.15.4/lib/ckfw/pem/pargs.c
-+++ nss-3.15.4/lib/ckfw/pem/pargs.c
+diff --git a/lib/ckfw/pem/pargs.c b/lib/ckfw/pem/pargs.c
+new file mode 100644
+index 0000000..f292a8b
+--- /dev/null
++++ b/lib/ckfw/pem/pargs.c
 @@ -0,0 +1,162 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -1041,8 +1109,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    PR_Free((void *) instrings);
 +    return PR_TRUE;
 +}
---- nss-3.15.4/lib/ckfw/pem/pfind.c
-+++ nss-3.15.4/lib/ckfw/pem/pfind.c
+diff --git a/lib/ckfw/pem/pfind.c b/lib/ckfw/pem/pfind.c
+new file mode 100644
+index 0000000..30b1174
+--- /dev/null
++++ b/lib/ckfw/pem/pfind.c
 @@ -0,0 +1,435 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -1479,8 +1550,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    }
 +    return (NSSCKMDFindObjects *) NULL;
 +}
---- nss-3.15.4/lib/ckfw/pem/pinst.c
-+++ nss-3.15.4/lib/ckfw/pem/pinst.c
+diff --git a/lib/ckfw/pem/pinst.c b/lib/ckfw/pem/pinst.c
+new file mode 100644
+index 0000000..13d3b88
+--- /dev/null
++++ b/lib/ckfw/pem/pinst.c
 @@ -0,0 +1,751 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -2233,8 +2307,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    NULL, /* WaitForSlotEvent */
 +    (void *) NULL /* null terminator */
 +};
---- nss-3.15.4/lib/ckfw/pem/pobject.c
-+++ nss-3.15.4/lib/ckfw/pem/pobject.c
+diff --git a/lib/ckfw/pem/pobject.c b/lib/ckfw/pem/pobject.c
+new file mode 100644
+index 0000000..eaf7943
+--- /dev/null
++++ b/lib/ckfw/pem/pobject.c
 @@ -0,0 +1,1236 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -3472,8 +3549,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    }
 +    return pem_CreateMDObject(NULL, listObj, pError);
 +}
---- nss-3.15.4/lib/ckfw/pem/prsa.c
-+++ nss-3.15.4/lib/ckfw/pem/prsa.c
+diff --git a/lib/ckfw/pem/prsa.c b/lib/ckfw/pem/prsa.c
+new file mode 100644
+index 0000000..f0e069c
+--- /dev/null
++++ b/lib/ckfw/pem/prsa.c
 @@ -0,0 +1,699 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -4174,8 +4254,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    NULL, /* DeriveKey - default errs */
 +    (void *) NULL /* null terminator */
 +};
---- nss-3.15.4/lib/ckfw/pem/psession.c
-+++ nss-3.15.4/lib/ckfw/pem/psession.c
+diff --git a/lib/ckfw/pem/psession.c b/lib/ckfw/pem/psession.c
+new file mode 100644
+index 0000000..70c5407
+--- /dev/null
++++ b/lib/ckfw/pem/psession.c
 @@ -0,0 +1,388 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -4565,8 +4648,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +
 +    return rv;
 +}
---- nss-3.15.4/lib/ckfw/pem/pslot.c
-+++ nss-3.15.4/lib/ckfw/pem/pslot.c
+diff --git a/lib/ckfw/pem/pslot.c b/lib/ckfw/pem/pslot.c
+new file mode 100644
+index 0000000..1a7d062
+--- /dev/null
++++ b/lib/ckfw/pem/pslot.c
 @@ -0,0 +1,182 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -4750,8 +4836,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    pem_mdSlot_GetToken,
 +    (void *) NULL /* null terminator */
 +};
---- nss-3.15.4/lib/ckfw/pem/ptoken.c
-+++ nss-3.15.4/lib/ckfw/pem/ptoken.c
+diff --git a/lib/ckfw/pem/ptoken.c b/lib/ckfw/pem/ptoken.c
+new file mode 100644
+index 0000000..67b5f10
+--- /dev/null
++++ b/lib/ckfw/pem/ptoken.c
 @@ -0,0 +1,333 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -5086,8 +5175,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    (void *) NULL               /* null terminator */
 +};
 +#endif
---- nss-3.15.4/lib/ckfw/pem/rsawrapr.c
-+++ nss-3.15.4/lib/ckfw/pem/rsawrapr.c
+diff --git a/lib/ckfw/pem/rsawrapr.c b/lib/ckfw/pem/rsawrapr.c
+new file mode 100644
+index 0000000..103eeda
+--- /dev/null
++++ b/lib/ckfw/pem/rsawrapr.c
 @@ -0,0 +1,823 @@
 +/*
 + * PKCS#1 encoding and decoding functions.
@@ -5912,8 +6004,11 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    return SECFailure;
 +}
 +#endif
---- nss-3.15.4/lib/ckfw/pem/util.c
-+++ nss-3.15.4/lib/ckfw/pem/util.c
+diff --git a/lib/ckfw/pem/util.c b/lib/ckfw/pem/util.c
+new file mode 100644
+index 0000000..6a7495f
+--- /dev/null
++++ b/lib/ckfw/pem/util.c
 @@ -0,0 +1,312 @@
 +/* ***** BEGIN LICENSE BLOCK *****
 + * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -6227,3 +6322,6 @@ Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
 +    PR_LOG(pemLogModule, PR_LOG_DEBUG, ("%s", buf));
 +#endif
 +}
+-- 
+2.8.0.rc3.226.g39d4020
+
