@@ -1,5 +1,5 @@
---- gencat/genlib.c
-+++ gencat/genlib.c
+--- a/gencat/genlib.c
++++ b/gencat/genlib.c
 @@ -49,10 +49,8 @@
  
  #include <stdio.h>
