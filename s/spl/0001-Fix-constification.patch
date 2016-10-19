@@ -1,0 +1,25 @@
+From 146f8129cadbc8119793a7fab0ceba8689bf251b Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Wed, 9 Dec 2015 16:15:07 -0800
+Subject: [PATCH 1/2] Fix constification
+
+---
+ module/spl/spl-proc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/module/spl/spl-proc.c b/module/spl/spl-proc.c
+index db546ea..c2605ae 100644
+--- a/module/spl/spl-proc.c
++++ b/module/spl/spl-proc.c
+@@ -37,7 +37,7 @@
+ #include <linux/uaccess.h>
+ #include <linux/version.h>
+ 
+-#if defined(CONSTIFY_PLUGIN) && LINUX_VERSION_CODE >= KERNEL_VERSION(3,8,0)
++#if defined(CONSTIFY_PLUGIN)
+ typedef struct ctl_table __no_const spl_ctl_table;
+ #else
+ typedef struct ctl_table spl_ctl_table;
+-- 
+2.8.0.rc3.226.g39d4020
+
