@@ -1,21 +1,20 @@
-From 697f29170478fbb8831ce00adaf94fd14e6ab08c Mon Sep 17 00:00:00 2001
+From 335a9da7010bc8f1f14b24aaae4e629d7cad9296 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Wed, 19 Oct 2016 18:33:20 -0700
 Subject: [PATCH 2/2] Fix binary paths
 
 ---
- cmd/ztest/ztest.c                       | 13 ++++++-------
- etc/systemd/system/zfs-share.service.in |  2 +-
- lib/libzfs/libzfs_mount.c               |  4 ++--
- module/Makefile.in                      |  2 +-
- module/zfs/zfs_ctldir.c                 |  4 ++--
- 5 files changed, 12 insertions(+), 13 deletions(-)
+ cmd/ztest/ztest.c                       | 6 +++---
+ etc/systemd/system/zfs-share.service.in | 2 +-
+ lib/libzfs/libzfs_mount.c               | 4 ++--
+ module/Makefile.in                      | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/cmd/ztest/ztest.c b/cmd/ztest/ztest.c
-index afe6faa..d0d3d1d 100644
+index 2e4dae3..89a19f0 100644
 --- a/cmd/ztest/ztest.c
 +++ b/cmd/ztest/ztest.c
-@@ -789,14 +789,14 @@ process_options(int argc, char **argv)
+@@ -790,14 +790,14 @@ process_options(int argc, char **argv)
  		 * We want to extract <isa> to determine if we should use
  		 * 32 or 64 bit binaries.
  		 */
@@ -33,20 +32,6 @@ index afe6faa..d0d3d1d 100644
  
  		if (0 != access(zo->zo_alt_ztest, X_OK)) {
  			ztest_dump_core = B_FALSE;
-@@ -5388,10 +5388,9 @@ ztest_run_zdb(char *pool)
- 	zbuf = umem_alloc(1024, UMEM_NOFAIL);
- 
- 	VERIFY(realpath(getexecname(), bin) != NULL);
--	if (strncmp(bin, "/usr/sbin/ztest", 15) == 0) {
--		strcpy(bin, "/usr/sbin/zdb"); /* Installed */
--	} else if (strncmp(bin, "/sbin/ztest", 11) == 0) {
--		strcpy(bin, "/sbin/zdb"); /* Installed */
-+	const char *ztest_bin = "/run/current-system/sw/bin/ztest";
-+	if (strncmp(bin, ztest_bin, strlen(ztest_bin)) == 0) {
-+		strcpy(bin, "/run/current-system/sw/bin/zdb"); /* Installed */
- 	} else {
- 		strstr(bin, "/ztest/")[0] = '\0'; /* In-tree */
- 		strcat(bin, "/zdb/zdb");
 diff --git a/etc/systemd/system/zfs-share.service.in b/etc/systemd/system/zfs-share.service.in
 index 688731e..cd0efc7 100644
 --- a/etc/systemd/system/zfs-share.service.in
@@ -61,10 +46,10 @@ index 688731e..cd0efc7 100644
  
  [Install]
 diff --git a/lib/libzfs/libzfs_mount.c b/lib/libzfs/libzfs_mount.c
-index bd874e4..3b9157e 100644
+index 4478167..93f6a12 100644
 --- a/lib/libzfs/libzfs_mount.c
 +++ b/lib/libzfs/libzfs_mount.c
-@@ -277,7 +277,7 @@ static int
+@@ -278,7 +278,7 @@ static int
  do_mount(const char *src, const char *mntpt, char *opts)
  {
  	char *argv[8] = {
@@ -73,7 +58,7 @@ index bd874e4..3b9157e 100644
  	    "-t", MNTTYPE_ZFS,
  	    "-o", opts,
  	    (char *)src,
-@@ -313,7 +313,7 @@ do_unmount(const char *mntpt, int flags)
+@@ -314,7 +314,7 @@ do_unmount(const char *mntpt, int flags)
  	char force_opt[] = "-f";
  	char lazy_opt[] = "-l";
  	char *argv[7] = {
@@ -83,40 +68,18 @@ index bd874e4..3b9157e 100644
  	    NULL, NULL, NULL, NULL };
  	int rc, count = 3;
 diff --git a/module/Makefile.in b/module/Makefile.in
-index 876c811..c153d95 100644
+index 8d02f57..5d5546e 100644
 --- a/module/Makefile.in
 +++ b/module/Makefile.in
-@@ -67,7 +67,7 @@ modules_uninstall:
+@@ -73,7 +73,7 @@ modules_uninstall:
  distdir:
  	list='$(subdir-m)'; for subdir in $$list; do \
- 		(find @top_srcdir@/module/$$subdir -name '*.c' -o -name '*.h' |\
--		xargs /bin/cp -t $$distdir/$$subdir); \
-+		xargs cp -t $$distdir/$$subdir); \
+ 		(cd @top_srcdir@/module && find $$subdir -name '*.c' -o -name '*.h' -o -name '*.S' |\
+-		xargs /bin/cp --parents -t $$distdir); \
++		xargs cp --parents -t $$distdir); \
  	done
  
  distclean maintainer-clean: clean
-diff --git a/module/zfs/zfs_ctldir.c b/module/zfs/zfs_ctldir.c
-index 05d841d..8b7d71c 100644
---- a/module/zfs/zfs_ctldir.c
-+++ b/module/zfs/zfs_ctldir.c
-@@ -1013,7 +1013,7 @@ out:
- 	"exec 0</dev/null " \
- 	"     1>/dev/null " \
- 	"     2>/dev/null; " \
--	"umount -t zfs -n %s'%s'"
-+	"/run/current-system/sw/bin/umount -t zfs -n %s'%s'"
- 
- int
- zfsctl_snapshot_unmount(char *snapname, int flags)
-@@ -1054,7 +1054,7 @@ zfsctl_snapshot_unmount(char *snapname, int flags)
- 	"exec 0</dev/null " \
- 	"     1>/dev/null " \
- 	"     2>/dev/null; " \
--	"mount -t zfs -n '%s' '%s'"
-+	"/run/current-system/sw/bin/mount -t zfs -n '%s' '%s'"
- 
- int
- zfsctl_snapshot_mount(struct path *path, int flags)
 -- 
 2.8.0.rc3.226.g39d4020
 
