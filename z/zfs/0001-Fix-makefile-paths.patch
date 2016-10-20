@@ -1,6 +1,6 @@
-From 042a8ee83bb59e2614d6487c024c92944020cd65 Mon Sep 17 00:00:00 2001
+From 99fb7950b0c80e0bc09a5bb82015a1b2aa472b76 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
-Date: Wed, 19 Oct 2016 17:53:36 -0700
+Date: Wed, 19 Oct 2016 18:46:08 -0700
 Subject: [PATCH 1/2] Fix makefile paths
 
 ---
@@ -15,7 +15,7 @@ Subject: [PATCH 1/2] Fix makefile paths
  8 files changed, 16 insertions(+), 14 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index eacc76a..9b194dc 100644
+index 26f684d..b23d3e6 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -11,10 +11,10 @@ endif
@@ -44,10 +44,10 @@ index a94cad5..a160fe2 100644
  kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
  endif
 diff --git a/include/linux/Makefile.am b/include/linux/Makefile.am
-index 595d1db..d41375d 100644
+index 9bb0b34..885d1b0 100644
 --- a/include/linux/Makefile.am
 +++ b/include/linux/Makefile.am
-@@ -18,6 +18,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
+@@ -21,6 +21,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
  endif
  
  if CONFIG_KERNEL
@@ -56,10 +56,10 @@ index 595d1db..d41375d 100644
  kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
  endif
 diff --git a/include/sys/Makefile.am b/include/sys/Makefile.am
-index 77ecfb2..52b3612 100644
+index 37df6e1..8e2ad51 100644
 --- a/include/sys/Makefile.am
 +++ b/include/sys/Makefile.am
-@@ -114,6 +114,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
+@@ -128,6 +128,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
  endif
  
  if CONFIG_KERNEL
@@ -104,10 +104,10 @@ index 0859b9f..b0c6eec 100644
  kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
  endif
 diff --git a/module/Makefile.in b/module/Makefile.in
-index d4ddee2..876c811 100644
+index e4f06a6..8d02f57 100644
 --- a/module/Makefile.in
 +++ b/module/Makefile.in
-@@ -18,9 +18,9 @@ modules:
+@@ -21,9 +21,9 @@ modules:
  	@# installed devel headers, or they may be in the module
  	@# subdirectory when building against the spl source tree.
  	@if [ -f @SPL_OBJ@/@SPL_SYMBOLS@ ]; then \
@@ -119,16 +119,16 @@ index d4ddee2..876c811 100644
  	else \
  		echo -e "\n" \
  		"*** Missing spl symbols ensure you have built the spl:\n" \
-@@ -28,6 +28,8 @@ modules:
+@@ -31,6 +31,8 @@ modules:
  		"*** - @SPL_OBJ@/module/@SPL_SYMBOLS@\n"; \
  		exit 1; \
  	fi
 +	@# when copying a file out of the nix store, we need to make it writable again.
 +	chmod +w @SPL_SYMBOLS@
- 	$(MAKE) -C @LINUX_OBJ@ SUBDIRS=`pwd` @KERNELMAKE_PARAMS@ CONFIG_ZFS=m $@
- 
- clean:
-@@ -42,15 +44,15 @@ clean:
+ 	list='$(SUBDIR_TARGETS)'; for targetdir in $$list; do \
+ 		$(MAKE) -C $$targetdir; \
+ 	done
+@@ -48,15 +50,15 @@ clean:
  modules_install:
  	@# Install the kernel modules
  	$(MAKE) -C @LINUX_OBJ@ SUBDIRS=`pwd` $@ \
