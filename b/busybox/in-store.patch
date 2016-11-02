@@ -1,16 +1,25 @@
-Allow BusyBox to be invoked as "<something>-busybox". This is
-necessary when it's run from the Nix store as <hash>-busybox during
-stdenv bootstrap.
+From 0204c8fab5b9104aea46b2fb1f541ca1b7a6eb98 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Tue, 1 Nov 2016 21:04:49 -0700
+Subject: [PATCH] Allow busybox to be in /nix/store/xxxxx-busybox
 
-diff -ru -x '*~' busybox-1.22.1-orig/libbb/appletlib.c busybox-1.22.1/libbb/appletlib.c
---- busybox-1.22.1-orig/libbb/appletlib.c	2014-01-09 19:15:44.000000000 +0100
-+++ busybox-1.22.1/libbb/appletlib.c	2014-10-29 09:53:01.232052068 +0100
-@@ -764,7 +764,7 @@
- 	int applet = find_applet_by_name(name);
- 	if (applet >= 0)
- 		run_applet_no_and_exit(applet, argv);
+---
+ libbb/appletlib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libbb/appletlib.c b/libbb/appletlib.c
+index 480bf50..1bef92c 100644
+--- a/libbb/appletlib.c
++++ b/libbb/appletlib.c
+@@ -884,7 +884,7 @@ static NORETURN void run_applet_and_exit(const char *name, char **argv)
+ 	int applet;
+ 
+ # if ENABLE_BUSYBOX
 -	if (is_prefixed_with(name, "busybox"))
 +	if (strstr(name, "busybox") != 0)
  		exit(busybox_main(argv));
- }
- 
+ # endif
+ 	/* find_applet_by_name() search is more expensive, so goes second */
+-- 
+2.8.0.rc3.226.g39d4020
+
