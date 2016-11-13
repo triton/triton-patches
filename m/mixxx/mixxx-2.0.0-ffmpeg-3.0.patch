@@ -1,0 +1,21 @@
+From 51d95ba58d99309f439cb7e2d1285cfb33aa0f63 Mon Sep 17 00:00:00 2001
+From: Uwe Klotz <uwe_klotz@web.de>
+Date: Wed, 22 Jun 2016 19:23:18 +0200
+Subject: [PATCH] Fix build for FFmpeg 3.0.x
+
+---
+ src/encoder/encoderffmpegcore.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/encoder/encoderffmpegcore.h b/src/encoder/encoderffmpegcore.h
+index bef25f2..c291d68 100644
+--- a/src/encoder/encoderffmpegcore.h
++++ b/src/encoder/encoderffmpegcore.h
+@@ -25,7 +25,6 @@ extern "C" {
+ #include <libavutil/opt.h>
+ #include <libavcodec/avcodec.h>
+ #include <libavformat/avformat.h>
+-#include <libavutil/audioconvert.h>
+ #include <libavutil/common.h>
+ #include <libavutil/mathematics.h>
+ #include <libavutil/samplefmt.h>
