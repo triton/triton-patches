@@ -1,22 +1,10 @@
-From 4b15e34ee859916e5d7eeb7ca4d80e3d3d93ddb5 Mon Sep 17 00:00:00 2001
-From: Mike Buland <mike@xagasoft.com>
-Date: Tue, 9 Jul 2013 23:38:41 +0200
-Subject: [PATCH 1/3] Removed usage of the opaque png info_ptr struct.
+$NetBSD: patch-aa,v 1.8 2011/01/21 10:21:51 wiz Exp $
 
-The info_ptr structure should not be used, this has been in the png
-documentation since at least July 2000.
+Fix build with png-1.5.
 
-Hopefully this mantains the same functionality, but in a way that will
-compile with the newest versions of libpng.
----
- src/pngcodec.c | 90 ++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 53 insertions(+), 37 deletions(-)
-
-diff --git a/src/pngcodec.c b/src/pngcodec.c
-index 15c608a..ce38d67 100644
---- a/src/pngcodec.c
-+++ b/src/pngcodec.c
-@@ -116,10 +116,16 @@ gdip_load_png_properties (png_structp png_ptr, png_infop info_ptr, png_infop end
+--- src/pngcodec.c.orig	2010-11-03 16:52:54.000000000 +0000
++++ src/pngcodec.c
+@@ -116,10 +116,15 @@ gdip_load_png_properties (png_structp pn
  	bitmap_data->dpi_horz = png_get_x_pixels_per_inch(png_ptr, info_ptr);
  	bitmap_data->dpi_vert = png_get_y_pixels_per_inch(png_ptr, info_ptr);
  #elif defined(PNG_pHYs_SUPPORTED)
@@ -24,11 +12,10 @@ index 15c608a..ce38d67 100644
 -		bitmap_data->image_flags |= ImageFlagsHasRealDPI;
 -		bitmap_data->dpi_horz = info_ptr->x_pixels_per_unit * 0.0254;
 -		bitmap_data->dpi_vert = info_ptr->y_pixels_per_unit * 0.0254;
-+	{
-+		int		unit_type;
-+		png_uint_32	res_x;
-+		png_uint_32	res_y;
-+		png_get_pHYs( png_ptr, info_ptr, &res_x, &res_y, &unit_type );
++	if (png_get_valid (png_ptr, info_ptr, PNG_INFO_pHYs)) {
++		png_uint_32 res_x, res_y;
++		int unit_type;
++		png_get_pHYs (png_ptr, info_ptr, &res_x, &res_y, &unit_type);
 +		if (unit_type == PNG_RESOLUTION_METER) {
 +			bitmap_data->image_flags |= ImageFlagsHasRealDPI;
 +			bitmap_data->dpi_horz = res_x * 0.0254;
@@ -37,43 +24,48 @@ index 15c608a..ce38d67 100644
  	}
  #endif
  	/* default to screen resolution (if nothing was provided or available) */
-@@ -130,11 +136,11 @@ gdip_load_png_properties (png_structp png_ptr, png_infop info_ptr, png_infop end
+@@ -130,7 +135,7 @@ gdip_load_png_properties (png_structp pn
  #if defined(PNG_iCCP_SUPPORTED)
  	{
  		png_charp	name;
 -		png_charp	profile;
-+		png_bytepp	profile;
++		png_bytep	profile;
  		png_uint_32	proflen;
  		int		compression_type;
  
--		if (png_get_iCCP(png_ptr, info_ptr, &name, &compression_type, &profile, &proflen)) {
-+		if (png_get_iCCP(png_ptr, info_ptr, &name, &compression_type, profile, &proflen)) {
- 			gdip_bitmapdata_property_add_ASCII(bitmap_data, PropertyTagICCProfileDescriptor, (BYTE*)name);
- 			gdip_bitmapdata_property_add_byte(bitmap_data, PropertyTagICCProfile, (BYTE)compression_type);
+@@ -292,6 +297,11 @@ gdip_load_png_image_from_file_or_stream 
+ 		ImageFlags	colourspace_flag;
+ 		int		i;
+ 		int		j;
++		png_colorp	png_palette;
++		int		png_num_palette;
++		png_bytep	trans_alpha;
++		int		num_trans;
++		png_color_16p	trans_color;
+ 
+ 		width = png_get_image_width (png_ptr, info_ptr);
+ 		height = png_get_image_height (png_ptr, info_ptr);
+@@ -309,6 +319,8 @@ gdip_load_png_image_from_file_or_stream 
  		}
-@@ -243,6 +249,8 @@ gdip_load_png_image_from_file_or_stream (FILE *fp, GetBytesDelegate getBytesFunc
- 	int		bit_depth;
- 	int		channels;
- 	BYTE		color_type;
-+	int 	num_palette;
-+	png_colorp	png_palette;
  
- 	png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+ 		/* Copy palette. */
++		png_get_PLTE (png_ptr, info_ptr, &png_palette, &png_num_palette);
++
+ 		num_colours = 1 << bit_depth;
  
-@@ -320,9 +328,10 @@ gdip_load_png_image_from_file_or_stream (FILE *fp, GetBytesDelegate getBytesFunc
- 			/* Copy the palette data into the GDI+ structure. */
+ 		if (png_get_color_type (png_ptr, info_ptr) == PNG_COLOR_TYPE_GRAY) {
+@@ -321,8 +333,8 @@ gdip_load_png_image_from_file_or_stream 
  			colourspace_flag = ImageFlagsColorSpaceRGB;
  
-+			png_get_PLTE( png_ptr, info_ptr, &png_palette, &num_palette );
  			palette_entries = num_colours;
 -			if (palette_entries > info_ptr->num_palette) {
 -				palette_entries = info_ptr->num_palette;
-+			if (palette_entries > num_palette) {
-+				palette_entries = num_palette;
++			if (palette_entries > png_num_palette) {
++				palette_entries = png_num_palette;
  			}
  
  			palette = GdipAlloc (sizeof(ColorPalette) + (num_colours - 1) * sizeof(ARGB));
-@@ -331,32 +340,39 @@ gdip_load_png_image_from_file_or_stream (FILE *fp, GetBytesDelegate getBytesFunc
+@@ -331,29 +343,30 @@ gdip_load_png_image_from_file_or_stream 
  
  			for (i=0; i < palette_entries; i++) {
  				set_pixel_bgra (&palette->Entries[i], 0,
@@ -87,51 +79,48 @@ index 15c608a..ce38d67 100644
  			}
  		}
  
--		/* Make sure transparency is respected. */
++		png_get_tRNS (png_ptr, info_ptr, &trans_alpha, &num_trans, &trans_color);
+ 		/* Make sure transparency is respected. */
 -		if (info_ptr->num_trans > 0) {
--			palette->Flags |= PaletteFlagsHasAlpha;
--			colourspace_flag |= ImageFlagsHasAlpha;
-+		{
-+			png_bytep trans_alpha;
-+			int num_trans;
-+			png_color_16p trans_color;
++		if (num_trans > 0) {
+ 			palette->Flags |= PaletteFlagsHasAlpha;
+ 			colourspace_flag |= ImageFlagsHasAlpha;
  
 -			if (info_ptr->num_trans > info_ptr->num_palette) {
 -				info_ptr->num_trans = info_ptr->num_palette;
--			}
-+			/* Make sure transparency is respected. */
-+			png_get_tRNS( png_ptr, info_ptr, &trans_alpha, &num_trans, &trans_color );
-+			if (num_trans > 0) {
-+				palette->Flags |= PaletteFlagsHasAlpha;
-+				colourspace_flag |= ImageFlagsHasAlpha;
-+
-+				if (num_trans > num_palette) {
-+					num_trans = num_palette;
-+				}
++			if (num_trans > png_num_palette) {
++				num_trans = png_num_palette;
+ 			}
  
 -			for (i=0; i < info_ptr->num_trans; i++) {
--				set_pixel_bgra(&palette->Entries[i], 0,
++			for (i=0; i < num_trans; i++) {
+ 				set_pixel_bgra(&palette->Entries[i], 0,
 -						info_ptr->palette[i].blue,
 -						info_ptr->palette[i].green,
 -						info_ptr->palette[i].red,
-+				for (i=0; i < num_trans; i++) {
-+					set_pixel_bgra(&palette->Entries[i], 0,
-+							png_palette[i].blue,
-+							png_palette[i].green,
-+							png_palette[i].red,
++						png_palette[i].blue,
++						png_palette[i].green,
++						png_palette[i].red,
  #if PNG_LIBPNG_VER > 10399
 -						info_ptr->trans_alpha [i]); /* alpha */
-+							trans_alpha [i]); /* alpha */
++						trans_alpha [i]); /* alpha */
  #else
--						info_ptr->trans[i]); /* alpha */
-+							trans[i]); /* alpha */
+ 						info_ptr->trans[i]); /* alpha */
  #endif
-+				}
- 			}
- 		}
+@@ -398,6 +411,8 @@ gdip_load_png_image_from_file_or_stream 
+ 		BYTE		bit_depth;
+ 		int		stride;
+ 		int		interlace;
++		png_colorp	png_palette;
++		int		png_num_palette;
+ 		png_bytep *row_pointers;
+ 		BYTE *rawptr;
+ 		int i, j;
+@@ -490,32 +505,33 @@ gdip_load_png_image_from_file_or_stream 
+ 							png_byte palette = 0;
+ 							png_byte pix = *rowp++;
  
-@@ -486,30 +502,30 @@ gdip_load_png_image_from_file_or_stream (FILE *fp, GetBytesDelegate getBytesFunc
- 
++							png_get_PLTE (png_ptr, info_ptr, &png_palette, &png_num_palette);
  							palette = (pix >> 6) & 0x03;
  							set_pixel_bgra (rawptr, 0,
 -								info_ptr->palette[palette].blue,
@@ -173,57 +162,3 @@ index 15c608a..ce38d67 100644
  								0xFF); /* alpha */
  							rawptr += 16;
  						}
-
-From 87c953a4adf21fb8e1264144b4ac309819ab16e7 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Andr=C3=A9s=20G=2E=20Aragoneses?= <knocte@gmail.com>
-Date: Tue, 9 Jul 2013 23:44:30 +0200
-Subject: [PATCH 2/3] Fix previous commit so that it doesn't break the build
- with libpng v12.0
-
----
- src/pngcodec.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/pngcodec.c b/src/pngcodec.c
-index ce38d67..cf48152 100644
---- a/src/pngcodec.c
-+++ b/src/pngcodec.c
-@@ -370,7 +370,7 @@ gdip_load_png_image_from_file_or_stream (FILE *fp, GetBytesDelegate getBytesFunc
- #if PNG_LIBPNG_VER > 10399
- 							trans_alpha [i]); /* alpha */
- #else
--							trans[i]); /* alpha */
-+							info_ptr->trans[i]); /* alpha */
- #endif
- 				}
- 			}
-
-From 2766e9574a7437b5b52c9e778abe83420729dba0 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Andr=C3=A9s=20G=2E=20Aragoneses?= <knocte@gmail.com>
-Date: Tue, 9 Jul 2013 23:48:07 +0200
-Subject: [PATCH 3/3] Use png_bytep instead of png_bytepp for the iCCP profile
-
-As suggested by Andrew Ruder in https://github.com/mono/libgdiplus/pull/3
-to avoid storing the profile pointer in an undefined memory location.
----
- src/pngcodec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/src/pngcodec.c b/src/pngcodec.c
-index cf48152..25c9baf 100644
---- a/src/pngcodec.c
-+++ b/src/pngcodec.c
-@@ -136,11 +136,11 @@ gdip_load_png_properties (png_structp png_ptr, png_infop info_ptr, png_infop end
- #if defined(PNG_iCCP_SUPPORTED)
- 	{
- 		png_charp	name;
--		png_bytepp	profile;
-+		png_bytep	profile;
- 		png_uint_32	proflen;
- 		int		compression_type;
- 
--		if (png_get_iCCP(png_ptr, info_ptr, &name, &compression_type, profile, &proflen)) {
-+		if (png_get_iCCP(png_ptr, info_ptr, &name, &compression_type, &profile, &proflen)) {
- 			gdip_bitmapdata_property_add_ASCII(bitmap_data, PropertyTagICCProfileDescriptor, (BYTE*)name);
- 			gdip_bitmapdata_property_add_byte(bitmap_data, PropertyTagICCProfile, (BYTE)compression_type);
- 		}
