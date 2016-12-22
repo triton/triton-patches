@@ -1,25 +1,25 @@
-From 0204c8fab5b9104aea46b2fb1f541ca1b7a6eb98 Mon Sep 17 00:00:00 2001
-From: "William A. Kennington III" <william@wkennington.com>
+From d3d7a9b22c5763865a4334554cd634d89f5f2e0b Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
 Date: Tue, 1 Nov 2016 21:04:49 -0700
-Subject: [PATCH] Allow busybox to be in /nix/store/xxxxx-busybox
+Subject: [PATCH 1/1] Allow busybox to be in /nix/store/xxxxx-busybox
 
 ---
  libbb/appletlib.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libbb/appletlib.c b/libbb/appletlib.c
-index 480bf50..1bef92c 100644
+index 9425c7b..edc3aaa 100644
 --- a/libbb/appletlib.c
 +++ b/libbb/appletlib.c
-@@ -884,7 +884,7 @@ static NORETURN void run_applet_and_exit(const char *name, char **argv)
- 	int applet;
- 
- # if ENABLE_BUSYBOX
+@@ -887,7 +887,7 @@ void FAST_FUNC run_applet_no_and_exit(int applet_no, char **argv)
+ static NORETURN void run_applet_and_exit(const char *name, char **argv)
+ {
+ #  if ENABLE_BUSYBOX
 -	if (is_prefixed_with(name, "busybox"))
-+	if (strstr(name, "busybox") != 0)
++	if (strstr(name, "busybox") != NULL)
  		exit(busybox_main(argv));
- # endif
- 	/* find_applet_by_name() search is more expensive, so goes second */
+ #  endif
+ #  if NUM_APPLETS > 0
 -- 
 2.8.0.rc3.226.g39d4020
 
