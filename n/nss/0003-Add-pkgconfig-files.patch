@@ -1,38 +1,41 @@
-From 4c5bd090427e24b40f1c8bd4d518ecb57c0cc3e2 Mon Sep 17 00:00:00 2001
+From 989f66f6c0f48a1dba968a0a9b57035809a40726 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Wed, 28 Sep 2016 12:26:15 -0700
 Subject: [PATCH 3/3] Add pkgconfig files
 
 ---
- Makefile             |   8 +--
+ Makefile             |  11 +---
  config/Makefile      |  39 ++++++++++++++
  config/nss-config.in | 144 +++++++++++++++++++++++++++++++++++++++++++++++++++
  config/nss.pc.in     |  12 +++++
  manifest.mn          |   2 +-
- 5 files changed, 197 insertions(+), 8 deletions(-)
+ 5 files changed, 197 insertions(+), 11 deletions(-)
  create mode 100644 config/Makefile
  create mode 100644 config/nss-config.in
  create mode 100644 config/nss.pc.in
 
 diff --git a/Makefile b/Makefile
-index aa346ae..cc74276 100644
+index c824ba2..2446be5 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -46,7 +46,7 @@ include $(CORE_DEPTH)/coreconf/rules.mk
  # (7) Execute "local" rules. (OPTIONAL).                              #
  #######################################################################
  
--nss_build_all: build_nspr all
-+nss_build_all: all
+-nss_build_all: build_nspr all latest
++nss_build_all: all latest
  
  nss_clean_all: clobber_nspr clobber
  
-@@ -124,12 +124,6 @@ $(NSPR_CONFIG_STATUS): $(NSPR_CONFIGURE)
- 	--with-dist-prefix='$(NSPR_PREFIX)' \
- 	--with-dist-includedir='$(NSPR_PREFIX)/include'
+@@ -143,15 +143,6 @@ $(NSPR_CONFIG_STATUS): $(NSPR_CONFIGURE)
+ 	--prefix='$(NSS_GYP_PREFIX)'
+ endif
  
 -build_nspr: $(NSPR_CONFIG_STATUS)
 -	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME)
+-
+-install_nspr: build_nspr
+-	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME) install
 -
 -clobber_nspr: $(NSPR_CONFIG_STATUS)
 -	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME) clobber
@@ -254,15 +257,15 @@ index 0000000..b2d1735
 +Cflags: -I${includedir}
 +
 diff --git a/manifest.mn b/manifest.mn
-index cb2470b..0be7d94 100644
+index 32086bf..ad4c33b 100644
 --- a/manifest.mn
 +++ b/manifest.mn
 @@ -10,4 +10,4 @@ IMPORTS =	nspr20/v4.8 \
  
  RELEASE = nss
  
--DIRS = coreconf lib cmd external_tests
-+DIRS = coreconf lib cmd config external_tests
+-DIRS = coreconf lib cmd gtests
++DIRS = coreconf lib cmd config gtests
 -- 
-2.8.0.rc3.226.g39d4020
+2.11.0
 
