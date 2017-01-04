@@ -1,4 +1,4 @@
-From 2640e4f60a1a5f1ee5d3fcea2638c401117cb897 Mon Sep 17 00:00:00 2001
+From 95bb5db872b2c39073b268fccc7737a2363c79b5 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Tue, 3 Jan 2017 19:49:45 -0800
 Subject: [PATCH 3/3] Don't look in /usr
