@@ -1,8 +1,17 @@
+From 8b09de767be654c75d989b47cbfad62c9eefd15a Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Tue, 3 Jan 2017 19:49:45 -0800
+Subject: [PATCH 3/3] Don't look in /usr
+
+---
+ gcc/gcc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/gcc/gcc.c b/gcc/gcc.c
-index d956c36..1ba357a 100644
+index 0f042b0f12f..0fb858927ab 100644
 --- a/gcc/gcc.c
 +++ b/gcc/gcc.c
-@@ -1261,10 +1261,10 @@ static const char *gcc_libexec_prefix;
+@@ -1448,10 +1448,10 @@ static const char *gcc_libexec_prefix;
  /* Default prefixes to attach to command names.  */
  
  #ifndef STANDARD_STARTFILE_PREFIX_1
@@ -15,3 +24,6 @@ index d956c36..1ba357a 100644
  #endif
  
  #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
+-- 
+2.11.0
+
