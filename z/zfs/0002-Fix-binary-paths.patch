@@ -1,4 +1,4 @@
-From 335a9da7010bc8f1f14b24aaae4e629d7cad9296 Mon Sep 17 00:00:00 2001
+From 73504ad0e722c6d5c6a18cb2198549a5bb6ab6cc Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Wed, 19 Oct 2016 18:33:20 -0700
 Subject: [PATCH 2/2] Fix binary paths
@@ -7,14 +7,13 @@ Subject: [PATCH 2/2] Fix binary paths
  cmd/ztest/ztest.c                       | 6 +++---
  etc/systemd/system/zfs-share.service.in | 2 +-
  lib/libzfs/libzfs_mount.c               | 4 ++--
- module/Makefile.in                      | 2 +-
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/cmd/ztest/ztest.c b/cmd/ztest/ztest.c
-index 2e4dae3..89a19f0 100644
+index 139ff00cd..99d91ba68 100644
 --- a/cmd/ztest/ztest.c
 +++ b/cmd/ztest/ztest.c
-@@ -790,14 +790,14 @@ process_options(int argc, char **argv)
+@@ -792,14 +792,14 @@ process_options(int argc, char **argv)
  		 * We want to extract <isa> to determine if we should use
  		 * 32 or 64 bit binaries.
  		 */
@@ -33,20 +32,20 @@ index 2e4dae3..89a19f0 100644
  		if (0 != access(zo->zo_alt_ztest, X_OK)) {
  			ztest_dump_core = B_FALSE;
 diff --git a/etc/systemd/system/zfs-share.service.in b/etc/systemd/system/zfs-share.service.in
-index 688731e..cd0efc7 100644
+index 494f5cbef..cd0efc762 100644
 --- a/etc/systemd/system/zfs-share.service.in
 +++ b/etc/systemd/system/zfs-share.service.in
 @@ -9,7 +9,7 @@ PartOf=smb.service
  [Service]
  Type=oneshot
  RemainAfterExit=yes
--ExecStartPre=-@bindir@/rm -f /etc/dfs/sharetab
+-ExecStartPre=-/bin/rm -f /etc/dfs/sharetab
 +ExecStartPre=-/run/current-system/sw/bin/rm -f /etc/dfs/sharetab
  ExecStart=@sbindir@/zfs share -a
  
  [Install]
 diff --git a/lib/libzfs/libzfs_mount.c b/lib/libzfs/libzfs_mount.c
-index 4478167..93f6a12 100644
+index a2bb471b3..ab8be8e1d 100644
 --- a/lib/libzfs/libzfs_mount.c
 +++ b/lib/libzfs/libzfs_mount.c
 @@ -278,7 +278,7 @@ static int
@@ -67,19 +66,6 @@ index 4478167..93f6a12 100644
  	    "-t", MNTTYPE_ZFS,
  	    NULL, NULL, NULL, NULL };
  	int rc, count = 3;
-diff --git a/module/Makefile.in b/module/Makefile.in
-index 8d02f57..5d5546e 100644
---- a/module/Makefile.in
-+++ b/module/Makefile.in
-@@ -73,7 +73,7 @@ modules_uninstall:
- distdir:
- 	list='$(subdir-m)'; for subdir in $$list; do \
- 		(cd @top_srcdir@/module && find $$subdir -name '*.c' -o -name '*.h' -o -name '*.S' |\
--		xargs /bin/cp --parents -t $$distdir); \
-+		xargs cp --parents -t $$distdir); \
- 	done
- 
- distclean maintainer-clean: clean
 -- 
-2.8.0.rc3.226.g39d4020
+2.11.0
 
