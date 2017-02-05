@@ -1,6 +1,6 @@
-From 11b6821c8639970fcd9d0c1679a1003b278c393b Mon Sep 17 00:00:00 2001
+From 04bc576e44fb31ba5f96e382d7a91d62c98188c4 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
-Date: Wed, 19 Oct 2016 18:46:08 -0700
+Date: Wed, 19 Oct 2016 17:53:36 -0700
 Subject: [PATCH 1/2] Fix makefile paths
 
 ---
@@ -11,11 +11,11 @@ Subject: [PATCH 1/2] Fix makefile paths
  include/sys/fm/Makefile.am    |  2 +-
  include/sys/fm/fs/Makefile.am |  2 +-
  include/sys/fs/Makefile.am    |  2 +-
- module/Makefile.in            | 10 ++++++----
- 8 files changed, 14 insertions(+), 12 deletions(-)
+ module/Makefile.in            | 14 ++++++++------
+ 8 files changed, 16 insertions(+), 14 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index e009212f4..27ff7c6e0 100644
+index eacc76a8c..9b194dcba 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -11,10 +11,10 @@ endif
@@ -44,10 +44,10 @@ index a94cad50d..a160fe23e 100644
  kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
  endif
 diff --git a/include/linux/Makefile.am b/include/linux/Makefile.am
-index 9bb0b3493..885d1b0ca 100644
+index 595d1db01..d41375d9e 100644
 --- a/include/linux/Makefile.am
 +++ b/include/linux/Makefile.am
-@@ -21,6 +21,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
+@@ -18,6 +18,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
  endif
  
  if CONFIG_KERNEL
@@ -56,10 +56,10 @@ index 9bb0b3493..885d1b0ca 100644
  kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
  endif
 diff --git a/include/sys/Makefile.am b/include/sys/Makefile.am
-index 956643801..2cb8eb169 100644
+index 77ecfb2dc..52b3612f2 100644
 --- a/include/sys/Makefile.am
 +++ b/include/sys/Makefile.am
-@@ -129,6 +129,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
+@@ -114,6 +114,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
  endif
  
  if CONFIG_KERNEL
@@ -104,19 +104,31 @@ index 0859b9f67..b0c6eec8b 100644
  kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
  endif
 diff --git a/module/Makefile.in b/module/Makefile.in
-index 1c1ea032e..5d5546eed 100644
+index d4ddee2f4..876c8116d 100644
 --- a/module/Makefile.in
 +++ b/module/Makefile.in
-@@ -31,6 +31,8 @@ modules:
+@@ -18,9 +18,9 @@ modules:
+ 	@# installed devel headers, or they may be in the module
+ 	@# subdirectory when building against the spl source tree.
+ 	@if [ -f @SPL_OBJ@/@SPL_SYMBOLS@ ]; then \
+-		/bin/cp @SPL_OBJ@/@SPL_SYMBOLS@ .; \
++		cp @SPL_OBJ@/@SPL_SYMBOLS@ .; \
+ 	elif [ -f @SPL_OBJ@/module/@SPL_SYMBOLS@ ]; then \
+-		/bin/cp @SPL_OBJ@/module/@SPL_SYMBOLS@ .; \
++		cp @SPL_OBJ@/module/@SPL_SYMBOLS@ .; \
+ 	else \
+ 		echo -e "\n" \
+ 		"*** Missing spl symbols ensure you have built the spl:\n" \
+@@ -28,6 +28,8 @@ modules:
  		"*** - @SPL_OBJ@/module/@SPL_SYMBOLS@\n"; \
  		exit 1; \
  	fi
 +	@# when copying a file out of the nix store, we need to make it writable again.
 +	chmod +w @SPL_SYMBOLS@
- 	list='$(SUBDIR_TARGETS)'; for targetdir in $$list; do \
- 		$(MAKE) -C $$targetdir; \
- 	done
-@@ -48,15 +50,15 @@ clean:
+ 	$(MAKE) -C @LINUX_OBJ@ SUBDIRS=`pwd` @KERNELMAKE_PARAMS@ CONFIG_ZFS=m $@
+ 
+ clean:
+@@ -42,15 +44,15 @@ clean:
  modules_install:
  	@# Install the kernel modules
  	$(MAKE) -C @LINUX_OBJ@ SUBDIRS=`pwd` $@ \
