@@ -78,6 +78,8 @@ commit_patches() {
     fi
   done
 
+  git pull --rebase
+
   git push
 }
 
