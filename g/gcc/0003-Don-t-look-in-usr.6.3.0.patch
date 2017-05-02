@@ -1,0 +1,43 @@
+From 12ae07519f6a63cad06ccf1b2b6dbfa64ae6449b Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Tue, 3 Jan 2017 19:49:45 -0800
+Subject: [PATCH 3/3] Don't look in /usr
+
+---
+ gcc/cppdefault.c | 2 ++
+ gcc/gcc.c        | 4 ++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/cppdefault.c b/gcc/cppdefault.c
+index 54aaf06f61c..963c03a5879 100644
+--- a/gcc/cppdefault.c
++++ b/gcc/cppdefault.c
+@@ -35,6 +35,8 @@
+ # undef CROSS_INCLUDE_DIR
+ #endif
+ 
++#undef LOCAL_INCLUDE_DIR
++
+ const struct default_include cpp_include_defaults[]
+ #ifdef INCLUDE_DEFAULTS
+ = INCLUDE_DEFAULTS;
+diff --git a/gcc/gcc.c b/gcc/gcc.c
+index 0f042b0f12f..0fb858927ab 100644
+--- a/gcc/gcc.c
++++ b/gcc/gcc.c
+@@ -1448,10 +1448,10 @@ static const char *gcc_libexec_prefix;
+ /* Default prefixes to attach to command names.  */
+ 
+ #ifndef STANDARD_STARTFILE_PREFIX_1
+-#define STANDARD_STARTFILE_PREFIX_1 "/lib/"
++#define STANDARD_STARTFILE_PREFIX_1 "/no-such-path/"
+ #endif
+ #ifndef STANDARD_STARTFILE_PREFIX_2
+-#define STANDARD_STARTFILE_PREFIX_2 "/usr/lib/"
++#define STANDARD_STARTFILE_PREFIX_2 "/no-such-path/"
+ #endif
+ 
+ #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
+-- 
+2.12.2
+
