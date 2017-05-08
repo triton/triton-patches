@@ -1,0 +1,144 @@
+diff --git a/lib/auth/tun.go b/lib/auth/tun.go
+index 505f51e2..c801d7f0 100644
+--- a/lib/auth/tun.go
++++ b/lib/auth/tun.go
+@@ -144,8 +144,8 @@ func NewTunnel(addr utils.NetAddr,
+ 	if err != nil {
+ 		return nil, err
+ 	}
+-	tunnel.userCertChecker = ssh.CertChecker{IsAuthority: tunnel.isUserAuthority}
+-	tunnel.hostCertChecker = ssh.CertChecker{IsAuthority: tunnel.isHostAuthority}
++	tunnel.userCertChecker = ssh.CertChecker{IsUserAuthority: tunnel.isUserAuthority}
++	tunnel.hostCertChecker = ssh.CertChecker{IsHostAuthority: tunnel.isHostAuthority}
+ 	return tunnel, nil
+ }
+ 
+@@ -221,7 +221,7 @@ func (s *AuthTunnel) HandleNewChan(_ net.Conn, sconn *ssh.ServerConn, nch ssh.Ne
+ 
+ // isHostAuthority is called during checking the client key, to see if the signing
+ // key is the real host CA authority key.
+-func (s *AuthTunnel) isHostAuthority(auth ssh.PublicKey) bool {
++func (s *AuthTunnel) isHostAuthority(auth ssh.PublicKey, principal string) bool {
+ 	key, err := s.authServer.GetCertAuthority(services.CertAuthID{DomainName: s.authServer.DomainName, Type: services.HostCA}, false)
+ 	if err != nil {
+ 		log.Errorf("failed to retrieve user authority key, err: %v", err)
+diff --git a/lib/client/api.go b/lib/client/api.go
+index f0d43442..f8e03885 100644
+--- a/lib/client/api.go
++++ b/lib/client/api.go
+@@ -84,10 +84,6 @@ func (p *ForwardedPort) ToString() string {
+ 	return net.JoinHostPort(p.SrcIP, sport) + ":" + net.JoinHostPort(p.DestHost, dport)
+ }
+ 
+-// HostKeyCallback is called by SSH client when it needs to check
+-// remote host key or certificate validity
+-type HostKeyCallback func(host string, ip net.Addr, key ssh.PublicKey) error
+-
+ // Config is a client config
+ type Config struct {
+ 	// Username is the Teleport account username (for logging into Teleport proxies)
+@@ -151,7 +147,7 @@ type Config struct {
+ 	// HostKeyCallback will be called to check host keys of the remote
+ 	// node, if not specified will be using CheckHostSignature function
+ 	// that uses local cache to validate hosts
+-	HostKeyCallback HostKeyCallback
++	HostKeyCallback ssh.HostKeyCallback
+ 
+ 	// KeyDir defines where temporary session keys will be stored.
+ 	// if empty, they'll go to ~/.tsh
+diff --git a/lib/client/client.go b/lib/client/client.go
+index 0629ef1d..20bf5b49 100644
+--- a/lib/client/client.go
++++ b/lib/client/client.go
+@@ -48,7 +48,7 @@ type ProxyClient struct {
+ 	hostLogin       string
+ 	proxyAddress    string
+ 	proxyPrincipal  string
+-	hostKeyCallback utils.HostKeyCallback
++	hostKeyCallback ssh.HostKeyCallback
+ 	authMethod      ssh.AuthMethod
+ 	siteName        string
+ 	clientAddr      string
+diff --git a/lib/reversetunnel/agent.go b/lib/reversetunnel/agent.go
+index 0798fa8a..dbed8b83 100644
+--- a/lib/reversetunnel/agent.go
++++ b/lib/reversetunnel/agent.go
+@@ -51,7 +51,7 @@ type Agent struct {
+ 	clientName      string
+ 	broadcastClose  *utils.CloseBroadcaster
+ 	disconnectC     chan bool
+-	hostKeyCallback utils.HostKeyCallback
++	hostKeyCallback ssh.HostKeyCallback
+ 	authMethods     []ssh.AuthMethod
+ 	accessPoint     auth.AccessPoint
+ }
+diff --git a/lib/reversetunnel/srv.go b/lib/reversetunnel/srv.go
+index 6ebc18bc..d8370ee9 100644
+--- a/lib/reversetunnel/srv.go
++++ b/lib/reversetunnel/srv.go
+@@ -125,8 +125,8 @@ func NewServer(addr utils.NetAddr, hostSigners []ssh.Signer,
+ 	if err != nil {
+ 		return nil, err
+ 	}
+-	srv.hostCertChecker = ssh.CertChecker{IsAuthority: srv.isHostAuthority}
+-	srv.userCertChecker = ssh.CertChecker{IsAuthority: srv.isUserAuthority}
++	srv.hostCertChecker = ssh.CertChecker{IsHostAuthority: srv.isHostAuthority}
++	srv.userCertChecker = ssh.CertChecker{IsUserAuthority: srv.isUserAuthority}
+ 	srv.srv = s
+ 	return srv, nil
+ }
+@@ -186,7 +186,7 @@ func (s *server) HandleNewChan(conn net.Conn, sconn *ssh.ServerConn, nch ssh.New
+ 
+ // isHostAuthority is called during checking the client key, to see if the signing
+ // key is the real host CA authority key.
+-func (s *server) isHostAuthority(auth ssh.PublicKey) bool {
++func (s *server) isHostAuthority(auth ssh.PublicKey, principal string) bool {
+ 	keys, err := s.getTrustedCAKeys(services.HostCA)
+ 	if err != nil {
+ 		log.Errorf("failed to retrieve trusted keys, err: %v", err)
+diff --git a/lib/srv/sshserver.go b/lib/srv/sshserver.go
+index e4757e12..3f529c5c 100644
+--- a/lib/srv/sshserver.go
++++ b/lib/srv/sshserver.go
+@@ -219,7 +219,7 @@ func New(addr utils.NetAddr,
+ 	if err != nil {
+ 		return nil, trace.Wrap(err)
+ 	}
+-	s.certChecker = ssh.CertChecker{IsAuthority: s.isAuthority}
++	s.certChecker = ssh.CertChecker{IsUserAuthority: s.isUserAuthority}
+ 
+ 	for _, o := range options {
+ 		if err := o(s); err != nil {
+@@ -506,9 +506,9 @@ func (s *Server) fetchRoleSet(teleportUser string, clusterName string) (services
+ 	return roles, err
+ }
+ 
+-// isAuthority is called during checking the client key, to see if the signing
++// isUserAuthority is called during checking the client key, to see if the signing
+ // key is the real CA authority key.
+-func (s *Server) isAuthority(cert ssh.PublicKey) bool {
++func (s *Server) isUserAuthority(cert ssh.PublicKey) bool {
+ 	// find cert authority by it's key
+ 	cas, err := s.authService.GetCertAuthorities(services.UserCA, false)
+ 	if err != nil {
+diff --git a/lib/utils/utils.go b/lib/utils/utils.go
+index e36d06cd..e46fcc38 100644
+--- a/lib/utils/utils.go
++++ b/lib/utils/utils.go
+@@ -30,7 +30,6 @@ import (
+ 	"github.com/gravitational/teleport"
+ 	"github.com/gravitational/trace"
+ 	"github.com/pborman/uuid"
+-	"golang.org/x/crypto/ssh"
+ )
+ 
+ func CopyStrings(in []string) []string {
+@@ -42,8 +41,6 @@ func CopyStrings(in []string) []string {
+ 	return out
+ }
+ 
+-type HostKeyCallback func(hostID string, remote net.Addr, key ssh.PublicKey) error
+-
+ func ReadPath(path string) ([]byte, error) {
+ 	s, err := filepath.Abs(path)
+ 	if err != nil {
