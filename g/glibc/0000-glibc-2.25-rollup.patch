@@ -1,8 +1,41 @@
 diff --git a/ChangeLog b/ChangeLog
-index f140ee67de..67ce0aa4de 100644
+index f140ee67de..31d18f53b6 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,200 @@
+@@ -1,3 +1,233 @@
++2017-07-12  Szabolcs Nagy  <szabolcs.nagy@arm.com>
++
++	* sysdeps/aarch64/dl-machine.h (RTLD_START_1): Change _dl_argv to the
++	hidden __GI__dl_argv symbol.
++
++2017-07-06  Florian Weimer  <fweimer@redhat.com>
++	    H.J. Lu  <hongjiu.lu@intel.com>
++
++	[BZ #21609]
++	* sysdeps/x86_64/Makefile (sysdep-dl-routines): Add tls_get_addr.
++	(gen-as-const-headers): Add rtld-offsets.sym.
++	* sysdeps/x86_64/dl-tls.c: New file.
++	* sysdeps/x86_64/rtld-offsets.sym: Likwise.
++	* sysdeps/x86_64/tls_get_addr.S: Likewise.
++	* sysdeps/x86_64/dl-tls.h: Add multiple inclusion guards.
++	* sysdeps/x86_64/tlsdesc.sym (TI_MODULE_OFFSET): New.
++	(TI_OFFSET_OFFSET): Likwise.
++
++2017-06-14  Florian Weimer  <fweimer@redhat.com>
++
++	* sysdeps/i386/i686/multiarch/strcspn-c.c: Add IS_IN (libc) guard.
++	* sysdeps/i386/i686/multiarch/varshift.c: Likewise.
++
++2017-03-07  Siddhesh Poyarekar  <siddhesh@sourceware.org>
++
++	[BZ #21209]
++	* elf/rtld.c (process_envvars): Ignore LD_HWCAP_MASK for
++	AT_SECURE processes.
++	* sysdeps/generic/unsecvars.h: Add LD_HWCAP_MASK.
++	* elf/tst-env-setuid.c (test_parent): Test LD_HWCAP_MASK.
++	(test_child): Likewise.
++	* elf/Makefile (tst-env-setuid-ENV): Add LD_HWCAP_MASK.
++
 +2017-06-19  Florian Weimer  <fweimer@redhat.com>
 +
 +	* elf/rtld.c (audit_list_string): New variable.
@@ -273,10 +306,10 @@ index e9194e54cf..7f0eef8096 100644
  	| sed -n -f $< > $@.new
  	test -s $@.new
 diff --git a/NEWS b/NEWS
-index ec15dde761..29079e8586 100644
+index ec15dde761..7be238c404 100644
 --- a/NEWS
 +++ b/NEWS
-@@ -5,6 +5,18 @@ See the end for copying conditions.
+@@ -5,6 +5,19 @@ See the end for copying conditions.
  Please send GNU C library bug reports via <http://sourceware.org/bugzilla/>
  using `glibc' in the "product" field.
  
@@ -288,6 +321,7 @@ index ec15dde761..29079e8586 100644
 +  [21015] Document and fix --enable-bind-now
 +  [21109] Tunables broken on big-endian
 +  [21115] sunrpc: Use-after-free in error path in clntudp_call
++  [21209] Ignore and remove LD_HWCAP_MASK for AT_SECURE programs
 +  [21289] Fix symbol redirect for fts_set
 +  [21386] Assertion in fork for distinct parent PID is incorrect
 +  [21624] Unsafe alloca allows local attackers to alias stack and heap (CVE-2017-1000366)
@@ -295,6 +329,19 @@ index ec15dde761..29079e8586 100644
  Version 2.25
  
  * The feature test macro __STDC_WANT_LIB_EXT2__, from ISO/IEC TR
+diff --git a/elf/Makefile b/elf/Makefile
+index 61abeb59ee..cc4aeb25b6 100644
+--- a/elf/Makefile
++++ b/elf/Makefile
+@@ -1398,6 +1398,7 @@ $(objpfx)tst-nodelete-dlclose: $(objpfx)tst-nodelete-dlclose-dso.so
+ $(objpfx)tst-nodelete-dlclose.out: $(objpfx)tst-nodelete-dlclose-dso.so \
+ 				   $(objpfx)tst-nodelete-dlclose-plugin.so
+ 
+-tst-env-setuid-ENV = MALLOC_CHECK_=2 MALLOC_MMAP_THRESHOLD_=4096
++tst-env-setuid-ENV = MALLOC_CHECK_=2 MALLOC_MMAP_THRESHOLD_=4096 \
++		     LD_HWCAP_MASK=0xffffffff
+ tst-env-setuid-tunables-ENV = \
+ 	GLIBC_TUNABLES=glibc.malloc.check=2:glibc.malloc.mmap_threshold=4096
 diff --git a/elf/dl-tunable-types.h b/elf/dl-tunable-types.h
 index a986f0b593..37a4e8021f 100644
 --- a/elf/dl-tunable-types.h
@@ -331,7 +378,7 @@ index a8d53d6a31..e42aa67003 100644
      goto cb;
  
 diff --git a/elf/rtld.c b/elf/rtld.c
-index a036ece956..369724babe 100644
+index a036ece956..9362a21e73 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
 @@ -99,14 +99,121 @@ uintptr_t __pointer_chk_guard_local
@@ -616,7 +663,17 @@ index a036ece956..369724babe 100644
  	  break;
  
  	case 7:
-@@ -2418,7 +2548,8 @@ process_envvars (enum mode *modep)
+@@ -2404,7 +2534,8 @@ process_envvars (enum mode *modep)
+ 
+ 	case 10:
+ 	  /* Mask for the important hardware capabilities.  */
+-	  if (memcmp (envline, "HWCAP_MASK", 10) == 0)
++	  if (!__libc_enable_secure
++	      && memcmp (envline, "HWCAP_MASK", 10) == 0)
+ 	    GLRO(dl_hwcap_mask) = __strtoul_internal (&envline[11], NULL,
+ 						      0, 0);
+ 	  break;
+@@ -2418,7 +2549,8 @@ process_envvars (enum mode *modep)
  
  	case 12:
  	  /* The library search path.  */
@@ -626,6 +683,36 @@ index a036ece956..369724babe 100644
  	    {
  	      library_path = &envline[13];
  	      break;
+diff --git a/elf/tst-env-setuid.c b/elf/tst-env-setuid.c
+index 6ec3fa5874..eec408eb5d 100644
+--- a/elf/tst-env-setuid.c
++++ b/elf/tst-env-setuid.c
+@@ -213,6 +213,12 @@ test_child (void)
+       return 1;
+     }
+ 
++  if (getenv ("LD_HWCAP_MASK") != NULL)
++    {
++      printf ("LD_HWCAP_MASK still set\n");
++      return 1;
++    }
++
+   return 0;
+ }
+ #endif
+@@ -233,6 +239,12 @@ test_parent (void)
+       return 1;
+     }
+ 
++  if (getenv ("LD_HWCAP_MASK") == NULL)
++    {
++      printf ("LD_HWCAP_MASK lost\n");
++      return 1;
++    }
++
+   return 0;
+ }
+ #endif
 diff --git a/iconvdata/Makefile b/iconvdata/Makefile
 index 04157b25c5..e4845871f5 100644
 --- a/iconvdata/Makefile
@@ -2495,6 +2582,33 @@ index 0000000000..db9943a03e
 +/* The minimum run time is around 17 seconds.  */
 +#define TIMEOUT 25
 +#include <support/test-driver.c>
+diff --git a/sysdeps/aarch64/dl-machine.h b/sysdeps/aarch64/dl-machine.h
+index 84b8aecfb8..6067a1d8a0 100644
+--- a/sysdeps/aarch64/dl-machine.h
++++ b/sysdeps/aarch64/dl-machine.h
+@@ -193,8 +193,8 @@ _dl_start_user:								\n\
+ 	cmp	" PTR "0, #0						\n\
+ 	bne	1b							\n\
+ 	// Update _dl_argv						\n\
+-	adrp	x3, _dl_argv						\n\
+-	str	" PTR "2, [x3, #:lo12:_dl_argv]				\n\
++	adrp	x3, __GI__dl_argv					\n\
++	str	" PTR "2, [x3, #:lo12:__GI__dl_argv]			\n\
+ .L_done_stack_adjust:							\n\
+ 	// compute envp							\n\
+ 	add	" PTR "3, " PTR "2, " PTR "1, lsl #" PTR_SIZE_LOG "	\n\
+diff --git a/sysdeps/generic/unsecvars.h b/sysdeps/generic/unsecvars.h
+index a74083786e..5ea8a4a259 100644
+--- a/sysdeps/generic/unsecvars.h
++++ b/sysdeps/generic/unsecvars.h
+@@ -16,6 +16,7 @@
+   "LD_DEBUG\0"								      \
+   "LD_DEBUG_OUTPUT\0"							      \
+   "LD_DYNAMIC_WEAK\0"							      \
++  "LD_HWCAP_MASK\0"							      \
+   "LD_LIBRARY_PATH\0"							      \
+   "LD_ORIGIN_PATH\0"							      \
+   "LD_PRELOAD\0"							      \
 diff --git a/sysdeps/hppa/dl-machine.h b/sysdeps/hppa/dl-machine.h
 index 339c7bb771..787b95f502 100644
 --- a/sysdeps/hppa/dl-machine.h
@@ -2542,6 +2656,26 @@ index 910679cfc0..e41f324a77 100644
  	jbe	L(return_null)
  	lea	16(%edi), %edi
  # else
+diff --git a/sysdeps/i386/i686/multiarch/strcspn-c.c b/sysdeps/i386/i686/multiarch/strcspn-c.c
+index 6d61e190a8..ec230fb383 100644
+--- a/sysdeps/i386/i686/multiarch/strcspn-c.c
++++ b/sysdeps/i386/i686/multiarch/strcspn-c.c
+@@ -1,2 +1,4 @@
+-#define __strcspn_sse2 __strcspn_ia32
+-#include <sysdeps/x86_64/multiarch/strcspn-c.c>
++#if IS_IN (libc)
++# define __strcspn_sse2 __strcspn_ia32
++# include <sysdeps/x86_64/multiarch/strcspn-c.c>
++#endif
+diff --git a/sysdeps/i386/i686/multiarch/varshift.c b/sysdeps/i386/i686/multiarch/varshift.c
+index 7760b966e2..6742a35d41 100644
+--- a/sysdeps/i386/i686/multiarch/varshift.c
++++ b/sysdeps/i386/i686/multiarch/varshift.c
+@@ -1 +1,3 @@
+-#include <sysdeps/x86_64/multiarch/varshift.c>
++#if IS_IN (libc)
++# include <sysdeps/x86_64/multiarch/varshift.c>
++#endif
 diff --git a/sysdeps/nptl/fork.c b/sysdeps/nptl/fork.c
 index db6d721fce..4bb87e2331 100644
 --- a/sysdeps/nptl/fork.c
@@ -2795,6 +2929,105 @@ index 5043b32563..95282a3ac7 100644
    vector_func (mx, mr, mr, mr, mr, mr1, mr1, mr1, mr1);		\
    TEST_VEC_LOOP (r_loc, VEC_LEN/4);				\
    TEST_VEC_LOOP (r1_loc, VEC_LEN/4);				\
+diff --git a/sysdeps/x86_64/Makefile b/sysdeps/x86_64/Makefile
+index 5f25893dc9..c896e22568 100644
+--- a/sysdeps/x86_64/Makefile
++++ b/sysdeps/x86_64/Makefile
+@@ -27,7 +27,7 @@ ifeq ($(subdir),elf)
+ CFLAGS-.os += $(if $(filter $(@F),$(patsubst %,%.os,$(all-rtld-routines))),\
+ 		   -mno-mmx)
+ 
+-sysdep-dl-routines += tlsdesc dl-tlsdesc
++sysdep-dl-routines += tlsdesc dl-tlsdesc tls_get_addr
+ 
+ tests += ifuncmain8
+ modules-names += ifuncmod8
+@@ -108,5 +108,5 @@ endif
+ endif
+ 
+ ifeq ($(subdir),csu)
+-gen-as-const-headers += tlsdesc.sym
++gen-as-const-headers += tlsdesc.sym rtld-offsets.sym
+ endif
+diff --git a/sysdeps/x86_64/dl-tls.c b/sysdeps/x86_64/dl-tls.c
+new file mode 100644
+index 0000000000..3584805c8e
+--- /dev/null
++++ b/sysdeps/x86_64/dl-tls.c
+@@ -0,0 +1,53 @@
++/* Thread-local storage handling in the ELF dynamic linker.  x86-64 version.
++   Copyright (C) 2017 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++#ifdef SHARED
++/* Work around GCC PR58066, due to which __tls_get_addr may be called
++   with an unaligned stack.  The compat implementation is in
++   tls_get_addr-compat.S.  */
++
++# include <dl-tls.h>
++
++/* Define __tls_get_addr within elf/dl-tls.c under a different
++   name.  */
++extern __typeof__ (__tls_get_addr) ___tls_get_addr;
++
++# define __tls_get_addr ___tls_get_addr
++# include <elf/dl-tls.c>
++# undef __tls_get_addr
++
++hidden_ver (___tls_get_addr, __tls_get_addr)
++
++/* Only handle slow paths for __tls_get_addr.  */
++attribute_hidden
++void *
++__tls_get_addr_slow (GET_ADDR_ARGS)
++{
++  dtv_t *dtv = THREAD_DTV ();
++
++  if (__glibc_unlikely (dtv[0].counter != GL(dl_tls_generation)))
++    return update_get_addr (GET_ADDR_PARAM);
++
++  return tls_get_addr_tail (GET_ADDR_PARAM, dtv, NULL);
++}
++#else
++
++/* No compatibility symbol needed.  */
++# include <elf/dl-tls.c>
++
++#endif
+diff --git a/sysdeps/x86_64/dl-tls.h b/sysdeps/x86_64/dl-tls.h
+index 4a59d2a924..c2fb56c0a1 100644
+--- a/sysdeps/x86_64/dl-tls.h
++++ b/sysdeps/x86_64/dl-tls.h
+@@ -16,6 +16,9 @@
+    License along with the GNU C Library; if not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef _X86_64_DL_TLS_H
++#define _X86_64_DL_TLS_H
++
+ #include <stdint.h>
+ 
+ /* Type used for the representation of TLS information in the GOT.  */
+@@ -27,3 +30,5 @@ typedef struct dl_tls_index
+ 
+ 
+ extern void *__tls_get_addr (tls_index *ti);
++
++#endif /* _X86_64_DL_TLS_H */
 diff --git a/sysdeps/x86_64/dl-trampoline.S b/sysdeps/x86_64/dl-trampoline.S
 index 33d7fcf7d0..c14c61aa58 100644
 --- a/sysdeps/x86_64/dl-trampoline.S
@@ -2976,3 +3209,93 @@ index 79eaa37bb6..7e08311cdf 100644
  	HAS_ARCH_FEATURE (AVX512F_Usable)
  	jz	2f
  	lea	__memset_chk_avx512_no_vzeroupper(%rip), %RAX_LP
+diff --git a/sysdeps/x86_64/rtld-offsets.sym b/sysdeps/x86_64/rtld-offsets.sym
+new file mode 100644
+index 0000000000..fd41b51521
+--- /dev/null
++++ b/sysdeps/x86_64/rtld-offsets.sym
+@@ -0,0 +1,6 @@
++#define SHARED
++#include <ldsodefs.h>
++
++--
++
++GL_TLS_GENERATION_OFFSET        offsetof (struct rtld_global, _dl_tls_generation)
+diff --git a/sysdeps/x86_64/tls_get_addr.S b/sysdeps/x86_64/tls_get_addr.S
+new file mode 100644
+index 0000000000..9d38fb3be5
+--- /dev/null
++++ b/sysdeps/x86_64/tls_get_addr.S
+@@ -0,0 +1,61 @@
++/* Stack-aligning implementation of __tls_get_addr.  x86-64 version.
++   Copyright (C) 2017 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++#ifdef SHARED
++
++# include <sysdep.h>
++# include "tlsdesc.h"
++# include "rtld-offsets.h"
++
++/* See __tls_get_addr and __tls_get_addr_slow in dl-tls.c.  This function
++   call __tls_get_addr_slow on both slow paths.  It realigns the stack
++   before the call to work around GCC PR58066.  */
++
++ENTRY (__tls_get_addr)
++	mov 	%fs:DTV_OFFSET, %RDX_LP
++	mov	GL_TLS_GENERATION_OFFSET+_rtld_local(%rip), %RAX_LP
++	/* GL(dl_tls_generation) == dtv[0].counter */
++	cmp	%RAX_LP, (%rdx)
++	jne	1f
++	mov	TI_MODULE_OFFSET(%rdi), %RAX_LP
++	/* dtv[ti->ti_module] */
++# ifdef __LP64__
++	salq	$4, %rax
++	movq	(%rdx,%rax), %rax
++# else
++	movl	(%rdx,%rax, 8), %eax
++# endif
++	cmp	$-1, %RAX_LP
++	je	1f
++	add	TI_OFFSET_OFFSET(%rdi), %RAX_LP
++	ret
++1:
++	/* On the slow path, align the stack.  */
++	pushq	%rbp
++	cfi_def_cfa_offset (16)
++	cfi_offset (%rbp, -16)
++	mov	%RSP_LP, %RBP_LP
++	cfi_def_cfa_register (%rbp)
++	and	$-16, %RSP_LP
++	call	__tls_get_addr_slow
++	mov	%RBP_LP, %RSP_LP
++	popq	%rbp
++	cfi_def_cfa (%rsp, 8)
++	ret
++END (__tls_get_addr)
++#endif /* SHARED */
+diff --git a/sysdeps/x86_64/tlsdesc.sym b/sysdeps/x86_64/tlsdesc.sym
+index 33854975d0..fc897ab4b5 100644
+--- a/sysdeps/x86_64/tlsdesc.sym
++++ b/sysdeps/x86_64/tlsdesc.sym
+@@ -15,3 +15,6 @@ TLSDESC_ARG			offsetof(struct tlsdesc, arg)
+ TLSDESC_GEN_COUNT		offsetof(struct tlsdesc_dynamic_arg, gen_count)
+ TLSDESC_MODID			offsetof(struct tlsdesc_dynamic_arg, tlsinfo.ti_module)
+ TLSDESC_MODOFF			offsetof(struct tlsdesc_dynamic_arg, tlsinfo.ti_offset)
++
++TI_MODULE_OFFSET 		offsetof(tls_index, ti_module)
++TI_OFFSET_OFFSET 		offsetof(tls_index, ti_offset)
