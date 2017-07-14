@@ -6,7 +6,7 @@ diff -ru glibc-2.16.0-orig/elf/ldconfig.c glibc-2.16.0/elf/ldconfig.c
  
  #ifndef LD_SO_CONF
 -# define LD_SO_CONF SYSCONFDIR "/ld.so.conf"
-+# define LD_SO_CONF "/run/current-system/etc/ld.so.conf"
++# define LD_SO_CONF "@NIX_LD_SO_CONF@"
  #endif
  
  /* Get libc version number.  */
@@ -18,7 +18,7 @@ diff -ru glibc-2.16.0-orig/sysdeps/generic/dl-cache.h glibc-2.16.0/sysdeps/gener
  
  #ifndef LD_SO_CACHE
 -# define LD_SO_CACHE SYSCONFDIR "/ld.so.cache"
-+# define LD_SO_CACHE "/run/current-system/etc/ld.so.cache"
++# define LD_SO_CACHE "@NIX_LD_SO_CACHE@"
  #endif
  
  #ifndef add_system_dir
