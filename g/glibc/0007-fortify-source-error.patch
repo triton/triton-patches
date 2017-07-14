@@ -1,0 +1,16 @@
+diff --git a/include/features.h b/include/features.h
+index dc8ae794a5..91966c1783 100644
+--- a/include/features.h
++++ b/include/features.h
+@@ -370,9 +370,9 @@
+ 
+ #if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0
+ # if !defined __OPTIMIZE__ || __OPTIMIZE__ <= 0
+-#  warning _FORTIFY_SOURCE requires compiling with optimization (-O)
++#  error _FORTIFY_SOURCE requires compiling with optimization (-O)
+ # elif !__GNUC_PREREQ (4, 1)
+-#  warning _FORTIFY_SOURCE requires GCC 4.1 or later
++#  error _FORTIFY_SOURCE requires GCC 4.1 or later
+ # elif _FORTIFY_SOURCE > 1
+ #  define __USE_FORTIFY_LEVEL 2
+ # else
