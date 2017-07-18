@@ -1,0 +1,73 @@
+From a1744ded73ee55c2a58404d13a51005f11bce339 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Tue, 18 Jul 2017 12:58:48 -0700
+Subject: [PATCH] Fix search paths
+
+---
+ Modules/Platform/UnixPaths.cmake | 42 ++++------------------------------------
+ 1 file changed, 4 insertions(+), 38 deletions(-)
+
+diff --git a/Modules/Platform/UnixPaths.cmake b/Modules/Platform/UnixPaths.cmake
+index 5687653cf..c93adba0a 100644
+--- a/Modules/Platform/UnixPaths.cmake
++++ b/Modules/Platform/UnixPaths.cmake
+@@ -22,52 +22,18 @@ get_filename_component(_CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" PATH)
+ # List common installation prefixes.  These will be used for all
+ # search types.
+ list(APPEND CMAKE_SYSTEM_PREFIX_PATH
+-  # Standard
+-  /usr/local /usr /
+-
+-  # CMake install location
+-  "${_CMAKE_INSTALL_DIR}"
+-  )
+-if (NOT CMAKE_FIND_NO_INSTALL_PREFIX)
+-  list(APPEND CMAKE_SYSTEM_PREFIX_PATH
+-    # Project install destination.
+-    "${CMAKE_INSTALL_PREFIX}"
+-  )
+-  if(CMAKE_STAGING_PREFIX)
+-    list(APPEND CMAKE_SYSTEM_PREFIX_PATH
+-      # User-supplied staging prefix.
+-      "${CMAKE_STAGING_PREFIX}"
+-    )
+-  endif()
+-endif()
+-
+-# Non "standard" but common install prefixes
+-list(APPEND CMAKE_SYSTEM_PREFIX_PATH
+-  /usr/X11R6
+-  /usr/pkg
+-  /opt
+-  )
+-
+-# List common include file locations not under the common prefixes.
+-list(APPEND CMAKE_SYSTEM_INCLUDE_PATH
+-  # X11
+-  /usr/include/X11
+-  )
+-
+-list(APPEND CMAKE_SYSTEM_LIBRARY_PATH
+-  # X11
+-  /usr/lib/X11
++  @libc@
+   )
+ 
+ list(APPEND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
+-  /lib /lib32 /lib64 /usr/lib /usr/lib32 /usr/lib64
++  @libc@/lib
+   )
+ 
+ list(APPEND CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES
+-  /usr/include
++  @libc@/include
+   )
+ list(APPEND CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES
+-  /usr/include
++  @libc@/include
+   )
+ 
+ # Enable use of lib32 and lib64 search path variants by default.
+-- 
+2.13.1
+
