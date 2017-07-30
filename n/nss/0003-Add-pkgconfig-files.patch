@@ -21,16 +21,16 @@ index c824ba2..2446be5 100644
 @@ -46,7 +46,7 @@ include $(CORE_DEPTH)/coreconf/rules.mk
  # (7) Execute "local" rules. (OPTIONAL).                              #
  #######################################################################
- 
+
 -nss_build_all: build_nspr all latest
 +nss_build_all: all latest
- 
+
  nss_clean_all: clobber_nspr clobber
- 
+
 @@ -143,15 +143,6 @@ $(NSPR_CONFIG_STATUS): $(NSPR_CONFIGURE)
  	--prefix='$(NSS_GYP_PREFIX)'
  endif
- 
+
 -build_nspr: $(NSPR_CONFIG_STATUS)
 -	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME)
 -
@@ -42,7 +42,7 @@ index c824ba2..2446be5 100644
 -
  build_docs:
  	$(MAKE) -C $(CORE_DEPTH)/doc
- 
+
 diff --git a/config/Makefile b/config/Makefile
 new file mode 100644
 index 0000000..9f6afb7
@@ -261,11 +261,11 @@ index 32086bf..ad4c33b 100644
 --- a/manifest.mn
 +++ b/manifest.mn
 @@ -10,4 +10,4 @@ IMPORTS =	nspr20/v4.8 \
- 
+
  RELEASE = nss
- 
--DIRS = coreconf lib cmd gtests
-+DIRS = coreconf lib cmd config gtests
--- 
+
+-DIRS = coreconf lib cmd cpputil gtests
++DIRS = coreconf lib cmd config cpputil gtests
+--
 2.11.0
 
