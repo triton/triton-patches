@@ -1,0 +1,19 @@
+diff --git a/cpp/Makefile b/cpp/Makefile
+index 4dc4a22..7f54097 100644
+--- a/cpp/Makefile
++++ b/cpp/Makefile
+@@ -30,14 +30,5 @@ include $(filter-out $(foreach p,$(load_first),%/src/$p/Makefile.mk),$(shell fin
+ 
+ $(call make-projects,$(projects),make-cpp-src-project)
+ 
+-#
+-# Now, create and load test projects.
+-#
+-projects :=
+-tests := $(call tests-without-project-makefile,cpp)
+-include $(shell find $(lang_srcdir)/test -name Makefile.mk)
+-$(foreach t,$(tests),$(eval $(call create-cpp-test-project,$(t))))
+-$(call make-projects,$(projects),make-cpp-test-project)
+-
+ install:: | $(DESTDIR)$(install_configdir)
+ 	$(Q)$(INSTALL) $(lang_srcdir)/config/templates.xml $(DESTDIR)$(install_configdir)
