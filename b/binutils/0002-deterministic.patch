@@ -1,0 +1,60 @@
+diff --git a/bfd/archive.c b/bfd/archive.c
+index b3d03d3..0e10846 100644
+--- a/bfd/archive.c
++++ b/bfd/archive.c
+@@ -1936,13 +1936,10 @@ bfd_ar_hdr_from_filesystem (bfd *abfd, const char *filename, bfd *member)
+ 
+   /* If the caller requested that the BFD generate deterministic output,
+      fake values for modification time, UID, GID, and file mode.  */
+-  if ((abfd->flags & BFD_DETERMINISTIC_OUTPUT) != 0)
+-    {
+-      status.st_mtime = 0;
+-      status.st_uid = 0;
+-      status.st_gid = 0;
+-      status.st_mode = 0644;
+-    }
++  status.st_mtime = 0;
++  status.st_uid = 0;
++  status.st_gid = 0;
++  status.st_mode = 0644;
+ 
+   amt = sizeof (struct ar_hdr) + sizeof (struct areltdata);
+   ared = (struct areltdata *) bfd_zmalloc (amt);
+@@ -2484,16 +2481,6 @@ bsd_write_armap (bfd *arch,
+   bfd_ardata (arch)->armap_timestamp = 0;
+   uid = 0;
+   gid = 0;
+-  if ((arch->flags & BFD_DETERMINISTIC_OUTPUT) == 0)
+-    {
+-      struct stat statbuf;
+-
+-      if (stat (arch->filename, &statbuf) == 0)
+-	bfd_ardata (arch)->armap_timestamp = (statbuf.st_mtime
+-					      + ARMAP_TIME_OFFSET);
+-      uid = getuid();
+-      gid = getgid();
+-    }
+ 
+   memset (&hdr, ' ', sizeof (struct ar_hdr));
+   memcpy (hdr.ar_name, RANLIBMAG, strlen (RANLIBMAG));
+@@ -2586,8 +2573,7 @@ _bfd_archive_bsd_update_armap_timestamp (bfd *arch)
+   struct ar_hdr hdr;
+ 
+   /* If creating deterministic archives, just leave the timestamp as-is.  */
+-  if ((arch->flags & BFD_DETERMINISTIC_OUTPUT) != 0)
+-    return TRUE;
++  return TRUE;
+ 
+   /* Flush writes, get last-write timestamp from file, and compare it
+      to the timestamp IN the file.  */
+@@ -2672,9 +2658,7 @@ coff_write_armap (bfd *arch,
+   hdr.ar_name[0] = '/';
+   if (!_bfd_ar_sizepad (hdr.ar_size, sizeof (hdr.ar_size), mapsize))
+     return FALSE;
+-  _bfd_ar_spacepad (hdr.ar_date, sizeof (hdr.ar_date), "%ld",
+-		    ((arch->flags & BFD_DETERMINISTIC_OUTPUT) == 0
+-		     ? time (NULL) : 0));
++  _bfd_ar_spacepad (hdr.ar_date, sizeof (hdr.ar_date), "%ld", 0);
+   /* This, at least, is what Intel coff sets the values to.  */
+   _bfd_ar_spacepad (hdr.ar_uid, sizeof (hdr.ar_uid), "%ld", 0);
+   _bfd_ar_spacepad (hdr.ar_gid, sizeof (hdr.ar_gid), "%ld", 0);
