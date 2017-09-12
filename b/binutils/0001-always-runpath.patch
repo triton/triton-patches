@@ -1,0 +1,36 @@
+diff --git a/bfd/elflink.c b/bfd/elflink.c
+index 3d37bb4..74311ce 100644
+--- a/bfd/elflink.c
++++ b/bfd/elflink.c
+@@ -5798,7 +5798,7 @@ bfd_elf_size_dynamic_sections (bfd *output_bfd,
+ 	  if (indx == (bfd_size_type) -1)
+ 	    return FALSE;
+ 
+-	  tag = info->new_dtags ? DT_RUNPATH : DT_RPATH;
++	  tag = DT_RUNPATH;
+ 	  if (!_bfd_elf_add_dynamic_entry (info, tag, indx))
+ 	    return FALSE;
+ 	}
+@@ -6314,7 +6314,7 @@ bfd_elf_size_dynamic_sections (bfd *output_bfd,
+ 	  elf_tdata (output_bfd)->cverdefs = cdefs;
+ 	}
+ 
+-      if ((info->new_dtags && info->flags) || (info->flags & DF_STATIC_TLS))
++      if (info->flags || (info->flags & DF_STATIC_TLS))
+ 	{
+ 	  if (!_bfd_elf_add_dynamic_entry (info, DT_FLAGS, info->flags))
+ 	    return FALSE;
+diff --git a/gold/layout.cc b/gold/layout.cc
+index ad92fcc..55cfa12 100644
+--- a/gold/layout.cc
++++ b/gold/layout.cc
+@@ -4822,9 +4822,6 @@ Layout::finish_dynamic_section(const Input_objects* input_objects,
+ 	    }
+ 	}
+ 
+-      if (!parameters->options().enable_new_dtags())
+-	odyn->add_string(elfcpp::DT_RPATH, rpath_val);
+-      else
+ 	odyn->add_string(elfcpp::DT_RUNPATH, rpath_val);
+     }
+ 
