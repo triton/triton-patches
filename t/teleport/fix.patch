@@ -1,9 +1,11 @@
-From 7992874c904657caa8ac93201d71c262a22e2408 Mon Sep 17 00:00:00 2001
+From 2c3203b30a562c51a83b522ec925fa74855827b4 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Tue, 3 Oct 2017 12:10:23 -0700
 Subject: [PATCH] fix
 
 ---
+ lib/auth/apiserver.go      | 4 +++-
+ lib/auth/clt.go            | 4 +++-
  lib/auth/tun.go            | 6 +++---
  lib/client/api.go          | 6 +-----
  lib/client/client.go       | 2 +-
@@ -11,8 +13,52 @@ Subject: [PATCH] fix
  lib/reversetunnel/srv.go   | 6 +++---
  lib/srv/sshserver.go       | 6 +++---
  lib/utils/utils.go         | 3 ---
- 7 files changed, 12 insertions(+), 19 deletions(-)
+ 9 files changed, 18 insertions(+), 21 deletions(-)
 
+diff --git a/lib/auth/apiserver.go b/lib/auth/apiserver.go
+index 7d197d51..d4698851 100644
+--- a/lib/auth/apiserver.go
++++ b/lib/auth/apiserver.go
+@@ -39,6 +39,8 @@ import (
+ 
+ 	"github.com/jonboulle/clockwork"
+ 	"github.com/tstranex/u2f"
++
++	"github.com/golang/protobuf/proto"
+ )
+ 
+ type APIConfig struct {
+@@ -1449,7 +1451,7 @@ func (s *APIServer) postSessionSlice(auth ClientI, w http.ResponseWriter, r *htt
+ 		return nil, trace.Wrap(err)
+ 	}
+ 	var slice events.SessionSlice
+-	if err := slice.Unmarshal(data); err != nil {
++	if err := proto.Unmarshal(data, slice); err != nil {
+ 		return nil, trace.BadParameter("failed to unmarshal %v", err)
+ 	}
+ 	if err := auth.PostSessionSlice(slice); err != nil {
+diff --git a/lib/auth/clt.go b/lib/auth/clt.go
+index 675312d2..ef0e7e29 100644
+--- a/lib/auth/clt.go
++++ b/lib/auth/clt.go
+@@ -41,6 +41,8 @@ import (
+ 
+ 	log "github.com/sirupsen/logrus"
+ 	"github.com/tstranex/u2f"
++
++	"github.com/golang/protobuf/proto"
+ )
+ 
+ const (
+@@ -1152,7 +1154,7 @@ func (c *Client) PostSessionChunk(namespace string, sid session.ID, reader io.Re
+ // The data is POSTed to HTTP server as a simple binary body (no encodings of any
+ // kind are needed)
+ func (c *Client) PostSessionSlice(slice events.SessionSlice) error {
+-	data, err := slice.Marshal()
++	data, err := proto.Marshal(slice)
+ 	if err != nil {
+ 		return trace.Wrap(err)
+ 	}
 diff --git a/lib/auth/tun.go b/lib/auth/tun.go
 index d17eef51..b813563c 100644
 --- a/lib/auth/tun.go
