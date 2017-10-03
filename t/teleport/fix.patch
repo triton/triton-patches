@@ -1,5 +1,20 @@
+From 7992874c904657caa8ac93201d71c262a22e2408 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Tue, 3 Oct 2017 12:10:23 -0700
+Subject: [PATCH] fix
+
+---
+ lib/auth/tun.go            | 6 +++---
+ lib/client/api.go          | 6 +-----
+ lib/client/client.go       | 2 +-
+ lib/reversetunnel/agent.go | 2 +-
+ lib/reversetunnel/srv.go   | 6 +++---
+ lib/srv/sshserver.go       | 6 +++---
+ lib/utils/utils.go         | 3 ---
+ 7 files changed, 12 insertions(+), 19 deletions(-)
+
 diff --git a/lib/auth/tun.go b/lib/auth/tun.go
-index 505f51e2..c801d7f0 100644
+index d17eef51..b813563c 100644
 --- a/lib/auth/tun.go
 +++ b/lib/auth/tun.go
 @@ -144,8 +144,8 @@ func NewTunnel(addr utils.NetAddr,
@@ -19,14 +34,14 @@ index 505f51e2..c801d7f0 100644
  // key is the real host CA authority key.
 -func (s *AuthTunnel) isHostAuthority(auth ssh.PublicKey) bool {
 +func (s *AuthTunnel) isHostAuthority(auth ssh.PublicKey, principal string) bool {
- 	key, err := s.authServer.GetCertAuthority(services.CertAuthID{DomainName: s.authServer.DomainName, Type: services.HostCA}, false)
+ 	domainName, err := s.authServer.GetDomainName()
  	if err != nil {
- 		log.Errorf("failed to retrieve user authority key, err: %v", err)
+ 		return false
 diff --git a/lib/client/api.go b/lib/client/api.go
-index f0d43442..f8e03885 100644
+index 0653fc70..9a41ff9f 100644
 --- a/lib/client/api.go
 +++ b/lib/client/api.go
-@@ -84,10 +84,6 @@ func (p *ForwardedPort) ToString() string {
+@@ -85,10 +85,6 @@ func (p *ForwardedPort) ToString() string {
  	return net.JoinHostPort(p.SrcIP, sport) + ":" + net.JoinHostPort(p.DestHost, dport)
  }
  
@@ -37,7 +52,7 @@ index f0d43442..f8e03885 100644
  // Config is a client config
  type Config struct {
  	// Username is the Teleport account username (for logging into Teleport proxies)
-@@ -151,7 +147,7 @@ type Config struct {
+@@ -152,7 +148,7 @@ type Config struct {
  	// HostKeyCallback will be called to check host keys of the remote
  	// node, if not specified will be using CheckHostSignature function
  	// that uses local cache to validate hosts
@@ -47,10 +62,10 @@ index f0d43442..f8e03885 100644
  	// KeyDir defines where temporary session keys will be stored.
  	// if empty, they'll go to ~/.tsh
 diff --git a/lib/client/client.go b/lib/client/client.go
-index 0629ef1d..20bf5b49 100644
+index edba3a1a..27140f9a 100644
 --- a/lib/client/client.go
 +++ b/lib/client/client.go
-@@ -48,7 +48,7 @@ type ProxyClient struct {
+@@ -46,7 +46,7 @@ type ProxyClient struct {
  	hostLogin       string
  	proxyAddress    string
  	proxyPrincipal  string
@@ -60,10 +75,10 @@ index 0629ef1d..20bf5b49 100644
  	siteName        string
  	clientAddr      string
 diff --git a/lib/reversetunnel/agent.go b/lib/reversetunnel/agent.go
-index 0798fa8a..dbed8b83 100644
+index 6be46c1f..590e4b19 100644
 --- a/lib/reversetunnel/agent.go
 +++ b/lib/reversetunnel/agent.go
-@@ -51,7 +51,7 @@ type Agent struct {
+@@ -52,7 +52,7 @@ type Agent struct {
  	clientName      string
  	broadcastClose  *utils.CloseBroadcaster
  	disconnectC     chan bool
@@ -73,7 +88,7 @@ index 0798fa8a..dbed8b83 100644
  	accessPoint     auth.AccessPoint
  }
 diff --git a/lib/reversetunnel/srv.go b/lib/reversetunnel/srv.go
-index 6ebc18bc..d8370ee9 100644
+index 0cddf15a..a2eaf132 100644
 --- a/lib/reversetunnel/srv.go
 +++ b/lib/reversetunnel/srv.go
 @@ -125,8 +125,8 @@ func NewServer(addr utils.NetAddr, hostSigners []ssh.Signer,
@@ -97,10 +112,10 @@ index 6ebc18bc..d8370ee9 100644
  	if err != nil {
  		log.Errorf("failed to retrieve trusted keys, err: %v", err)
 diff --git a/lib/srv/sshserver.go b/lib/srv/sshserver.go
-index e4757e12..3f529c5c 100644
+index 266b5f4a..1b96d2a5 100644
 --- a/lib/srv/sshserver.go
 +++ b/lib/srv/sshserver.go
-@@ -219,7 +219,7 @@ func New(addr utils.NetAddr,
+@@ -264,7 +264,7 @@ func New(addr utils.NetAddr,
  	if err != nil {
  		return nil, trace.Wrap(err)
  	}
@@ -109,7 +124,7 @@ index e4757e12..3f529c5c 100644
  
  	for _, o := range options {
  		if err := o(s); err != nil {
-@@ -506,9 +506,9 @@ func (s *Server) fetchRoleSet(teleportUser string, clusterName string) (services
+@@ -586,9 +586,9 @@ func (s *Server) fetchRoleSet(teleportUser string, clusterName string) (services
  	return roles, err
  }
  
@@ -122,7 +137,7 @@ index e4757e12..3f529c5c 100644
  	cas, err := s.authService.GetCertAuthorities(services.UserCA, false)
  	if err != nil {
 diff --git a/lib/utils/utils.go b/lib/utils/utils.go
-index e36d06cd..e46fcc38 100644
+index b873d071..ef2f9637 100644
 --- a/lib/utils/utils.go
 +++ b/lib/utils/utils.go
 @@ -30,7 +30,6 @@ import (
@@ -132,9 +147,9 @@ index e36d06cd..e46fcc38 100644
 -	"golang.org/x/crypto/ssh"
  )
  
- func CopyStrings(in []string) []string {
-@@ -42,8 +41,6 @@ func CopyStrings(in []string) []string {
- 	return out
+ // SplitHostPort splits host and port and checks that host is not empty
+@@ -45,8 +44,6 @@ func SplitHostPort(hostname string) (string, string, error) {
+ 	return host, port, nil
  }
  
 -type HostKeyCallback func(hostID string, remote net.Addr, key ssh.PublicKey) error
@@ -142,3 +157,6 @@ index e36d06cd..e46fcc38 100644
  func ReadPath(path string) ([]byte, error) {
  	s, err := filepath.Abs(path)
  	if err != nil {
+-- 
+2.14.2
+
