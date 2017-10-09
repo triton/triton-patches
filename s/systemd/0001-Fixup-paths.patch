@@ -1,0 +1,932 @@
+From df73eb632d5149cdd28e98c5421ef0960c9a718a Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 9 Oct 2017 14:12:48 -0700
+Subject: [PATCH] Fixup paths
+
+---
+ src/basic/def.h                       | 22 ++++++++++-----------
+ src/basic/locale-util.c               |  4 ++--
+ src/basic/path-util.c                 |  1 +
+ src/basic/path-util.h                 |  4 ++--
+ src/basic/stat-util.c                 |  2 +-
+ src/basic/time-util.c                 |  8 ++++----
+ src/basic/user-util.c                 |  3 ++-
+ src/core/main.c                       |  2 +-
+ src/core/manager.c                    |  4 ++--
+ src/core/mount.c                      |  4 +++-
+ src/core/namespace.c                  |  8 ++------
+ src/core/swap.c                       |  4 ++--
+ src/core/systemd.pc.in                |  4 ++--
+ src/core/umount.c                     |  2 ++
+ src/delta/delta.c                     |  9 ++-------
+ src/firstboot/firstboot.c             |  4 ++--
+ src/fsck/fsck.c                       |  2 +-
+ src/fstab-generator/fstab-generator.c |  3 ++-
+ src/hostname/hostnamed.c              |  2 +-
+ src/journal/cat.c                     |  2 +-
+ src/journal/catalog.c                 |  3 +--
+ src/libsystemd/sd-hwdb/sd-hwdb.c      |  5 +----
+ src/libsystemd/sd-path/sd-path.c      | 36 +++++++++++------------------------
+ src/locale/localectl.c                |  2 +-
+ src/machine/image-dbus.c              |  4 ++--
+ src/machine/machine-dbus.c            |  2 +-
+ src/network/networkd-manager.c        |  6 ++----
+ src/nspawn/nspawn.c                   |  4 ++--
+ src/nss-mymachines/nss-mymachines.c   |  4 ++--
+ src/nss-systemd/nss-systemd.c         |  6 +++---
+ src/remount-fs/remount-fs.c           |  4 +++-
+ src/shared/install.c                  | 11 ++++-------
+ src/shared/machine-image.c            |  5 ++---
+ src/shared/machine-image.h            |  8 +++++++-
+ src/shared/path-lookup.c              | 21 +++++---------------
+ src/sysusers/sysusers.c               |  2 +-
+ src/tmpfiles/tmpfiles.c               |  4 ++--
+ src/udev/net/link-config.c            |  6 ++----
+ units/kmod-static-nodes.service.in    |  1 -
+ 39 files changed, 97 insertions(+), 131 deletions(-)
+
+diff --git a/src/basic/def.h b/src/basic/def.h
+index c04e58b57..9c8edfb79 100644
+--- a/src/basic/def.h
++++ b/src/basic/def.h
+@@ -44,16 +44,15 @@
+ #define SIGNALS_IGNORE SIGPIPE
+ 
+ #if HAVE_SPLIT_USR
+-#define KBD_KEYMAP_DIRS                         \
+-        "/usr/share/keymaps/\0"                 \
+-        "/usr/share/kbd/keymaps/\0"             \
+-        "/usr/lib/kbd/keymaps/\0"               \
+-        "/lib/kbd/keymaps/\0"
++#define KBD_KEYMAP_DIRS                               \
++        "/run/current-system/sw/share/keymaps/\0"     \
++        "/run/current-system/sw/share/kbd/keymaps/\0" \
++        "/run/current-system/sw/lib/kbd/keymaps/\0"
+ #else
+-#define KBD_KEYMAP_DIRS                         \
+-        "/usr/share/keymaps/\0"                 \
+-        "/usr/share/kbd/keymaps/\0"             \
+-        "/usr/lib/kbd/keymaps/\0"
++#define KBD_KEYMAP_DIRS                               \
++        "/run/current-system/sw/share/keymaps/\0"     \
++        "/run/current-system/sw/share/kbd/keymaps/\0" \
++        "/run/current-system/sw/lib/kbd/keymaps/\0"
+ #endif
+ 
+ #define UNIX_SYSTEM_BUS_ADDRESS "unix:path=/var/run/dbus/system_bus_socket"
+@@ -69,7 +68,7 @@
+ #define NOTIFY_BUFFER_MAX PIPE_BUF
+ 
+ #if HAVE_SPLIT_USR
+-#  define _CONF_PATHS_SPLIT_USR(n) "/lib/" n "\0"
++#  define _CONF_PATHS_SPLIT_USR(n)
+ #else
+ #  define _CONF_PATHS_SPLIT_USR(n)
+ #endif
+@@ -81,8 +80,7 @@
+ #define CONF_PATHS_NULSTR(n)                    \
+         "/etc/" n "\0"                          \
+         "/run/" n "\0"                          \
+-        "/usr/local/lib/" n "\0"                \
+-        "/usr/lib/" n "\0"                      \
++        "/run/current-system/sw/lib/" n "\0"    \
+         _CONF_PATHS_SPLIT_USR(n)
+ 
+ #define LONG_LINE_MAX (1U*1024U*1024U)
+diff --git a/src/basic/locale-util.c b/src/basic/locale-util.c
+index ada0a28cd..72f67d2c1 100644
+--- a/src/basic/locale-util.c
++++ b/src/basic/locale-util.c
+@@ -84,7 +84,7 @@ static int add_locales_from_archive(Set *locales) {
+         unsigned i;
+         int r;
+ 
+-        fd = open("/usr/lib/locale/locale-archive", O_RDONLY|O_NOCTTY|O_CLOEXEC);
++        fd = open("/run/current-system/sw/lib/locale/locale-archive", O_RDONLY|O_NOCTTY|O_CLOEXEC);
+         if (fd < 0)
+                 return errno == ENOENT ? 0 : -errno;
+ 
+@@ -146,7 +146,7 @@ static int add_locales_from_libdir (Set *locales) {
+         struct dirent *entry;
+         int r;
+ 
+-        dir = opendir("/usr/lib/locale");
++        dir = opendir("/run/current/system/sw/lib/locale");
+         if (!dir)
+                 return errno == ENOENT ? 0 : -errno;
+ 
+diff --git a/src/basic/path-util.c b/src/basic/path-util.c
+index 6c06bd2ac..6e03a2bde 100644
+--- a/src/basic/path-util.c
++++ b/src/basic/path-util.c
+@@ -588,6 +588,7 @@ static int binary_is_good(const char *binary) {
+         return !PATH_IN_SET(d, "true"
+                                "/bin/true",
+                                "/usr/bin/true",
++                               "/run/current-system/sw/bin/true",
+                                "/dev/null");
+ }
+ 
+diff --git a/src/basic/path-util.h b/src/basic/path-util.h
+index 546246595..58efb4dd9 100644
+--- a/src/basic/path-util.h
++++ b/src/basic/path-util.h
+@@ -27,8 +27,8 @@
+ #include "string-util.h"
+ #include "time-util.h"
+ 
+-#define DEFAULT_PATH_NORMAL "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+-#define DEFAULT_PATH_SPLIT_USR DEFAULT_PATH_NORMAL ":/sbin:/bin"
++#define DEFAULT_PATH_NORMAL "/no-such-path"
++#define DEFAULT_PATH_SPLIT_USR DEFAULT_PATH_NORMAL "/no-such-path"
+ 
+ #if HAVE_SPLIT_USR
+ #  define DEFAULT_PATH DEFAULT_PATH_SPLIT_USR
+diff --git a/src/basic/stat-util.c b/src/basic/stat-util.c
+index d87370e67..1f7e0b7fc 100644
+--- a/src/basic/stat-util.c
++++ b/src/basic/stat-util.c
+@@ -155,7 +155,7 @@ int path_is_os_tree(const char *path) {
+                 return -errno;
+ 
+         /* We use /usr/lib/os-release as flag file if something is an OS */
+-        r = chase_symlinks("/usr/lib/os-release", path, CHASE_PREFIX_ROOT, NULL);
++        r = chase_symlinks("/run/current-system/sw/lib/os-release", path, CHASE_PREFIX_ROOT, NULL);
+         if (r == -ENOENT) {
+ 
+                 /* Also check for the old location in /etc, just in case. */
+diff --git a/src/basic/time-util.c b/src/basic/time-util.c
+index f7f5e614f..65f28bc31 100644
+--- a/src/basic/time-util.c
++++ b/src/basic/time-util.c
+@@ -1247,7 +1247,7 @@ int get_timezones(char ***ret) {
+         n_allocated = 2;
+         n_zones = 1;
+ 
+-        f = fopen("/usr/share/zoneinfo/zone.tab", "re");
++        f = fopen("/etc/zoneinfo/zone.tab", "re");
+         if (f) {
+                 char l[LINE_MAX];
+ 
+@@ -1328,7 +1328,7 @@ bool timezone_is_valid(const char *name) {
+         if (slash)
+                 return false;
+ 
+-        t = strjoina("/usr/share/zoneinfo/", name);
++        t = strjoina("/etc/zoneinfo/", name);
+         if (stat(t, &st) < 0)
+                 return false;
+ 
+@@ -1399,9 +1399,9 @@ int get_timezone(char **tz) {
+         if (r < 0)
+                 return r; /* returns EINVAL if not a symlink */
+ 
+-        e = path_startswith(t, "/usr/share/zoneinfo/");
++        e = path_startswith(t, "/etc/zoneinfo/");
+         if (!e)
+-                e = path_startswith(t, "../usr/share/zoneinfo/");
++                e = path_startswith(t, "../etc/zoneinfo/");
+         if (!e)
+                 return -EINVAL;
+ 
+diff --git a/src/basic/user-util.c b/src/basic/user-util.c
+index a691a0d3f..24d5fbdef 100644
+--- a/src/basic/user-util.c
++++ b/src/basic/user-util.c
+@@ -198,7 +198,8 @@ int get_user_creds_clean(
+                                             "/bin/nologin",
+                                             "/sbin/nologin",
+                                             "/usr/bin/nologin",
+-                                            "/usr/sbin/nologin")))
++                                            "/usr/sbin/nologin",
++                                            "/run/current-system/sw/bin/nologin")))
+                 *shell = NULL;
+ 
+         if (home &&
+diff --git a/src/core/main.c b/src/core/main.c
+index b9bc2f684..1bafa75b8 100644
+--- a/src/core/main.c
++++ b/src/core/main.c
+@@ -1286,7 +1286,7 @@ static int status_welcome(void) {
+                            "ANSI_COLOR", &ansi_color,
+                            NULL);
+         if (r == -ENOENT)
+-                r = parse_env_file("/usr/lib/os-release", NEWLINE,
++                r = parse_env_file("/run/current-system/sw/lib/os-release", NEWLINE,
+                                    "PRETTY_NAME", &pretty_name,
+                                    "ANSI_COLOR", &ansi_color,
+                                    NULL);
+diff --git a/src/core/manager.c b/src/core/manager.c
+index d2be218b0..cf35d5db2 100644
+--- a/src/core/manager.c
++++ b/src/core/manager.c
+@@ -3129,7 +3129,7 @@ static bool generator_path_any(const char* const* paths) {
+ static const char* system_env_generator_binary_paths[] = {
+         "/run/systemd/system-environment-generators",
+         "/etc/systemd/system-environment-generators",
+-        "/usr/local/lib/systemd/system-environment-generators",
++        "/etc/systemd-mutable/system-environment-generators",
+         SYSTEM_ENV_GENERATOR_PATH,
+         NULL
+ };
+@@ -3137,7 +3137,7 @@ static const char* system_env_generator_binary_paths[] = {
+ static const char* user_env_generator_binary_paths[] = {
+         "/run/systemd/user-environment-generators",
+         "/etc/systemd/user-environment-generators",
+-        "/usr/local/lib/systemd/user-environment-generators",
++        "/etc/systemd-mutable/user-environment-generators",
+         USER_ENV_GENERATOR_PATH,
+         NULL
+ };
+diff --git a/src/core/mount.c b/src/core/mount.c
+index 903b3a9c1..39dca670b 100644
+--- a/src/core/mount.c
++++ b/src/core/mount.c
+@@ -414,7 +414,9 @@ static bool mount_is_extrinsic(Mount *m) {
+ 
+         if (PATH_IN_SET(m->where,  /* Don't bother with the OS data itself */
+                         "/",
+-                        "/usr"))
++                        "/usr",
++                        "/nix",
++                        "/nix/store"))
+                 return true;
+ 
+         if (PATH_STARTSWITH_SET(m->where,
+diff --git a/src/core/namespace.c b/src/core/namespace.c
+index 6d74b8da6..87a0f49b7 100644
+--- a/src/core/namespace.c
++++ b/src/core/namespace.c
+@@ -107,10 +107,6 @@ static const MountEntry protect_kernel_tunables_table[] = {
+ 
+ /* ProtectKernelModules= option */
+ static const MountEntry protect_kernel_modules_table[] = {
+-#if HAVE_SPLIT_USR
+-        { "/lib/modules",        INACCESSIBLE, true  },
+-#endif
+-        { "/usr/lib/modules",    INACCESSIBLE, true  },
+ };
+ 
+ /*
+@@ -132,14 +128,14 @@ static const MountEntry protect_home_yes_table[] = {
+ 
+ /* ProtectSystem=yes table */
+ static const MountEntry protect_system_yes_table[] = {
+-        { "/usr",                READONLY,     false },
++        { "/nix",                READONLY,     false },
+         { "/boot",               READONLY,     true  },
+         { "/efi",                READONLY,     true  },
+ };
+ 
+ /* ProtectSystem=full includes ProtectSystem=yes */
+ static const MountEntry protect_system_full_table[] = {
+-        { "/usr",                READONLY,     false },
++        { "/nix",                READONLY,     false },
+         { "/boot",               READONLY,     true  },
+         { "/efi",                READONLY,     true  },
+         { "/etc",                READONLY,     false },
+diff --git a/src/core/swap.c b/src/core/swap.c
+index f47575557..0ec05c7a0 100644
+--- a/src/core/swap.c
++++ b/src/core/swap.c
+@@ -762,7 +762,7 @@ static void swap_enter_activating(Swap *s) {
+                 }
+         }
+ 
+-        r = exec_command_set(s->control_command, "/sbin/swapon", NULL);
++        r = exec_command_set(s->control_command, "/run/current-system/sw/bin/swapon", NULL);
+         if (r < 0)
+                 goto fail;
+ 
+@@ -801,7 +801,7 @@ static void swap_enter_deactivating(Swap *s) {
+         s->control_command = s->exec_command + SWAP_EXEC_DEACTIVATE;
+ 
+         r = exec_command_set(s->control_command,
+-                             "/sbin/swapoff",
++                             "/run/current-system/sw/bin/swapoff",
+                              s->what,
+                              NULL);
+         if (r < 0)
+diff --git a/src/core/systemd.pc.in b/src/core/systemd.pc.in
+index ac52b30dd..ac8488215 100644
+--- a/src/core/systemd.pc.in
++++ b/src/core/systemd.pc.in
+@@ -13,8 +13,8 @@ systemduserunitdir=@userunitdir@
+ systemduserpresetdir=@userpresetdir@
+ systemdsystemconfdir=@pkgsysconfdir@/system
+ systemduserconfdir=@pkgsysconfdir@/user
+-systemdsystemunitpath=${systemdsystemconfdir}:/etc/systemd/system:/run/systemd/system:/usr/local/lib/systemd/system:${systemdsystemunitdir}:/usr/lib/systemd/system:/lib/systemd/system
+-systemduserunitpath=${systemduserconfdir}:/etc/systemd/user:/run/systemd/user:/usr/local/lib/systemd/user:/usr/local/share/systemd/user:${systemduserunitdir}:/usr/lib/systemd/user:/usr/share/systemd/user
++systemdsystemunitpath=${systemdsystemconfdir}:/etc/systemd/system:/etc/systemd-mutable/system:/run/systemd/system:${systemdsystemunitdir}
++systemduserunitpath=${systemduserconfdir}:/etc/systemd/user:/etc/systemd-mutable/user:/run/systemd/user:${systemduserunitdir}
+ systemdsystemgeneratordir=@systemgeneratordir@
+ systemdusergeneratordir=@usergeneratordir@
+ systemdsleepdir=@systemsleepdir@
+diff --git a/src/core/umount.c b/src/core/umount.c
+index 813d25713..cb9a089b9 100644
+--- a/src/core/umount.c
++++ b/src/core/umount.c
+@@ -375,6 +375,8 @@ static int delete_dm(dev_t devnum) {
+ 
+ static bool nonunmountable_path(const char *path) {
+         return path_equal(path, "/")
++                || path_equal(path, "/nix")
++                || path_equal(path, "/nix/store")
+ #if ! HAVE_SPLIT_USR
+                 || path_equal(path, "/usr")
+ #endif
+diff --git a/src/delta/delta.c b/src/delta/delta.c
+index 605bea57b..4a60cee1e 100644
+--- a/src/delta/delta.c
++++ b/src/delta/delta.c
+@@ -45,13 +45,8 @@
+ static const char prefixes[] =
+         "/etc\0"
+         "/run\0"
+-        "/usr/local/lib\0"
+-        "/usr/local/share\0"
+-        "/usr/lib\0"
+-        "/usr/share\0"
+-#if HAVE_SPLIT_USR
+-        "/lib\0"
+-#endif
++        "/run/current-system/sw/lib\0"
++        "/run/current-system/sw/share\0"
+         ;
+ 
+ static const char suffixes[] =
+diff --git a/src/firstboot/firstboot.c b/src/firstboot/firstboot.c
+index 586674d45..97dc7b06e 100644
+--- a/src/firstboot/firstboot.c
++++ b/src/firstboot/firstboot.c
+@@ -87,7 +87,7 @@ static void print_welcome(void) {
+                            NULL);
+         if (r == -ENOENT) {
+ 
+-                os_release = prefix_roota(arg_root, "/usr/lib/os-release");
++                os_release = prefix_roota(arg_root, "/run/current-system/sw/lib/os-release");
+                 r = parse_env_file(os_release, NEWLINE,
+                                    "PRETTY_NAME", &pretty_name,
+                                    NULL);
+@@ -347,7 +347,7 @@ static int process_timezone(void) {
+         if (isempty(arg_timezone))
+                 return 0;
+ 
+-        e = strjoina("../usr/share/zoneinfo/", arg_timezone);
++        e = strjoina("../etc/zoneinfo/", arg_timezone);
+ 
+         mkdir_parents(etc_localtime, 0755);
+         if (symlink(e, etc_localtime) < 0)
+diff --git a/src/fsck/fsck.c b/src/fsck/fsck.c
+index cf5a9c59f..229f0b2d3 100644
+--- a/src/fsck/fsck.c
++++ b/src/fsck/fsck.c
+@@ -423,7 +423,7 @@ int main(int argc, char *argv[]) {
+                 } else
+                         dash_c[0] = 0;
+ 
+-                cmdline[i++] = "/sbin/fsck";
++                cmdline[i++] = "/run/current-system/sw/bin/fsck";
+                 cmdline[i++] =  arg_repair;
+                 cmdline[i++] = "-T";
+ 
+diff --git a/src/fstab-generator/fstab-generator.c b/src/fstab-generator/fstab-generator.c
+index ec70a349f..04503599b 100644
+--- a/src/fstab-generator/fstab-generator.c
++++ b/src/fstab-generator/fstab-generator.c
+@@ -169,7 +169,8 @@ static bool mount_in_initrd(struct mntent *me) {
+         assert(me);
+ 
+         return fstab_test_option(me->mnt_opts, "x-initrd.mount\0") ||
+-               streq(me->mnt_dir, "/usr");
++               streq(me->mnt_dir, "/usr") || streq(me->mnt_dir, "/nix") ||
++			   streq(me->mnt_dir, "/nix/store");
+ }
+ 
+ static int write_timeout(FILE *f, const char *where, const char *opts,
+diff --git a/src/hostname/hostnamed.c b/src/hostname/hostnamed.c
+index fe0aa00ef..b42595624 100644
+--- a/src/hostname/hostnamed.c
++++ b/src/hostname/hostnamed.c
+@@ -114,7 +114,7 @@ static int context_read_data(Context *c) {
+                            "CPE_NAME", &c->data[PROP_OS_CPE_NAME],
+                            NULL);
+         if (r == -ENOENT)
+-                r = parse_env_file("/usr/lib/os-release", NEWLINE,
++                r = parse_env_file("/run/current-system/sw/lib/os-release", NEWLINE,
+                                    "PRETTY_NAME", &c->data[PROP_OS_PRETTY_NAME],
+                                    "CPE_NAME", &c->data[PROP_OS_CPE_NAME],
+                                    NULL);
+diff --git a/src/journal/cat.c b/src/journal/cat.c
+index 08c844d44..51032d1e9 100644
+--- a/src/journal/cat.c
++++ b/src/journal/cat.c
+@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
+         fd = -1;
+ 
+         if (argc <= optind)
+-                (void) execl("/bin/cat", "/bin/cat", NULL);
++                (void) execl("/run/current-system/sw/bin/cat", "/run/current-system/sw/bin/cat", NULL);
+         else
+                 (void) execvp(argv[optind], argv + optind);
+         r = -errno;
+diff --git a/src/journal/catalog.c b/src/journal/catalog.c
+index bf92da9f9..ddc004334 100644
+--- a/src/journal/catalog.c
++++ b/src/journal/catalog.c
+@@ -44,8 +44,7 @@
+ #include "util.h"
+ 
+ const char * const catalog_file_dirs[] = {
+-        "/usr/local/lib/systemd/catalog/",
+-        "/usr/lib/systemd/catalog/",
++        "/run/current-system/sw/lib/systemd/catalog/",
+         NULL
+ };
+ 
+diff --git a/src/libsystemd/sd-hwdb/sd-hwdb.c b/src/libsystemd/sd-hwdb/sd-hwdb.c
+index f8246eaa7..b43ab419e 100644
+--- a/src/libsystemd/sd-hwdb/sd-hwdb.c
++++ b/src/libsystemd/sd-hwdb/sd-hwdb.c
+@@ -316,10 +316,7 @@ static int trie_search_f(sd_hwdb *hwdb, const char *search) {
+ static const char hwdb_bin_paths[] =
+         "/etc/systemd/hwdb/hwdb.bin\0"
+         "/etc/udev/hwdb.bin\0"
+-        "/usr/lib/systemd/hwdb/hwdb.bin\0"
+-#if HAVE_SPLIT_USR
+-        "/lib/systemd/hwdb/hwdb.bin\0"
+-#endif
++        "/run/current-system/sw/lib/systemd/hwdb/hwdb.bin\0"
+         UDEVLIBEXECDIR "/hwdb.bin\0";
+ 
+ _public_ int sd_hwdb_new(sd_hwdb **ret) {
+diff --git a/src/libsystemd/sd-path/sd-path.c b/src/libsystemd/sd-path/sd-path.c
+index 6570d0139..716631e2d 100644
+--- a/src/libsystemd/sd-path/sd-path.c
++++ b/src/libsystemd/sd-path/sd-path.c
+@@ -226,15 +226,15 @@ static int get_path(uint64_t type, char **buffer, const char **ret) {
+                 return var_tmp_dir(ret);
+ 
+         case SD_PATH_SYSTEM_BINARIES:
+-                *ret = "/usr/bin";
++                *ret = "/run/current-system/sw/bin";
+                 return 0;
+ 
+         case SD_PATH_SYSTEM_INCLUDE:
+-                *ret = "/usr/include";
++                *ret = "/no-such-path/include";
+                 return 0;
+ 
+         case SD_PATH_SYSTEM_LIBRARY_PRIVATE:
+-                *ret = "/usr/lib";
++                *ret = "/run/current-system/sw/lib";
+                 return 0;
+ 
+         case SD_PATH_SYSTEM_LIBRARY_ARCH:
+@@ -242,15 +242,15 @@ static int get_path(uint64_t type, char **buffer, const char **ret) {
+                 return 0;
+ 
+         case SD_PATH_SYSTEM_SHARED:
+-                *ret = "/usr/share";
++                *ret = "/run/current-system/sw/share";
+                 return 0;
+ 
+         case SD_PATH_SYSTEM_CONFIGURATION_FACTORY:
+-                *ret = "/usr/share/factory/etc";
++                *ret = "/run/current-system/sw/share/factory/etc";
+                 return 0;
+ 
+         case SD_PATH_SYSTEM_STATE_FACTORY:
+-                *ret = "/usr/share/factory/var";
++                *ret = "/run/current-system/sw/share/factory/var";
+                 return 0;
+ 
+         case SD_PATH_SYSTEM_CONFIGURATION:
+@@ -489,14 +489,7 @@ static int get_search(uint64_t type, char ***list) {
+                                                ".local/bin",
+                                                "PATH",
+                                                true,
+-                                               "/usr/local/sbin",
+-                                               "/usr/local/bin",
+-                                               "/usr/sbin",
+-                                               "/usr/bin",
+-#if HAVE_SPLIT_USR
+-                                               "/sbin",
+-                                               "/bin",
+-#endif
++                                               "/run/current-system/sw/bin",
+                                                NULL);
+ 
+         case SD_PATH_SEARCH_LIBRARY_PRIVATE:
+@@ -505,11 +498,7 @@ static int get_search(uint64_t type, char ***list) {
+                                                ".local/lib",
+                                                NULL,
+                                                false,
+-                                               "/usr/local/lib",
+-                                               "/usr/lib",
+-#if HAVE_SPLIT_USR
+-                                               "/lib",
+-#endif
++                                               "/run/current-system/sw/lib",
+                                                NULL);
+ 
+         case SD_PATH_SEARCH_LIBRARY_ARCH:
+@@ -530,8 +519,7 @@ static int get_search(uint64_t type, char ***list) {
+                                                ".local/share",
+                                                "XDG_DATA_DIRS",
+                                                false,
+-                                               "/usr/local/share",
+-                                               "/usr/share",
++                                               "/run/current-system/sw/share",
+                                                NULL);
+ 
+         case SD_PATH_SEARCH_CONFIGURATION_FACTORY:
+@@ -540,8 +528,7 @@ static int get_search(uint64_t type, char ***list) {
+                                                NULL,
+                                                NULL,
+                                                false,
+-                                               "/usr/local/share/factory/etc",
+-                                               "/usr/share/factory/etc",
++                                               "/run/current-system/sw/share/factory/etc",
+                                                NULL);
+ 
+         case SD_PATH_SEARCH_STATE_FACTORY:
+@@ -550,8 +537,7 @@ static int get_search(uint64_t type, char ***list) {
+                                                NULL,
+                                                NULL,
+                                                false,
+-                                               "/usr/local/share/factory/var",
+-                                               "/usr/share/factory/var",
++                                               "/run/current-system/sw/share/factory/var",
+                                                NULL);
+ 
+         case SD_PATH_SEARCH_CONFIGURATION:
+diff --git a/src/locale/localectl.c b/src/locale/localectl.c
+index 0bd18a5c0..270964e54 100644
+--- a/src/locale/localectl.c
++++ b/src/locale/localectl.c
+@@ -397,7 +397,7 @@ static int list_x11_keymaps(sd_bus *bus, char **args, unsigned n) {
+                 return -EINVAL;
+         }
+ 
+-        f = fopen("/usr/share/X11/xkb/rules/base.lst", "re");
++        f = fopen("/etc/X11/xkb/rules/base.lst", "re");
+         if (!f)
+                 return log_error_errno(errno, "Failed to open keyboard mapping list. %m");
+ 
+diff --git a/src/machine/image-dbus.c b/src/machine/image-dbus.c
+index 18e0e3489..05184e73b 100644
+--- a/src/machine/image-dbus.c
++++ b/src/machine/image-dbus.c
+@@ -301,7 +301,7 @@ static int directory_image_get_os_release(Image *image, char ***ret, sd_bus_erro
+ 
+         r = chase_symlinks("/etc/os-release", image->path, CHASE_PREFIX_ROOT, &path);
+         if (r == -ENOENT)
+-                r = chase_symlinks("/usr/lib/os-release", image->path, CHASE_PREFIX_ROOT, &path);
++                r = chase_symlinks("/run/current-system/sw/lib/os-release", image->path, CHASE_PREFIX_ROOT, &path);
+         if (r == -ENOENT)
+                 return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Image does not contain OS release information");
+         if (r < 0)
+@@ -368,7 +368,7 @@ static int raw_image_get_os_release(Image *image, char ***ret, sd_bus_error *err
+ 
+                 fd = open("/etc/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
+                 if (fd < 0 && errno == ENOENT) {
+-                        fd = open("/usr/lib/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
++                        fd = open("/run/current-system/sw/lib/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
+                         if (fd < 0 && errno == ENOENT)
+                                 _exit(EXIT_NOT_FOUND);
+                 }
+diff --git a/src/machine/machine-dbus.c b/src/machine/machine-dbus.c
+index 36568b65e..41bd6f28e 100644
+--- a/src/machine/machine-dbus.c
++++ b/src/machine/machine-dbus.c
+@@ -404,7 +404,7 @@ int bus_machine_method_get_os_release(sd_bus_message *message, void *userdata, s
+ 
+                         fd = open("/etc/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
+                         if (fd < 0 && errno == ENOENT) {
+-                                fd = open("/usr/lib/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
++                                fd = open("/run/current-system/sw/lib/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
+                                 if (fd < 0 && errno == ENOENT)
+                                         _exit(EXIT_NOT_FOUND);
+                         }
+diff --git a/src/network/networkd-manager.c b/src/network/networkd-manager.c
+index 71445d5dd..769efe180 100644
+--- a/src/network/networkd-manager.c
++++ b/src/network/networkd-manager.c
+@@ -46,11 +46,9 @@
+ 
+ const char* const network_dirs[] = {
+         "/etc/systemd/network",
++        "/etc/systemd-mutable/network",
+         "/run/systemd/network",
+-        "/usr/lib/systemd/network",
+-#if HAVE_SPLIT_USR
+-        "/lib/systemd/network",
+-#endif
++        "/run/current-system/sw/lib/systemd/network",
+         NULL};
+ 
+ static int setup_default_address_pool(Manager *m) {
+diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
+index 4e3803be8..d7f36ae42 100644
+--- a/src/nspawn/nspawn.c
++++ b/src/nspawn/nspawn.c
+@@ -2433,10 +2433,10 @@ static int inner_child(
+                         /* If we cannot change the directory, we'll end up in /, that is expected. */
+                         (void) chdir(home ?: "/root");
+ 
+-                execle("/bin/bash", "-bash", NULL, env_use);
++                execle("/run/current-system/sw/bin/bash", "-bash", NULL, env_use);
+                 execle("/bin/sh", "-sh", NULL, env_use);
+ 
+-                exec_target = "/bin/bash, /bin/sh";
++                exec_target = "/run/current-system/sw/bin/bash, /bin/sh";
+         }
+ 
+         r = -errno;
+diff --git a/src/nss-mymachines/nss-mymachines.c b/src/nss-mymachines/nss-mymachines.c
+index 6e468853a..6c986a719 100644
+--- a/src/nss-mymachines/nss-mymachines.c
++++ b/src/nss-mymachines/nss-mymachines.c
+@@ -483,7 +483,7 @@ enum nss_status _nss_mymachines_getpwnam_r(
+         pwd->pw_gecos = buffer;
+         pwd->pw_passwd = (char*) "*"; /* locked */
+         pwd->pw_dir = (char*) "/";
+-        pwd->pw_shell = (char*) "/sbin/nologin";
++        pwd->pw_shell = (char*) "/run/current-system/sw/bin/nologin";
+ 
+         *errnop = 0;
+         return NSS_STATUS_SUCCESS;
+@@ -560,7 +560,7 @@ enum nss_status _nss_mymachines_getpwuid_r(
+         pwd->pw_gecos = buffer;
+         pwd->pw_passwd = (char*) "*"; /* locked */
+         pwd->pw_dir = (char*) "/";
+-        pwd->pw_shell = (char*) "/sbin/nologin";
++        pwd->pw_shell = (char*) "/run/current-system/sw/bin/nologin";
+ 
+         *errnop = 0;
+         return NSS_STATUS_SUCCESS;
+diff --git a/src/nss-systemd/nss-systemd.c b/src/nss-systemd/nss-systemd.c
+index d856c4c16..0830122a9 100644
+--- a/src/nss-systemd/nss-systemd.c
++++ b/src/nss-systemd/nss-systemd.c
+@@ -50,7 +50,7 @@ static const struct passwd nobody_passwd = {
+         .pw_gid = 65534,
+         .pw_gecos = (char*) "User Nobody",
+         .pw_dir = (char*) "/",
+-        .pw_shell = (char*) "/sbin/nologin",
++        .pw_shell = (char*) "/run/current-system/sw/bin/nologin",
+ };
+ 
+ static const struct group root_group = {
+@@ -203,7 +203,7 @@ direct_lookup:
+         pwd->pw_gecos = (char*) "Dynamic User";
+         pwd->pw_passwd = (char*) "*"; /* locked */
+         pwd->pw_dir = (char*) "/";
+-        pwd->pw_shell = (char*) "/sbin/nologin";
++        pwd->pw_shell = (char*) "/run/current-system/sw/bin/nologin";
+ 
+         *errnop = 0;
+         return NSS_STATUS_SUCCESS;
+@@ -311,7 +311,7 @@ direct_lookup:
+         pwd->pw_gecos = (char*) "Dynamic User";
+         pwd->pw_passwd = (char*) "*"; /* locked */
+         pwd->pw_dir = (char*) "/";
+-        pwd->pw_shell = (char*) "/sbin/nologin";
++        pwd->pw_shell = (char*) "/run/current-system/sw/bin/nologin";
+ 
+         *errnop = 0;
+         return NSS_STATUS_SUCCESS;
+diff --git a/src/remount-fs/remount-fs.c b/src/remount-fs/remount-fs.c
+index 0cb9bd926..96db16445 100644
+--- a/src/remount-fs/remount-fs.c
++++ b/src/remount-fs/remount-fs.c
+@@ -81,7 +81,9 @@ int main(int argc, char *argv[]) {
+                 /* Remount the root fs, /usr and all API VFS */
+                 if (!mount_point_is_api(me->mnt_dir) &&
+                     !path_equal(me->mnt_dir, "/") &&
+-                    !path_equal(me->mnt_dir, "/usr"))
++                    !path_equal(me->mnt_dir, "/usr") &&
++					!path_equal(me->mnt_dir, "/nix") &&
++					!path_equal(me->mnt_dir, "/nix/store"))
+                         continue;
+ 
+                 log_debug("Remounting %s", me->mnt_dir);
+diff --git a/src/shared/install.c b/src/shared/install.c
+index 7598bf6a2..2763adb51 100644
+--- a/src/shared/install.c
++++ b/src/shared/install.c
+@@ -2737,17 +2737,14 @@ static int read_presets(UnitFileScope scope, const char *root_dir, Presets *pres
+         if (scope == UNIT_FILE_SYSTEM)
+                 r = conf_files_list(&files, ".preset", root_dir, 0,
+                                     "/etc/systemd/system-preset",
+-                                    "/usr/local/lib/systemd/system-preset",
+-                                    "/usr/lib/systemd/system-preset",
+-#if HAVE_SPLIT_USR
+-                                    "/lib/systemd/system-preset",
+-#endif
++                                    "/etc/systemd-mutable/system-preset",
++                                    "/run/current-system/sw/lib/systemd/system-preset",
+                                     NULL);
+         else if (scope == UNIT_FILE_GLOBAL)
+                 r = conf_files_list(&files, ".preset", root_dir, 0,
+                                     "/etc/systemd/user-preset",
+-                                    "/usr/local/lib/systemd/user-preset",
+-                                    "/usr/lib/systemd/user-preset",
++                                    "/etc/systemd-mutable/user-preset",
++                                    "/run/current-system/sw/lib/systemd/user-preset",
+                                     NULL);
+         else {
+                 *presets = (Presets){};
+diff --git a/src/shared/machine-image.c b/src/shared/machine-image.c
+index 859e5ffc1..927704460 100644
+--- a/src/shared/machine-image.c
++++ b/src/shared/machine-image.c
+@@ -55,8 +55,7 @@
+ static const char image_search_path[] =
+         "/var/lib/machines\0"
+         "/var/lib/container\0" /* legacy */
+-        "/usr/local/lib/machines\0"
+-        "/usr/lib/machines\0";
++        "/run/current-system/sw/lib/machines\0";
+ 
+ Image *image_unref(Image *i) {
+         if (!i)
+@@ -81,7 +80,7 @@ static char **image_settings_path(Image *image) {
+ 
+         fn = strjoina(image->name, ".nspawn");
+ 
+-        FOREACH_STRING(s, "/etc/systemd/nspawn/", "/run/systemd/nspawn/") {
++        FOREACH_STRING(s, "/etc/systemd/nspawn/", "/etc/systemd-mutable/nspawn/", "/run/systemd/nspawn/") {
+                 l[i] = strappend(s, fn);
+                 if (!l[i])
+                         return NULL;
+diff --git a/src/shared/machine-image.h b/src/shared/machine-image.h
+index 7410168c4..909930c58 100644
+--- a/src/shared/machine-image.h
++++ b/src/shared/machine-image.h
+@@ -87,7 +87,13 @@ static inline bool IMAGE_IS_HIDDEN(const struct Image *i) {
+ static inline bool IMAGE_IS_VENDOR(const struct Image *i) {
+         assert(i);
+ 
+-        return i->path && path_startswith(i->path, "/usr");
++        if (i->path && path_startswith(i->path, "/usr"))
++                return true;
++
++        if (i->path && path_startswith(i->path, "/nix"))
++                return true;
++
++        return false;
+ }
+ 
+ static inline bool IMAGE_IS_HOST(const struct Image *i) {
+diff --git a/src/shared/path-lookup.c b/src/shared/path-lookup.c
+index 802e4b9c8..180a75740 100644
+--- a/src/shared/path-lookup.c
++++ b/src/shared/path-lookup.c
+@@ -116,17 +116,16 @@ static int user_data_dir(char **ret, const char *suffix) {
+ }
+ 
+ static const char* const user_data_unit_paths[] = {
+-        "/usr/local/lib/systemd/user",
+-        "/usr/local/share/systemd/user",
+         USER_DATA_UNIT_PATH,
+-        "/usr/lib/systemd/user",
+-        "/usr/share/systemd/user",
++        "/run/current-system/sw/lib/systemd/user",
++        "/run/current-system/sw/share/systemd/user",
+         NULL
+ };
+ 
+ static const char* const user_config_unit_paths[] = {
+         USER_CONFIG_UNIT_PATH,
+         "/etc/systemd/user",
++        "/etc/systemd-mutable/user",
+         NULL
+ };
+ 
+@@ -139,7 +138,6 @@ static char** user_dirs(
+                 const char *transient,
+                 const char *persistent_control,
+                 const char *runtime_control) {
+-
+         _cleanup_strv_free_ char **config_dirs = NULL, **data_dirs = NULL;
+         _cleanup_free_ char *data_home = NULL;
+         _cleanup_strv_free_ char **res = NULL;
+@@ -570,15 +568,11 @@ int lookup_paths_init(
+                                         persistent_config,
+                                         SYSTEM_CONFIG_UNIT_PATH,
+                                         "/etc/systemd/system",
++                                        "/etc/systemd-mutable/system",
+                                         runtime_config,
+                                         "/run/systemd/system",
+                                         STRV_IFNOTNULL(generator),
+-                                        "/usr/local/lib/systemd/system",
+                                         SYSTEM_DATA_UNIT_PATH,
+-                                        "/usr/lib/systemd/system",
+-#if HAVE_SPLIT_USR
+-                                        "/lib/systemd/system",
+-#endif
+                                         STRV_IFNOTNULL(generator_late),
+                                         NULL);
+                         break;
+@@ -595,14 +589,11 @@ int lookup_paths_init(
+                                         persistent_config,
+                                         USER_CONFIG_UNIT_PATH,
+                                         "/etc/systemd/user",
++                                        "/etc/systemd-mutable/user",
+                                         runtime_config,
+                                         "/run/systemd/user",
+                                         STRV_IFNOTNULL(generator),
+-                                        "/usr/local/lib/systemd/user",
+-                                        "/usr/local/share/systemd/user",
+                                         USER_DATA_UNIT_PATH,
+-                                        "/usr/lib/systemd/user",
+-                                        "/usr/share/systemd/user",
+                                         STRV_IFNOTNULL(generator_late),
+                                         NULL);
+                         break;
+@@ -846,7 +837,6 @@ char **generator_binary_paths(UnitFileScope scope) {
+         case UNIT_FILE_SYSTEM:
+                 return strv_new("/run/systemd/system-generators",
+                                 "/etc/systemd/system-generators",
+-                                "/usr/local/lib/systemd/system-generators",
+                                 SYSTEM_GENERATOR_PATH,
+                                 NULL);
+ 
+@@ -854,7 +844,6 @@ char **generator_binary_paths(UnitFileScope scope) {
+         case UNIT_FILE_USER:
+                 return strv_new("/run/systemd/user-generators",
+                                 "/etc/systemd/user-generators",
+-                                "/usr/local/lib/systemd/user-generators",
+                                 USER_GENERATOR_PATH,
+                                 NULL);
+ 
+diff --git a/src/sysusers/sysusers.c b/src/sysusers/sysusers.c
+index 6ef00d8f2..c5952d600 100644
+--- a/src/sysusers/sysusers.c
++++ b/src/sysusers/sysusers.c
+@@ -446,7 +446,7 @@ static int write_temporary_passwd(const char *passwd_path, FILE **tmpfile, char
+ 
+                         /* Initialize the shell to nologin, with one exception:
+                          * for root we patch in something special */
+-                        .pw_shell = i->uid == 0 ? (char*) "/bin/sh" : (char*) "/sbin/nologin",
++                        .pw_shell = i->uid == 0 ? (char*) "/bin/sh" : (char*) "/run/current-system/sw/bin/nologin",
+                 };
+ 
+                 errno = 0;
+diff --git a/src/tmpfiles/tmpfiles.c b/src/tmpfiles/tmpfiles.c
+index 7f457ca36..6ec794aa7 100644
+--- a/src/tmpfiles/tmpfiles.c
++++ b/src/tmpfiles/tmpfiles.c
+@@ -1881,7 +1881,7 @@ static int parse_line(const char *fname, unsigned line, const char *buffer) {
+ 
+         case CREATE_SYMLINK:
+                 if (!i.argument) {
+-                        i.argument = strappend("/usr/share/factory/", i.path);
++                        i.argument = strappend("/run/current-system/sw/share/factory/", i.path);
+                         if (!i.argument)
+                                 return log_oom();
+                 }
+@@ -1896,7 +1896,7 @@ static int parse_line(const char *fname, unsigned line, const char *buffer) {
+ 
+         case COPY_FILES:
+                 if (!i.argument) {
+-                        i.argument = strappend("/usr/share/factory/", i.path);
++                        i.argument = strappend("/run/current-system/sw/share/factory/", i.path);
+                         if (!i.argument)
+                                 return log_oom();
+                 } else if (!path_is_absolute(i.argument)) {
+diff --git a/src/udev/net/link-config.c b/src/udev/net/link-config.c
+index a5f3b1a1b..d5b34a305 100644
+--- a/src/udev/net/link-config.c
++++ b/src/udev/net/link-config.c
+@@ -56,11 +56,9 @@ struct link_config_ctx {
+ 
+ static const char* const link_dirs[] = {
+         "/etc/systemd/network",
++        "/etc/systemd-mutable/network",
+         "/run/systemd/network",
+-        "/usr/lib/systemd/network",
+-#if HAVE_SPLIT_USR
+-        "/lib/systemd/network",
+-#endif
++        "/run/current-system/sw/lib/systemd/network",
+         NULL};
+ 
+ static void link_config_free(link_config *link) {
+diff --git a/units/kmod-static-nodes.service.in b/units/kmod-static-nodes.service.in
+index a9c8df118..7e30c9ea1 100644
+--- a/units/kmod-static-nodes.service.in
++++ b/units/kmod-static-nodes.service.in
+@@ -10,7 +10,6 @@ Description=Create list of required static device nodes for the current kernel
+ DefaultDependencies=no
+ Before=sysinit.target systemd-tmpfiles-setup-dev.service
+ ConditionCapability=CAP_SYS_MODULE
+-ConditionFileNotEmpty=/lib/modules/%v/modules.devname
+ 
+ [Service]
+ Type=oneshot
+-- 
+2.14.2
+
