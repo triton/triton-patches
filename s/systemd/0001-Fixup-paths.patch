@@ -1,80 +1,86 @@
-From df73eb632d5149cdd28e98c5421ef0960c9a718a Mon Sep 17 00:00:00 2001
+From bba45a0e2be7fc9a1d64e25aef840e9effbfada4 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 9 Oct 2017 14:12:48 -0700
 Subject: [PATCH] Fixup paths
 
 ---
- src/basic/def.h                       | 22 ++++++++++-----------
- src/basic/locale-util.c               |  4 ++--
- src/basic/path-util.c                 |  1 +
+ src/basic/def.h                       | 33 +++++++++++++++++--------------
+ src/basic/locale-util.c               |  5 +++--
+ src/basic/path-util.c                 |  2 ++
  src/basic/path-util.h                 |  4 ++--
- src/basic/stat-util.c                 |  2 +-
+ src/basic/stat-util.c                 |  3 ++-
  src/basic/time-util.c                 |  8 ++++----
- src/basic/user-util.c                 |  3 ++-
+ src/basic/user-util.c                 |  4 +++-
  src/core/main.c                       |  2 +-
  src/core/manager.c                    |  4 ++--
  src/core/mount.c                      |  4 +++-
  src/core/namespace.c                  |  8 ++------
- src/core/swap.c                       |  4 ++--
+ src/core/swap.c                       |  5 +++--
  src/core/systemd.pc.in                |  4 ++--
  src/core/umount.c                     |  2 ++
- src/delta/delta.c                     |  9 ++-------
- src/firstboot/firstboot.c             |  4 ++--
- src/fsck/fsck.c                       |  2 +-
+ src/delta/delta.c                     | 10 +++-------
+ src/firstboot/firstboot.c             |  5 +++--
+ src/fsck/fsck.c                       |  3 ++-
  src/fstab-generator/fstab-generator.c |  3 ++-
  src/hostname/hostnamed.c              |  2 +-
- src/journal/cat.c                     |  2 +-
- src/journal/catalog.c                 |  3 +--
- src/libsystemd/sd-hwdb/sd-hwdb.c      |  5 +----
- src/libsystemd/sd-path/sd-path.c      | 36 +++++++++++------------------------
+ src/journal/cat.c                     |  3 ++-
+ src/journal/catalog.c                 |  4 ++--
+ src/libsystemd/sd-hwdb/sd-hwdb.c      |  6 ++----
+ src/libsystemd/sd-path/sd-path.c      | 37 ++++++++++++-----------------------
  src/locale/localectl.c                |  2 +-
- src/machine/image-dbus.c              |  4 ++--
- src/machine/machine-dbus.c            |  2 +-
+ src/machine/image-dbus.c              |  5 +++--
+ src/machine/machine-dbus.c            |  3 ++-
  src/network/networkd-manager.c        |  6 ++----
- src/nspawn/nspawn.c                   |  4 ++--
- src/nss-mymachines/nss-mymachines.c   |  4 ++--
- src/nss-systemd/nss-systemd.c         |  6 +++---
+ src/nspawn/nspawn.c                   |  7 ++++---
+ src/nss-mymachines/nss-mymachines.c   |  5 +++--
+ src/nss-systemd/nss-systemd.c         |  9 +++++----
  src/remount-fs/remount-fs.c           |  4 +++-
- src/shared/install.c                  | 11 ++++-------
- src/shared/machine-image.c            |  5 ++---
+ src/shared/install.c                  | 12 +++++-------
+ src/shared/machine-image.c            |  6 +++---
  src/shared/machine-image.h            |  8 +++++++-
- src/shared/path-lookup.c              | 21 +++++---------------
+ src/shared/path-lookup.c              | 22 ++++++---------------
  src/sysusers/sysusers.c               |  2 +-
  src/tmpfiles/tmpfiles.c               |  4 ++--
- src/udev/net/link-config.c            |  6 ++----
+ src/udev/net/link-config.c            |  7 +++----
  units/kmod-static-nodes.service.in    |  1 -
- 39 files changed, 97 insertions(+), 131 deletions(-)
+ 39 files changed, 128 insertions(+), 136 deletions(-)
 
 diff --git a/src/basic/def.h b/src/basic/def.h
-index c04e58b57..9c8edfb79 100644
+index c04e58b57..455793666 100644
 --- a/src/basic/def.h
 +++ b/src/basic/def.h
-@@ -44,16 +44,15 @@
+@@ -43,17 +43,21 @@
+ #define SIGNALS_CRASH_HANDLER SIGSEGV,SIGILL,SIGFPE,SIGBUS,SIGQUIT,SIGABRT
  #define SIGNALS_IGNORE SIGPIPE
  
++#define NIX_SYSTEM_SW "/run/current-system/sw"
++#define NIX_OS_RELEASE "/run/current-system/etc/os-release"
++#define NIX_LOCALE_MODULE "/run/current-system/module/locale"
++#define NIX_SYSTEMD_MODULE "/run/current-system/module/systemd"
++
  #if HAVE_SPLIT_USR
 -#define KBD_KEYMAP_DIRS                         \
 -        "/usr/share/keymaps/\0"                 \
 -        "/usr/share/kbd/keymaps/\0"             \
 -        "/usr/lib/kbd/keymaps/\0"               \
 -        "/lib/kbd/keymaps/\0"
-+#define KBD_KEYMAP_DIRS                               \
-+        "/run/current-system/sw/share/keymaps/\0"     \
-+        "/run/current-system/sw/share/kbd/keymaps/\0" \
-+        "/run/current-system/sw/lib/kbd/keymaps/\0"
++#define KBD_KEYMAP_DIRS                            \
++        NIX_SYSTEMD_MODULE "/share/keymaps/\0"     \
++        NIX_SYSTEMD_MODULE "/share/kbd/keymaps/\0" \
++        NIX_SYSTEMD_MODULE "/lib/kbd/keymaps/\0"
  #else
 -#define KBD_KEYMAP_DIRS                         \
 -        "/usr/share/keymaps/\0"                 \
 -        "/usr/share/kbd/keymaps/\0"             \
 -        "/usr/lib/kbd/keymaps/\0"
-+#define KBD_KEYMAP_DIRS                               \
-+        "/run/current-system/sw/share/keymaps/\0"     \
-+        "/run/current-system/sw/share/kbd/keymaps/\0" \
-+        "/run/current-system/sw/lib/kbd/keymaps/\0"
++#define KBD_KEYMAP_DIRS                            \
++        NIX_SYSTEMD_MODULE "/share/keymaps/\0"     \
++        NIX_SYSTEMD_MODULE "/share/kbd/keymaps/\0" \
++        NIX_SYSTEMD_MODULE "/lib/kbd/keymaps/\0"
  #endif
  
  #define UNIX_SYSTEM_BUS_ADDRESS "unix:path=/var/run/dbus/system_bus_socket"
-@@ -69,7 +68,7 @@
+@@ -69,7 +73,7 @@
  #define NOTIFY_BUFFER_MAX PIPE_BUF
  
  #if HAVE_SPLIT_USR
@@ -83,47 +89,69 @@ index c04e58b57..9c8edfb79 100644
  #else
  #  define _CONF_PATHS_SPLIT_USR(n)
  #endif
-@@ -81,8 +80,7 @@
- #define CONF_PATHS_NULSTR(n)                    \
-         "/etc/" n "\0"                          \
-         "/run/" n "\0"                          \
+@@ -78,11 +82,10 @@
+  * suitable to pass to conf_files_list_nulstr() or config_parse_many_nulstr()
+  * to implement drop-in directories for extending configuration
+  * files. */
+-#define CONF_PATHS_NULSTR(n)                    \
+-        "/etc/" n "\0"                          \
+-        "/run/" n "\0"                          \
 -        "/usr/local/lib/" n "\0"                \
 -        "/usr/lib/" n "\0"                      \
-+        "/run/current-system/sw/lib/" n "\0"    \
++#define CONF_PATHS_NULSTR(n)                 \
++        "/etc/" n "\0"                       \
++        "/run/" n "\0"                       \
++        NIX_SYSTEMD_MODULE "/lib/" n "\0"    \
          _CONF_PATHS_SPLIT_USR(n)
  
  #define LONG_LINE_MAX (1U*1024U*1024U)
 diff --git a/src/basic/locale-util.c b/src/basic/locale-util.c
-index ada0a28cd..72f67d2c1 100644
+index ada0a28cd..f1720bd7f 100644
 --- a/src/basic/locale-util.c
 +++ b/src/basic/locale-util.c
-@@ -84,7 +84,7 @@ static int add_locales_from_archive(Set *locales) {
+@@ -30,6 +30,7 @@
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+ 
++#include "def.h"
+ #include "dirent-util.h"
+ #include "fd-util.h"
+ #include "hashmap.h"
+@@ -84,7 +85,7 @@ static int add_locales_from_archive(Set *locales) {
          unsigned i;
          int r;
  
 -        fd = open("/usr/lib/locale/locale-archive", O_RDONLY|O_NOCTTY|O_CLOEXEC);
-+        fd = open("/run/current-system/sw/lib/locale/locale-archive", O_RDONLY|O_NOCTTY|O_CLOEXEC);
++        fd = open(NIX_LOCALE_MODULE "/lib/locale/locale-archive", O_RDONLY|O_NOCTTY|O_CLOEXEC);
          if (fd < 0)
                  return errno == ENOENT ? 0 : -errno;
  
-@@ -146,7 +146,7 @@ static int add_locales_from_libdir (Set *locales) {
+@@ -146,7 +147,7 @@ static int add_locales_from_libdir (Set *locales) {
          struct dirent *entry;
          int r;
  
 -        dir = opendir("/usr/lib/locale");
-+        dir = opendir("/run/current/system/sw/lib/locale");
++        dir = opendir(NIX_LOCALE_MODULE "/lib/locale");
          if (!dir)
                  return errno == ENOENT ? 0 : -errno;
  
 diff --git a/src/basic/path-util.c b/src/basic/path-util.c
-index 6c06bd2ac..6e03a2bde 100644
+index 6c06bd2ac..f106c4cdb 100644
 --- a/src/basic/path-util.c
 +++ b/src/basic/path-util.c
-@@ -588,6 +588,7 @@ static int binary_is_good(const char *binary) {
+@@ -31,6 +31,7 @@
+ #include <libgen.h>
+ #undef basename
+ 
++#include "def.h"
+ #include "alloc-util.h"
+ #include "extract-word.h"
+ #include "fs-util.h"
+@@ -588,6 +589,7 @@ static int binary_is_good(const char *binary) {
          return !PATH_IN_SET(d, "true"
                                 "/bin/true",
                                 "/usr/bin/true",
-+                               "/run/current-system/sw/bin/true",
++                               NIX_SYSTEM_SW "/bin/true",
                                 "/dev/null");
  }
  
@@ -143,15 +171,23 @@ index 546246595..58efb4dd9 100644
  #if HAVE_SPLIT_USR
  #  define DEFAULT_PATH DEFAULT_PATH_SPLIT_USR
 diff --git a/src/basic/stat-util.c b/src/basic/stat-util.c
-index d87370e67..1f7e0b7fc 100644
+index d87370e67..e7e2928d1 100644
 --- a/src/basic/stat-util.c
 +++ b/src/basic/stat-util.c
-@@ -155,7 +155,7 @@ int path_is_os_tree(const char *path) {
+@@ -26,6 +26,7 @@
+ #include <sys/statvfs.h>
+ #include <unistd.h>
+ 
++#include "def.h"
+ #include "dirent-util.h"
+ #include "fd-util.h"
+ #include "fs-util.h"
+@@ -155,7 +156,7 @@ int path_is_os_tree(const char *path) {
                  return -errno;
  
          /* We use /usr/lib/os-release as flag file if something is an OS */
 -        r = chase_symlinks("/usr/lib/os-release", path, CHASE_PREFIX_ROOT, NULL);
-+        r = chase_symlinks("/run/current-system/sw/lib/os-release", path, CHASE_PREFIX_ROOT, NULL);
++        r = chase_symlinks(NIX_OS_RELEASE, path, CHASE_PREFIX_ROOT, NULL);
          if (r == -ENOENT) {
  
                  /* Also check for the old location in /etc, just in case. */
@@ -190,21 +226,29 @@ index f7f5e614f..65f28bc31 100644
                  return -EINVAL;
  
 diff --git a/src/basic/user-util.c b/src/basic/user-util.c
-index a691a0d3f..24d5fbdef 100644
+index a691a0d3f..7ebbc8075 100644
 --- a/src/basic/user-util.c
 +++ b/src/basic/user-util.c
-@@ -198,7 +198,8 @@ int get_user_creds_clean(
+@@ -32,6 +32,7 @@
+ #include <utmp.h>
+ 
+ #include "alloc-util.h"
++#include "def.h"
+ #include "fd-util.h"
+ #include "fileio.h"
+ #include "format-util.h"
+@@ -198,7 +199,8 @@ int get_user_creds_clean(
                                              "/bin/nologin",
                                              "/sbin/nologin",
                                              "/usr/bin/nologin",
 -                                            "/usr/sbin/nologin")))
 +                                            "/usr/sbin/nologin",
-+                                            "/run/current-system/sw/bin/nologin")))
++                                            NIX_SYSTEM_SW "/bin/nologin")))
                  *shell = NULL;
  
          if (home &&
 diff --git a/src/core/main.c b/src/core/main.c
-index b9bc2f684..1bafa75b8 100644
+index b9bc2f684..7566c8f93 100644
 --- a/src/core/main.c
 +++ b/src/core/main.c
 @@ -1286,7 +1286,7 @@ static int status_welcome(void) {
@@ -212,7 +256,7 @@ index b9bc2f684..1bafa75b8 100644
                             NULL);
          if (r == -ENOENT)
 -                r = parse_env_file("/usr/lib/os-release", NEWLINE,
-+                r = parse_env_file("/run/current-system/sw/lib/os-release", NEWLINE,
++                r = parse_env_file(NIX_OS_RELEASE, NEWLINE,
                                     "PRETTY_NAME", &pretty_name,
                                     "ANSI_COLOR", &ansi_color,
                                     NULL);
@@ -286,24 +330,32 @@ index 6d74b8da6..87a0f49b7 100644
          { "/efi",                READONLY,     true  },
          { "/etc",                READONLY,     false },
 diff --git a/src/core/swap.c b/src/core/swap.c
-index f47575557..0ec05c7a0 100644
+index f47575557..dff13b717 100644
 --- a/src/core/swap.c
 +++ b/src/core/swap.c
-@@ -762,7 +762,7 @@ static void swap_enter_activating(Swap *s) {
+@@ -26,6 +26,7 @@
+ 
+ #include "alloc-util.h"
+ #include "dbus-swap.h"
++#include "def.h"
+ #include "escape.h"
+ #include "exit-status.h"
+ #include "fd-util.h"
+@@ -762,7 +763,7 @@ static void swap_enter_activating(Swap *s) {
                  }
          }
  
 -        r = exec_command_set(s->control_command, "/sbin/swapon", NULL);
-+        r = exec_command_set(s->control_command, "/run/current-system/sw/bin/swapon", NULL);
++        r = exec_command_set(s->control_command, NIX_SYSTEM_SW "/bin/swapon", NULL);
          if (r < 0)
                  goto fail;
  
-@@ -801,7 +801,7 @@ static void swap_enter_deactivating(Swap *s) {
+@@ -801,7 +802,7 @@ static void swap_enter_deactivating(Swap *s) {
          s->control_command = s->exec_command + SWAP_EXEC_DEACTIVATE;
  
          r = exec_command_set(s->control_command,
 -                             "/sbin/swapoff",
-+                             "/run/current-system/sw/bin/swapoff",
++                             NIX_SYSTEM_SW "/bin/swapoff",
                               s->what,
                               NULL);
          if (r < 0)
@@ -336,10 +388,18 @@ index 813d25713..cb9a089b9 100644
                  || path_equal(path, "/usr")
  #endif
 diff --git a/src/delta/delta.c b/src/delta/delta.c
-index 605bea57b..4a60cee1e 100644
+index 605bea57b..3d197cf11 100644
 --- a/src/delta/delta.c
 +++ b/src/delta/delta.c
-@@ -45,13 +45,8 @@
+@@ -25,6 +25,7 @@
+ #include <unistd.h>
+ 
+ #include "alloc-util.h"
++#include "def.h"
+ #include "dirent-util.h"
+ #include "fd-util.h"
+ #include "fs-util.h"
+@@ -45,13 +46,8 @@
  static const char prefixes[] =
          "/etc\0"
          "/run\0"
@@ -350,25 +410,33 @@ index 605bea57b..4a60cee1e 100644
 -#if HAVE_SPLIT_USR
 -        "/lib\0"
 -#endif
-+        "/run/current-system/sw/lib\0"
-+        "/run/current-system/sw/share\0"
++        NIX_SYSTEMD_MODULE "/lib\0"
++        NIX_SYSTEMD_MODULE "/share\0"
          ;
  
  static const char suffixes[] =
 diff --git a/src/firstboot/firstboot.c b/src/firstboot/firstboot.c
-index 586674d45..97dc7b06e 100644
+index 586674d45..ce5d7095d 100644
 --- a/src/firstboot/firstboot.c
 +++ b/src/firstboot/firstboot.c
-@@ -87,7 +87,7 @@ static void print_welcome(void) {
+@@ -25,6 +25,7 @@
+ #include "alloc-util.h"
+ #include "ask-password-api.h"
+ #include "copy.h"
++#include "def.h"
+ #include "fd-util.h"
+ #include "fileio.h"
+ #include "fs-util.h"
+@@ -87,7 +88,7 @@ static void print_welcome(void) {
                             NULL);
          if (r == -ENOENT) {
  
 -                os_release = prefix_roota(arg_root, "/usr/lib/os-release");
-+                os_release = prefix_roota(arg_root, "/run/current-system/sw/lib/os-release");
++                os_release = prefix_roota(arg_root, NIX_OS_RELEASE);
                  r = parse_env_file(os_release, NEWLINE,
                                     "PRETTY_NAME", &pretty_name,
                                     NULL);
-@@ -347,7 +347,7 @@ static int process_timezone(void) {
+@@ -347,7 +348,7 @@ static int process_timezone(void) {
          if (isempty(arg_timezone))
                  return 0;
  
@@ -378,15 +446,23 @@ index 586674d45..97dc7b06e 100644
          mkdir_parents(etc_localtime, 0755);
          if (symlink(e, etc_localtime) < 0)
 diff --git a/src/fsck/fsck.c b/src/fsck/fsck.c
-index cf5a9c59f..229f0b2d3 100644
+index cf5a9c59f..48aa4be73 100644
 --- a/src/fsck/fsck.c
 +++ b/src/fsck/fsck.c
-@@ -423,7 +423,7 @@ int main(int argc, char *argv[]) {
+@@ -34,6 +34,7 @@
+ #include "bus-common-errors.h"
+ #include "bus-error.h"
+ #include "bus-util.h"
++#include "def.h"
+ #include "device-util.h"
+ #include "fd-util.h"
+ #include "fs-util.h"
+@@ -423,7 +424,7 @@ int main(int argc, char *argv[]) {
                  } else
                          dash_c[0] = 0;
  
 -                cmdline[i++] = "/sbin/fsck";
-+                cmdline[i++] = "/run/current-system/sw/bin/fsck";
++                cmdline[i++] = NIX_SYSTEM_SW "/bin/fsck";
                  cmdline[i++] =  arg_repair;
                  cmdline[i++] = "-T";
  
@@ -405,7 +481,7 @@ index ec70a349f..04503599b 100644
  
  static int write_timeout(FILE *f, const char *where, const char *opts,
 diff --git a/src/hostname/hostnamed.c b/src/hostname/hostnamed.c
-index fe0aa00ef..b42595624 100644
+index fe0aa00ef..c850ca526 100644
 --- a/src/hostname/hostnamed.c
 +++ b/src/hostname/hostnamed.c
 @@ -114,7 +114,7 @@ static int context_read_data(Context *c) {
@@ -413,42 +489,66 @@ index fe0aa00ef..b42595624 100644
                             NULL);
          if (r == -ENOENT)
 -                r = parse_env_file("/usr/lib/os-release", NEWLINE,
-+                r = parse_env_file("/run/current-system/sw/lib/os-release", NEWLINE,
++                r = parse_env_file(NIX_OS_RELEASE, NEWLINE,
                                     "PRETTY_NAME", &c->data[PROP_OS_PRETTY_NAME],
                                     "CPE_NAME", &c->data[PROP_OS_CPE_NAME],
                                     NULL);
 diff --git a/src/journal/cat.c b/src/journal/cat.c
-index 08c844d44..51032d1e9 100644
+index 08c844d44..bd64fec08 100644
 --- a/src/journal/cat.c
 +++ b/src/journal/cat.c
-@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
+@@ -26,6 +26,7 @@
+ 
+ #include "sd-journal.h"
+ 
++#include "def.h"
+ #include "fd-util.h"
+ #include "parse-util.h"
+ #include "string-util.h"
+@@ -145,7 +146,7 @@ int main(int argc, char *argv[]) {
          fd = -1;
  
          if (argc <= optind)
 -                (void) execl("/bin/cat", "/bin/cat", NULL);
-+                (void) execl("/run/current-system/sw/bin/cat", "/run/current-system/sw/bin/cat", NULL);
++                (void) execl(NIX_SYSTEM_SW "/bin/cat", NIX_SYSTEM_SW "/bin/cat", NULL);
          else
                  (void) execvp(argv[optind], argv + optind);
          r = -errno;
 diff --git a/src/journal/catalog.c b/src/journal/catalog.c
-index bf92da9f9..ddc004334 100644
+index bf92da9f9..aac945613 100644
 --- a/src/journal/catalog.c
 +++ b/src/journal/catalog.c
-@@ -44,8 +44,7 @@
+@@ -30,6 +30,7 @@
+ #include "alloc-util.h"
+ #include "catalog.h"
+ #include "conf-files.h"
++#include "def.h"
+ #include "fd-util.h"
+ #include "fileio.h"
+ #include "hashmap.h"
+@@ -44,8 +45,7 @@
  #include "util.h"
  
  const char * const catalog_file_dirs[] = {
 -        "/usr/local/lib/systemd/catalog/",
 -        "/usr/lib/systemd/catalog/",
-+        "/run/current-system/sw/lib/systemd/catalog/",
++        NIX_SYSTEMD_MODULE "/lib/systemd/catalog/",
          NULL
  };
  
 diff --git a/src/libsystemd/sd-hwdb/sd-hwdb.c b/src/libsystemd/sd-hwdb/sd-hwdb.c
-index f8246eaa7..b43ab419e 100644
+index f8246eaa7..bf3d810be 100644
 --- a/src/libsystemd/sd-hwdb/sd-hwdb.c
 +++ b/src/libsystemd/sd-hwdb/sd-hwdb.c
-@@ -316,10 +316,7 @@ static int trie_search_f(sd_hwdb *hwdb, const char *search) {
+@@ -30,6 +30,7 @@
+ #include "sd-hwdb.h"
+ 
+ #include "alloc-util.h"
++#include "def.h"
+ #include "fd-util.h"
+ #include "hashmap.h"
+ #include "hwdb-internal.h"
+@@ -316,10 +317,7 @@ static int trie_search_f(sd_hwdb *hwdb, const char *search) {
  static const char hwdb_bin_paths[] =
          "/etc/systemd/hwdb/hwdb.bin\0"
          "/etc/udev/hwdb.bin\0"
@@ -456,20 +556,28 @@ index f8246eaa7..b43ab419e 100644
 -#if HAVE_SPLIT_USR
 -        "/lib/systemd/hwdb/hwdb.bin\0"
 -#endif
-+        "/run/current-system/sw/lib/systemd/hwdb/hwdb.bin\0"
++        NIX_SYSTEMD_MODULE "/lib/systemd/hwdb/hwdb.bin\0"
          UDEVLIBEXECDIR "/hwdb.bin\0";
  
  _public_ int sd_hwdb_new(sd_hwdb **ret) {
 diff --git a/src/libsystemd/sd-path/sd-path.c b/src/libsystemd/sd-path/sd-path.c
-index 6570d0139..716631e2d 100644
+index 6570d0139..ad40224b0 100644
 --- a/src/libsystemd/sd-path/sd-path.c
 +++ b/src/libsystemd/sd-path/sd-path.c
-@@ -226,15 +226,15 @@ static int get_path(uint64_t type, char **buffer, const char **ret) {
+@@ -21,6 +21,7 @@
+ 
+ #include "alloc-util.h"
+ #include "architecture.h"
++#include "def.h"
+ #include "fd-util.h"
+ #include "fileio.h"
+ #include "fs-util.h"
+@@ -226,15 +227,15 @@ static int get_path(uint64_t type, char **buffer, const char **ret) {
                  return var_tmp_dir(ret);
  
          case SD_PATH_SYSTEM_BINARIES:
 -                *ret = "/usr/bin";
-+                *ret = "/run/current-system/sw/bin";
++                *ret = NIX_SYSTEM_SW "/bin";
                  return 0;
  
          case SD_PATH_SYSTEM_INCLUDE:
@@ -479,30 +587,30 @@ index 6570d0139..716631e2d 100644
  
          case SD_PATH_SYSTEM_LIBRARY_PRIVATE:
 -                *ret = "/usr/lib";
-+                *ret = "/run/current-system/sw/lib";
++                *ret = NIX_SYSTEM_SW "/lib";
                  return 0;
  
          case SD_PATH_SYSTEM_LIBRARY_ARCH:
-@@ -242,15 +242,15 @@ static int get_path(uint64_t type, char **buffer, const char **ret) {
+@@ -242,15 +243,15 @@ static int get_path(uint64_t type, char **buffer, const char **ret) {
                  return 0;
  
          case SD_PATH_SYSTEM_SHARED:
 -                *ret = "/usr/share";
-+                *ret = "/run/current-system/sw/share";
++                *ret = NIX_SYSTEM_SW "/share";
                  return 0;
  
          case SD_PATH_SYSTEM_CONFIGURATION_FACTORY:
 -                *ret = "/usr/share/factory/etc";
-+                *ret = "/run/current-system/sw/share/factory/etc";
++                *ret = NIX_SYSTEM_SW "/share/factory/etc";
                  return 0;
  
          case SD_PATH_SYSTEM_STATE_FACTORY:
 -                *ret = "/usr/share/factory/var";
-+                *ret = "/run/current-system/sw/share/factory/var";
++                *ret = NIX_SYSTEM_SW "/share/factory/var";
                  return 0;
  
          case SD_PATH_SYSTEM_CONFIGURATION:
-@@ -489,14 +489,7 @@ static int get_search(uint64_t type, char ***list) {
+@@ -489,14 +490,7 @@ static int get_search(uint64_t type, char ***list) {
                                                 ".local/bin",
                                                 "PATH",
                                                 true,
@@ -514,11 +622,11 @@ index 6570d0139..716631e2d 100644
 -                                               "/sbin",
 -                                               "/bin",
 -#endif
-+                                               "/run/current-system/sw/bin",
++                                               NIX_SYSTEM_SW "/bin",
                                                 NULL);
  
          case SD_PATH_SEARCH_LIBRARY_PRIVATE:
-@@ -505,11 +498,7 @@ static int get_search(uint64_t type, char ***list) {
+@@ -505,11 +499,7 @@ static int get_search(uint64_t type, char ***list) {
                                                 ".local/lib",
                                                 NULL,
                                                 false,
@@ -527,37 +635,37 @@ index 6570d0139..716631e2d 100644
 -#if HAVE_SPLIT_USR
 -                                               "/lib",
 -#endif
-+                                               "/run/current-system/sw/lib",
++                                               NIX_SYSTEM_SW "/lib",
                                                 NULL);
  
          case SD_PATH_SEARCH_LIBRARY_ARCH:
-@@ -530,8 +519,7 @@ static int get_search(uint64_t type, char ***list) {
+@@ -530,8 +520,7 @@ static int get_search(uint64_t type, char ***list) {
                                                 ".local/share",
                                                 "XDG_DATA_DIRS",
                                                 false,
 -                                               "/usr/local/share",
 -                                               "/usr/share",
-+                                               "/run/current-system/sw/share",
++                                               NIX_SYSTEM_SW "/share",
                                                 NULL);
  
          case SD_PATH_SEARCH_CONFIGURATION_FACTORY:
-@@ -540,8 +528,7 @@ static int get_search(uint64_t type, char ***list) {
+@@ -540,8 +529,7 @@ static int get_search(uint64_t type, char ***list) {
                                                 NULL,
                                                 NULL,
                                                 false,
 -                                               "/usr/local/share/factory/etc",
 -                                               "/usr/share/factory/etc",
-+                                               "/run/current-system/sw/share/factory/etc",
++                                               NIX_SYSTEM_SW "/share/factory/etc",
                                                 NULL);
  
          case SD_PATH_SEARCH_STATE_FACTORY:
-@@ -550,8 +537,7 @@ static int get_search(uint64_t type, char ***list) {
+@@ -550,8 +538,7 @@ static int get_search(uint64_t type, char ***list) {
                                                 NULL,
                                                 NULL,
                                                 false,
 -                                               "/usr/local/share/factory/var",
 -                                               "/usr/share/factory/var",
-+                                               "/run/current-system/sw/share/factory/var",
++                                               NIX_SYSTEM_SW "/share/factory/var",
                                                 NULL);
  
          case SD_PATH_SEARCH_CONFIGURATION:
@@ -575,42 +683,58 @@ index 0bd18a5c0..270964e54 100644
                  return log_error_errno(errno, "Failed to open keyboard mapping list. %m");
  
 diff --git a/src/machine/image-dbus.c b/src/machine/image-dbus.c
-index 18e0e3489..05184e73b 100644
+index 18e0e3489..19e3d9ee3 100644
 --- a/src/machine/image-dbus.c
 +++ b/src/machine/image-dbus.c
-@@ -301,7 +301,7 @@ static int directory_image_get_os_release(Image *image, char ***ret, sd_bus_erro
+@@ -24,6 +24,7 @@
+ #include "bus-label.h"
+ #include "bus-util.h"
+ #include "copy.h"
++#include "def.h"
+ #include "dissect-image.h"
+ #include "fd-util.h"
+ #include "fileio.h"
+@@ -301,7 +302,7 @@ static int directory_image_get_os_release(Image *image, char ***ret, sd_bus_erro
  
          r = chase_symlinks("/etc/os-release", image->path, CHASE_PREFIX_ROOT, &path);
          if (r == -ENOENT)
 -                r = chase_symlinks("/usr/lib/os-release", image->path, CHASE_PREFIX_ROOT, &path);
-+                r = chase_symlinks("/run/current-system/sw/lib/os-release", image->path, CHASE_PREFIX_ROOT, &path);
++                r = chase_symlinks(NIX_OS_RELEASE, image->path, CHASE_PREFIX_ROOT, &path);
          if (r == -ENOENT)
                  return sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "Image does not contain OS release information");
          if (r < 0)
-@@ -368,7 +368,7 @@ static int raw_image_get_os_release(Image *image, char ***ret, sd_bus_error *err
+@@ -368,7 +369,7 @@ static int raw_image_get_os_release(Image *image, char ***ret, sd_bus_error *err
  
                  fd = open("/etc/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
                  if (fd < 0 && errno == ENOENT) {
 -                        fd = open("/usr/lib/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
-+                        fd = open("/run/current-system/sw/lib/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
++                        fd = open(NIX_OS_RELEASE, O_RDONLY|O_CLOEXEC|O_NOCTTY);
                          if (fd < 0 && errno == ENOENT)
                                  _exit(EXIT_NOT_FOUND);
                  }
 diff --git a/src/machine/machine-dbus.c b/src/machine/machine-dbus.c
-index 36568b65e..41bd6f28e 100644
+index 36568b65e..b1d5bb4d8 100644
 --- a/src/machine/machine-dbus.c
 +++ b/src/machine/machine-dbus.c
-@@ -404,7 +404,7 @@ int bus_machine_method_get_os_release(sd_bus_message *message, void *userdata, s
+@@ -34,6 +34,7 @@
+ #include "bus-label.h"
+ #include "bus-util.h"
+ #include "copy.h"
++#include "def.h"
+ #include "env-util.h"
+ #include "fd-util.h"
+ #include "fileio.h"
+@@ -404,7 +405,7 @@ int bus_machine_method_get_os_release(sd_bus_message *message, void *userdata, s
  
                          fd = open("/etc/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
                          if (fd < 0 && errno == ENOENT) {
 -                                fd = open("/usr/lib/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
-+                                fd = open("/run/current-system/sw/lib/os-release", O_RDONLY|O_CLOEXEC|O_NOCTTY);
++                                fd = open(NIX_OS_RELEASE, O_RDONLY|O_CLOEXEC|O_NOCTTY);
                                  if (fd < 0 && errno == ENOENT)
                                          _exit(EXIT_NOT_FOUND);
                          }
 diff --git a/src/network/networkd-manager.c b/src/network/networkd-manager.c
-index 71445d5dd..769efe180 100644
+index 71445d5dd..2172121ea 100644
 --- a/src/network/networkd-manager.c
 +++ b/src/network/networkd-manager.c
 @@ -46,11 +46,9 @@
@@ -623,77 +747,111 @@ index 71445d5dd..769efe180 100644
 -#if HAVE_SPLIT_USR
 -        "/lib/systemd/network",
 -#endif
-+        "/run/current-system/sw/lib/systemd/network",
++        NIX_SYSTEMD_MODULE "/lib/systemd/network",
          NULL};
  
  static int setup_default_address_pool(Manager *m) {
 diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index 4e3803be8..d7f36ae42 100644
+index 4e3803be8..298cb185b 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
-@@ -2433,10 +2433,10 @@ static int inner_child(
+@@ -55,6 +55,7 @@
+ #include "capability-util.h"
+ #include "cgroup-util.h"
+ #include "copy.h"
++#include "def.h"
+ #include "dev-setup.h"
+ #include "dissect-image.h"
+ #include "env-util.h"
+@@ -2433,10 +2434,10 @@ static int inner_child(
                          /* If we cannot change the directory, we'll end up in /, that is expected. */
                          (void) chdir(home ?: "/root");
  
 -                execle("/bin/bash", "-bash", NULL, env_use);
-+                execle("/run/current-system/sw/bin/bash", "-bash", NULL, env_use);
-                 execle("/bin/sh", "-sh", NULL, env_use);
+-                execle("/bin/sh", "-sh", NULL, env_use);
++                execle(NIX_SYSTEM_SW "/bin/bash", "-bash", NULL, env_use);
++                execle(NIX_SYSTEM_SW "/bin/sh", "-sh", NULL, env_use);
  
 -                exec_target = "/bin/bash, /bin/sh";
-+                exec_target = "/run/current-system/sw/bin/bash, /bin/sh";
++                exec_target = NIX_SYSTEM_SW "/bin/bash, " NIX_SYSTEM_SW "/bin/sh";
          }
  
          r = -errno;
 diff --git a/src/nss-mymachines/nss-mymachines.c b/src/nss-mymachines/nss-mymachines.c
-index 6e468853a..6c986a719 100644
+index 6e468853a..47d7f111a 100644
 --- a/src/nss-mymachines/nss-mymachines.c
 +++ b/src/nss-mymachines/nss-mymachines.c
-@@ -483,7 +483,7 @@ enum nss_status _nss_mymachines_getpwnam_r(
+@@ -25,6 +25,7 @@
+ 
+ #include "alloc-util.h"
+ #include "bus-common-errors.h"
++#include "def.h"
+ #include "env-util.h"
+ #include "hostname-util.h"
+ #include "in-addr-util.h"
+@@ -483,7 +484,7 @@ enum nss_status _nss_mymachines_getpwnam_r(
          pwd->pw_gecos = buffer;
          pwd->pw_passwd = (char*) "*"; /* locked */
          pwd->pw_dir = (char*) "/";
 -        pwd->pw_shell = (char*) "/sbin/nologin";
-+        pwd->pw_shell = (char*) "/run/current-system/sw/bin/nologin";
++        pwd->pw_shell = (char*) NIX_SYSTEM_SW "/bin/nologin";
  
          *errnop = 0;
          return NSS_STATUS_SUCCESS;
-@@ -560,7 +560,7 @@ enum nss_status _nss_mymachines_getpwuid_r(
+@@ -560,7 +561,7 @@ enum nss_status _nss_mymachines_getpwuid_r(
          pwd->pw_gecos = buffer;
          pwd->pw_passwd = (char*) "*"; /* locked */
          pwd->pw_dir = (char*) "/";
 -        pwd->pw_shell = (char*) "/sbin/nologin";
-+        pwd->pw_shell = (char*) "/run/current-system/sw/bin/nologin";
++        pwd->pw_shell = (char*) NIX_SYSTEM_SW "/bin/nologin";
  
          *errnop = 0;
          return NSS_STATUS_SUCCESS;
 diff --git a/src/nss-systemd/nss-systemd.c b/src/nss-systemd/nss-systemd.c
-index d856c4c16..0830122a9 100644
+index d856c4c16..c349810f7 100644
 --- a/src/nss-systemd/nss-systemd.c
 +++ b/src/nss-systemd/nss-systemd.c
-@@ -50,7 +50,7 @@ static const struct passwd nobody_passwd = {
+@@ -23,6 +23,7 @@
+ 
+ #include "alloc-util.h"
+ #include "bus-common-errors.h"
++#include "def.h"
+ #include "env-util.h"
+ #include "fs-util.h"
+ #include "macro.h"
+@@ -40,7 +41,7 @@ static const struct passwd root_passwd = {
+         .pw_gid = 0,
+         .pw_gecos = (char*) "Super User",
+         .pw_dir = (char*) "/root",
+-        .pw_shell = (char*) "/bin/sh",
++        .pw_shell = (char*) NIX_SYSTEM_SW "/bin/sh",
+ };
+ 
+ static const struct passwd nobody_passwd = {
+@@ -50,7 +51,7 @@ static const struct passwd nobody_passwd = {
          .pw_gid = 65534,
          .pw_gecos = (char*) "User Nobody",
          .pw_dir = (char*) "/",
 -        .pw_shell = (char*) "/sbin/nologin",
-+        .pw_shell = (char*) "/run/current-system/sw/bin/nologin",
++        .pw_shell = (char*) NIX_SYSTEM_SW "/bin/nologin",
  };
  
  static const struct group root_group = {
-@@ -203,7 +203,7 @@ direct_lookup:
+@@ -203,7 +204,7 @@ direct_lookup:
          pwd->pw_gecos = (char*) "Dynamic User";
          pwd->pw_passwd = (char*) "*"; /* locked */
          pwd->pw_dir = (char*) "/";
 -        pwd->pw_shell = (char*) "/sbin/nologin";
-+        pwd->pw_shell = (char*) "/run/current-system/sw/bin/nologin";
++        pwd->pw_shell = (char*) NIX_SYSTEM_SW "/bin/nologin";
  
          *errnop = 0;
          return NSS_STATUS_SUCCESS;
-@@ -311,7 +311,7 @@ direct_lookup:
+@@ -311,7 +312,7 @@ direct_lookup:
          pwd->pw_gecos = (char*) "Dynamic User";
          pwd->pw_passwd = (char*) "*"; /* locked */
          pwd->pw_dir = (char*) "/";
 -        pwd->pw_shell = (char*) "/sbin/nologin";
-+        pwd->pw_shell = (char*) "/run/current-system/sw/bin/nologin";
++        pwd->pw_shell = (char*) NIX_SYSTEM_SW "/bin/nologin";
  
          *errnop = 0;
          return NSS_STATUS_SUCCESS;
@@ -713,10 +871,18 @@ index 0cb9bd926..96db16445 100644
  
                  log_debug("Remounting %s", me->mnt_dir);
 diff --git a/src/shared/install.c b/src/shared/install.c
-index 7598bf6a2..2763adb51 100644
+index 7598bf6a2..38551513c 100644
 --- a/src/shared/install.c
 +++ b/src/shared/install.c
-@@ -2737,17 +2737,14 @@ static int read_presets(UnitFileScope scope, const char *root_dir, Presets *pres
+@@ -32,6 +32,7 @@
+ #include "alloc-util.h"
+ #include "conf-files.h"
+ #include "conf-parser.h"
++#include "def.h"
+ #include "dirent-util.h"
+ #include "extract-word.h"
+ #include "fd-util.h"
+@@ -2737,17 +2738,14 @@ static int read_presets(UnitFileScope scope, const char *root_dir, Presets *pres
          if (scope == UNIT_FILE_SYSTEM)
                  r = conf_files_list(&files, ".preset", root_dir, 0,
                                      "/etc/systemd/system-preset",
@@ -726,7 +892,7 @@ index 7598bf6a2..2763adb51 100644
 -                                    "/lib/systemd/system-preset",
 -#endif
 +                                    "/etc/systemd-mutable/system-preset",
-+                                    "/run/current-system/sw/lib/systemd/system-preset",
++                                    NIX_SYSTEMD_MODULE "/lib/systemd/system-preset",
                                      NULL);
          else if (scope == UNIT_FILE_GLOBAL)
                  r = conf_files_list(&files, ".preset", root_dir, 0,
@@ -734,25 +900,33 @@ index 7598bf6a2..2763adb51 100644
 -                                    "/usr/local/lib/systemd/user-preset",
 -                                    "/usr/lib/systemd/user-preset",
 +                                    "/etc/systemd-mutable/user-preset",
-+                                    "/run/current-system/sw/lib/systemd/user-preset",
++                                    NIX_SYSTEMD_MODULE "/lib/systemd/user-preset",
                                      NULL);
          else {
                  *presets = (Presets){};
 diff --git a/src/shared/machine-image.c b/src/shared/machine-image.c
-index 859e5ffc1..927704460 100644
+index 859e5ffc1..a79e2b5f7 100644
 --- a/src/shared/machine-image.c
 +++ b/src/shared/machine-image.c
-@@ -55,8 +55,7 @@
+@@ -32,6 +32,7 @@
+ #include "btrfs-util.h"
+ #include "chattr-util.h"
+ #include "copy.h"
++#include "def.h"
+ #include "dirent-util.h"
+ #include "env-util.h"
+ #include "fd-util.h"
+@@ -55,8 +56,7 @@
  static const char image_search_path[] =
          "/var/lib/machines\0"
          "/var/lib/container\0" /* legacy */
 -        "/usr/local/lib/machines\0"
 -        "/usr/lib/machines\0";
-+        "/run/current-system/sw/lib/machines\0";
++        NIX_SYSTEMD_MODULE "/lib/machines\0";
  
  Image *image_unref(Image *i) {
          if (!i)
-@@ -81,7 +80,7 @@ static char **image_settings_path(Image *image) {
+@@ -81,7 +81,7 @@ static char **image_settings_path(Image *image) {
  
          fn = strjoina(image->name, ".nspawn");
  
@@ -781,10 +955,18 @@ index 7410168c4..909930c58 100644
  
  static inline bool IMAGE_IS_HOST(const struct Image *i) {
 diff --git a/src/shared/path-lookup.c b/src/shared/path-lookup.c
-index 802e4b9c8..180a75740 100644
+index 802e4b9c8..877cfcef6 100644
 --- a/src/shared/path-lookup.c
 +++ b/src/shared/path-lookup.c
-@@ -116,17 +116,16 @@ static int user_data_dir(char **ret, const char *suffix) {
+@@ -23,6 +23,7 @@
+ #include <string.h>
+ 
+ #include "alloc-util.h"
++#include "def.h"
+ #include "fileio.h"
+ #include "fs-util.h"
+ #include "install.h"
+@@ -116,17 +117,16 @@ static int user_data_dir(char **ret, const char *suffix) {
  }
  
  static const char* const user_data_unit_paths[] = {
@@ -793,8 +975,8 @@ index 802e4b9c8..180a75740 100644
          USER_DATA_UNIT_PATH,
 -        "/usr/lib/systemd/user",
 -        "/usr/share/systemd/user",
-+        "/run/current-system/sw/lib/systemd/user",
-+        "/run/current-system/sw/share/systemd/user",
++        NIX_SYSTEMD_MODULE "/lib/systemd/user",
++        NIX_SYSTEMD_MODULE "/share/systemd/user",
          NULL
  };
  
@@ -805,7 +987,7 @@ index 802e4b9c8..180a75740 100644
          NULL
  };
  
-@@ -139,7 +138,6 @@ static char** user_dirs(
+@@ -139,7 +139,6 @@ static char** user_dirs(
                  const char *transient,
                  const char *persistent_control,
                  const char *runtime_control) {
@@ -813,7 +995,7 @@ index 802e4b9c8..180a75740 100644
          _cleanup_strv_free_ char **config_dirs = NULL, **data_dirs = NULL;
          _cleanup_free_ char *data_home = NULL;
          _cleanup_strv_free_ char **res = NULL;
-@@ -570,15 +568,11 @@ int lookup_paths_init(
+@@ -570,15 +569,11 @@ int lookup_paths_init(
                                          persistent_config,
                                          SYSTEM_CONFIG_UNIT_PATH,
                                          "/etc/systemd/system",
@@ -830,7 +1012,7 @@ index 802e4b9c8..180a75740 100644
                                          STRV_IFNOTNULL(generator_late),
                                          NULL);
                          break;
-@@ -595,14 +589,11 @@ int lookup_paths_init(
+@@ -595,14 +590,11 @@ int lookup_paths_init(
                                          persistent_config,
                                          USER_CONFIG_UNIT_PATH,
                                          "/etc/systemd/user",
@@ -846,7 +1028,7 @@ index 802e4b9c8..180a75740 100644
                                          STRV_IFNOTNULL(generator_late),
                                          NULL);
                          break;
-@@ -846,7 +837,6 @@ char **generator_binary_paths(UnitFileScope scope) {
+@@ -846,7 +838,6 @@ char **generator_binary_paths(UnitFileScope scope) {
          case UNIT_FILE_SYSTEM:
                  return strv_new("/run/systemd/system-generators",
                                  "/etc/systemd/system-generators",
@@ -854,7 +1036,7 @@ index 802e4b9c8..180a75740 100644
                                  SYSTEM_GENERATOR_PATH,
                                  NULL);
  
-@@ -854,7 +844,6 @@ char **generator_binary_paths(UnitFileScope scope) {
+@@ -854,7 +845,6 @@ char **generator_binary_paths(UnitFileScope scope) {
          case UNIT_FILE_USER:
                  return strv_new("/run/systemd/user-generators",
                                  "/etc/systemd/user-generators",
@@ -863,7 +1045,7 @@ index 802e4b9c8..180a75740 100644
                                  NULL);
  
 diff --git a/src/sysusers/sysusers.c b/src/sysusers/sysusers.c
-index 6ef00d8f2..c5952d600 100644
+index 6ef00d8f2..329d446a0 100644
 --- a/src/sysusers/sysusers.c
 +++ b/src/sysusers/sysusers.c
 @@ -446,7 +446,7 @@ static int write_temporary_passwd(const char *passwd_path, FILE **tmpfile, char
@@ -871,12 +1053,12 @@ index 6ef00d8f2..c5952d600 100644
                          /* Initialize the shell to nologin, with one exception:
                           * for root we patch in something special */
 -                        .pw_shell = i->uid == 0 ? (char*) "/bin/sh" : (char*) "/sbin/nologin",
-+                        .pw_shell = i->uid == 0 ? (char*) "/bin/sh" : (char*) "/run/current-system/sw/bin/nologin",
++                        .pw_shell = i->uid == 0 ? (char*) NIX_SYSTEM_SW "/bin/sh" : (char*) NIX_SYSTEM_SW "/bin/nologin",
                  };
  
                  errno = 0;
 diff --git a/src/tmpfiles/tmpfiles.c b/src/tmpfiles/tmpfiles.c
-index 7f457ca36..6ec794aa7 100644
+index 7f457ca36..23a6c481c 100644
 --- a/src/tmpfiles/tmpfiles.c
 +++ b/src/tmpfiles/tmpfiles.c
 @@ -1881,7 +1881,7 @@ static int parse_line(const char *fname, unsigned line, const char *buffer) {
@@ -884,7 +1066,7 @@ index 7f457ca36..6ec794aa7 100644
          case CREATE_SYMLINK:
                  if (!i.argument) {
 -                        i.argument = strappend("/usr/share/factory/", i.path);
-+                        i.argument = strappend("/run/current-system/sw/share/factory/", i.path);
++                        i.argument = strappend(NIX_SYSTEM_SW "/share/factory/", i.path);
                          if (!i.argument)
                                  return log_oom();
                  }
@@ -893,15 +1075,23 @@ index 7f457ca36..6ec794aa7 100644
          case COPY_FILES:
                  if (!i.argument) {
 -                        i.argument = strappend("/usr/share/factory/", i.path);
-+                        i.argument = strappend("/run/current-system/sw/share/factory/", i.path);
++                        i.argument = strappend(NIX_SYSTEM_SW "/share/factory/", i.path);
                          if (!i.argument)
                                  return log_oom();
                  } else if (!path_is_absolute(i.argument)) {
 diff --git a/src/udev/net/link-config.c b/src/udev/net/link-config.c
-index a5f3b1a1b..d5b34a305 100644
+index a5f3b1a1b..0283aec2c 100644
 --- a/src/udev/net/link-config.c
 +++ b/src/udev/net/link-config.c
-@@ -56,11 +56,9 @@ struct link_config_ctx {
+@@ -24,6 +24,7 @@
+ #include "alloc-util.h"
+ #include "conf-files.h"
+ #include "conf-parser.h"
++#include "def.h"
+ #include "ethtool-util.h"
+ #include "fd-util.h"
+ #include "libudev-private.h"
+@@ -56,11 +57,9 @@ struct link_config_ctx {
  
  static const char* const link_dirs[] = {
          "/etc/systemd/network",
@@ -911,7 +1101,7 @@ index a5f3b1a1b..d5b34a305 100644
 -#if HAVE_SPLIT_USR
 -        "/lib/systemd/network",
 -#endif
-+        "/run/current-system/sw/lib/systemd/network",
++        NIX_SYSTEMD_MODULE "/lib/systemd/network",
          NULL};
  
  static void link_config_free(link_config *link) {
