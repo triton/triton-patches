@@ -1,8 +1,8 @@
 diff --git a/src/nautilus-module.c b/src/nautilus-module.c
-index bf474bd6f..c58fdf8d5 100644
+index bf474bd6f..181aaa777 100644
 --- a/src/nautilus-module.c
 +++ b/src/nautilus-module.c
-@@ -254,12 +254,16 @@ void
+@@ -254,12 +254,18 @@ void
  nautilus_module_setup (void)
  {
      static gboolean initialized = FALSE;
@@ -17,6 +17,8 @@ index bf474bd6f..c58fdf8d5 100644
 +        if (extensiondir == NULL) {
 +            extensiondir = NAUTILUS_EXTENSIONDIR;
 +        }
++
++        load_module_dir (extensiondir)
  
          eel_debug_call_at_shutdown (free_module_objects);
      }
