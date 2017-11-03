@@ -1,0 +1,33 @@
+From 10059c8733e30cef66e6c33fb8c3130ea11d8f8c Mon Sep 17 00:00:00 2001
+From: Sreerenj Balachandran <sreerenj.balachandran@intel.com>
+Date: Tue, 31 Oct 2017 22:19:43 -0700
+Subject: [PATCH] meson.build: blacklist only libva 0.99.0
+
+This is the same fix we used in gstreaemr-vaapi to blacklist
+the notoroious libva version 0.99.0
+
+Intel's MSDK uses libva 0.99.0, meanwhile open source libva bumped
+its API version to 1.0.0. Thus we have to blacklist only the MSDK's
+libva (0.99.0)
+
+https://bugzilla.gnome.org/show_bug.cgi?id=789744
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index f661c6f..adac070 100644
+--- a/meson.build
++++ b/meson.build
+@@ -60,7 +60,7 @@ if not get_option('disable_gst_omx')
+ endif
+ 
+ if not get_option('disable_gstreamer_vaapi')
+-  if dependency('libva', version: ['>= 0.30.4', '< 0.99.0'], required : false).found()
++  if dependency('libva', version: ['>= 0.30.4', '!= 0.99.0'], required : false).found()
+     subprojects += ['gstreamer-vaapi']
+   else
+     message('WARNING: not building gstreamer-vaapi module, missing libva')
+-- 
+2.14.1
+
