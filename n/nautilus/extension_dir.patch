@@ -1,5 +1,5 @@
 diff --git a/src/nautilus-module.c b/src/nautilus-module.c
-index bf474bd6f..181aaa777 100644
+index bf474bd6f..a7f2ffc0d 100644
 --- a/src/nautilus-module.c
 +++ b/src/nautilus-module.c
 @@ -254,12 +254,18 @@ void
@@ -18,7 +18,7 @@ index bf474bd6f..181aaa777 100644
 +            extensiondir = NAUTILUS_EXTENSIONDIR;
 +        }
 +
-+        load_module_dir (extensiondir)
++        load_module_dir (extensiondir);
  
          eel_debug_call_at_shutdown (free_module_objects);
      }
