@@ -1,0 +1,520 @@
+From 12429af2c0a40bb199ced605b7f7fab5ecc77e86 Mon Sep 17 00:00:00 2001
+From: Murray Cumming <murrayc@murrayc.com>
+Date: Wed, 25 Oct 2017 22:20:49 +0200
+Subject: [PATCH] Convert several headers from ISO-8559 to UTF-8.
+
+Using, for instance,
+recode ISO-8859-16..utf8 ./libgda/gda-meta-struct-private.h
+and then using sed to replace resulting strange characters.
+
+This avoids this error from recent versions of glib-mkenums:
+UnicodeDecodeError: 'utf8' codec can't decode byte 0xf3 in position 167:
+invalid continuation byte
+---
+ libgda-report/engine/rt-parser.h                           | 2 +-
+ libgda-report/gda-report-document-private.h                | 2 +-
+ libgda-report/gda-report-document.h                        | 2 +-
+ libgda-report/libgda-report.h                              | 2 +-
+ libgda-ui/gdaui-easy.h                                     | 2 +-
+ libgda-ui/libgda-ui.h                                      | 2 +-
+ libgda-xslt/libgda-xslt.h                                  | 2 +-
+ libgda/binreloc/gda-binreloc.h                             | 2 +-
+ libgda/gda-column.h                                        | 4 ++--
+ libgda/gda-connection-internal.h                           | 2 +-
+ libgda/gda-connection-sqlite.h                             | 2 +-
+ libgda/gda-data-model-extra.h                              | 2 +-
+ libgda/gda-data-model-iter-extra.h                         | 2 +-
+ libgda/gda-data-model.h                                    | 2 +-
+ libgda/gda-meta-store-extra.h                              | 2 +-
+ libgda/gda-meta-struct-private.h                           | 2 +-
+ libgda/gda-row.h                                           | 4 ++--
+ libgda/gda-server-operation-private.h                      | 2 +-
+ libgda/gda-server-provider-private.h                       | 2 +-
+ libgda/gda-statement-extra.h                               | 2 +-
+ libgda/gda-util.h                                          | 4 ++--
+ libgda/libgda-global-variables.h                           | 2 +-
+ libgda/providers-support/gda-data-select-priv.h            | 2 +-
+ libgda/sqlite/gda-sqlite-provider.h                        | 2 +-
+ libgda/sqlite/gda-sqlite-recordset.h                       | 2 +-
+ libgda/sqlite/gda-sqlite.h                                 | 4 ++--
+ libgda/sqlite/virtual/gda-vconnection-data-model-private.h | 2 +-
+ providers/firebird/gda-firebird.h                          | 2 +-
+ providers/jdbc/gda-jdbc.h                                  | 2 +-
+ providers/ldap/gdaprov-data-model-ldap.h                   | 2 +-
+ providers/mdb/gda-mdb-provider.h                           | 2 +-
+ providers/mdb/gda-mdb.h                                    | 2 +-
+ providers/mysql/gda-mysql-provider.h                       | 2 +-
+ providers/mysql/gda-mysql-recordset.h                      | 2 +-
+ providers/mysql/gda-mysql.h                                | 2 +-
+ providers/postgres/gda-postgres-recordset.h                | 2 +-
+ 36 files changed, 40 insertions(+), 40 deletions(-)
+
+diff --git a/libgda-report/engine/rt-parser.h b/libgda-report/engine/rt-parser.h
+index ce14e1167..d401b0b7b 100644
+--- a/libgda-report/engine/rt-parser.h
++++ b/libgda-report/engine/rt-parser.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda-report/gda-report-document-private.h b/libgda-report/gda-report-document-private.h
+index e17fa7c5c..5e4d74a08 100644
+--- a/libgda-report/gda-report-document-private.h
++++ b/libgda-report/gda-report-document-private.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda-report/gda-report-document.h b/libgda-report/gda-report-document.h
+index fff86038b..cd590b333 100644
+--- a/libgda-report/gda-report-document.h
++++ b/libgda-report/gda-report-document.h
+@@ -1,6 +1,6 @@
+ /*
+  * Copyright (C) 2001 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2002 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2002 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  * Copyright (C) 2003 Santi Camps <santi@gnome-db.org>
+  * Copyright (C) 2003 Santi Camps Taltavull <santi@src.gnome.org>
+diff --git a/libgda-report/libgda-report.h b/libgda-report/libgda-report.h
+index 64f121fc2..83bdd16b8 100644
+--- a/libgda-report/libgda-report.h
++++ b/libgda-report/libgda-report.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda-ui/gdaui-easy.h b/libgda-ui/gdaui-easy.h
+index 43e326943..a19cddd5b 100644
+--- a/libgda-ui/gdaui-easy.h
++++ b/libgda-ui/gdaui-easy.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2011 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda-ui/libgda-ui.h b/libgda-ui/libgda-ui.h
+index aa68e6837..3c4e470d4 100644
+--- a/libgda-ui/libgda-ui.h
++++ b/libgda-ui/libgda-ui.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2015 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda-xslt/libgda-xslt.h b/libgda-xslt/libgda-xslt.h
+index 06161ae51..c47b1c3d3 100644
+--- a/libgda-xslt/libgda-xslt.h
++++ b/libgda-xslt/libgda-xslt.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/binreloc/gda-binreloc.h b/libgda/binreloc/gda-binreloc.h
+index f943ab4d5..62e0a4c94 100644
+--- a/libgda/binreloc/gda-binreloc.h
++++ b/libgda/binreloc/gda-binreloc.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/gda-column.h b/libgda/gda-column.h
+index 0dc193c0c..4bea53c74 100644
+--- a/libgda/gda-column.h
++++ b/libgda/gda-column.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2005 - 2011 Vivien Malerba <malerba@gnome-db.org>
+- * Copyright (C) 2005 ¡lvaro PeÒa <alvaropg@telefonica.net>
+- * Copyright (C) 2008 Przemys≈Çaw Grzegorczyk <pgrzegorczyk@gmail.com>
++ * Copyright (C) 2005 √Ålvaro Pe≈Ña <alvaropg@telefonica.net>
++ * Copyright (C) 2008 PrzemysƒÜ¬Çaw Grzegorczyk <pgrzegorczyk@gmail.com>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+diff --git a/libgda/gda-connection-internal.h b/libgda/gda-connection-internal.h
+index a1763e2e6..b8aa0d592 100644
+--- a/libgda/gda-connection-internal.h
++++ b/libgda/gda-connection-internal.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2014 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/gda-connection-sqlite.h b/libgda/gda-connection-sqlite.h
+index 726d50070..2008ffb8a 100644
+--- a/libgda/gda-connection-sqlite.h
++++ b/libgda/gda-connection-sqlite.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/gda-data-model-extra.h b/libgda/gda-data-model-extra.h
+index 433b3a29b..0b9983627 100644
+--- a/libgda/gda-data-model-extra.h
++++ b/libgda/gda-data-model-extra.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2003 Rodrigo Moya <rodrigo@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 - 2003 Gonzalo Paniagua Javier <gonzalo@gnome-db.org>
+diff --git a/libgda/gda-data-model-iter-extra.h b/libgda/gda-data-model-iter-extra.h
+index 1ff4e98fd..5c9f7bbfb 100644
+--- a/libgda/gda-data-model-iter-extra.h
++++ b/libgda/gda-data-model-iter-extra.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/gda-data-model.h b/libgda/gda-data-model.h
+index 5aad50ef3..c4619334b 100644
+--- a/libgda/gda-data-model.h
++++ b/libgda/gda-data-model.h
+@@ -4,7 +4,7 @@
+  * Copyright (C) 2003 Laurent Sansonetti <lrz@gnome.org>
+  * Copyright (C) 2005 Dan Winship <danw@src.gnome.org>
+  * Copyright (C) 2005 - 2014 Vivien Malerba <malerba@gnome-db.org>
+- * Copyright (C) 2005 ¡lvaro PeÒa <alvaropg@telefonica.net>
++ * Copyright (C) 2005 √Ålvaro Pe√±a <alvaropg@telefonica.net>
+  * Copyright (C) 2007 Murray Cumming <murrayc@murrayc.com>
+  * Copyright (C) 2011 Daniel Espinosa <despinosa@src.gnome.org>
+  *
+diff --git a/libgda/gda-meta-store-extra.h b/libgda/gda-meta-store-extra.h
+index 12b431be1..718b4c771 100644
+--- a/libgda/gda-meta-store-extra.h
++++ b/libgda/gda-meta-store-extra.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/gda-meta-struct-private.h b/libgda/gda-meta-struct-private.h
+index cc84643d9..830d11ffb 100644
+--- a/libgda/gda-meta-struct-private.h
++++ b/libgda/gda-meta-struct-private.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/gda-row.h b/libgda/gda-row.h
+index 3e601d6b4..992864d90 100644
+--- a/libgda/gda-row.h
++++ b/libgda/gda-row.h
+@@ -3,10 +3,10 @@
+  * Copyright (C) 2001 - 2011 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@gnome-db.org>
+  * Copyright (C) 2003 Laurent Sansonetti <laurent@datarescue.be>
+- * Copyright (C) 2003 Xabier RodrÌguez Calvar <xrcalvar@igalia.com>
++ * Copyright (C) 2003 Xabier Rodr√≠guez Calvar <xrcalvar@igalia.com>
+  * Copyright (C) 2004 Paisa  Seeluangsawat <paisa@users.sf.net>
+  * Copyright (C) 2005 Bas Driessen <bas.driessen@xobas.com>
+- * Copyright (C) 2005 ¡lvaro PeÒa <alvaropg@telefonica.net>
++ * Copyright (C) 2005 √Ålvaro Pe≈Ña <alvaropg@telefonica.net>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+diff --git a/libgda/gda-server-operation-private.h b/libgda/gda-server-operation-private.h
+index b2db6afd6..0c3414949 100644
+--- a/libgda/gda-server-operation-private.h
++++ b/libgda/gda-server-operation-private.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/gda-server-provider-private.h b/libgda/gda-server-provider-private.h
+index 0c0abe572..e20f23c20 100644
+--- a/libgda/gda-server-provider-private.h
++++ b/libgda/gda-server-provider-private.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2005 Dan Winship <danw@src.gnome.org>
+  * Copyright (C) 2005 - 2014 Vivien Malerba <malerba@gnome-db.org>
+- * Copyright (C) 2005 ¡lvaro PeÒa <alvaropg@telefonica.net>
++ * Copyright (C) 2005 √Ålvaro Pe≈Ña <alvaropg@telefonica.net>
+  * Copyright (C) 2007 Murray Cumming <murrayc@murrayc.com>
+  *
+  * This library is free software; you can redistribute it and/or
+diff --git a/libgda/gda-statement-extra.h b/libgda/gda-statement-extra.h
+index f395a309e..559231c04 100644
+--- a/libgda/gda-statement-extra.h
++++ b/libgda/gda-statement-extra.h
+@@ -1,6 +1,6 @@
+ /*
+  * Copyright (C) 2008 - 2012 Vivien Malerba <malerba@gnome-db.org>
+- * Copyright (C) 2015 Corentin NoÎl <corentin@elementary.io>
++ * Copyright (C) 2015 Corentin No√´l <corentin@elementary.io>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+diff --git a/libgda/gda-util.h b/libgda/gda-util.h
+index a1a8bfef7..8a9fdc67c 100644
+--- a/libgda/gda-util.h
++++ b/libgda/gda-util.h
+@@ -1,12 +1,12 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2013 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  * Copyright (C) 2006 - 2007 Murray Cumming <murrayc@murrayc.com>
+  * Copyright (C) 2007 Armin Burgmeier <armin@openismus.com>
+- * Copyright (C) 2008 Przemys≈Çaw Grzegorczyk <pgrzegorczyk@gmail.com>
++ * Copyright (C) 2008 PrzemysƒÜ¬Çaw Grzegorczyk <pgrzegorczyk@gmail.com>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+diff --git a/libgda/libgda-global-variables.h b/libgda/libgda-global-variables.h
+index 79da7ba22..f0f710944 100644
+--- a/libgda/libgda-global-variables.h
++++ b/libgda/libgda-global-variables.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2003 Rodrigo Moya <rodrigo@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 - 2003 Gonzalo Paniagua Javier <gonzalo@gnome-db.org>
+diff --git a/libgda/providers-support/gda-data-select-priv.h b/libgda/providers-support/gda-data-select-priv.h
+index 07bbb655d..258547d63 100644
+--- a/libgda/providers-support/gda-data-select-priv.h
++++ b/libgda/providers-support/gda-data-select-priv.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2014 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/sqlite/gda-sqlite-provider.h b/libgda/sqlite/gda-sqlite-provider.h
+index 664100c38..ade766912 100644
+--- a/libgda/sqlite/gda-sqlite-provider.h
++++ b/libgda/sqlite/gda-sqlite-provider.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2001 - 2002 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 - 2002 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  * Copyright (C) 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+  * Copyright (C) 2007 - 2012 Vivien Malerba <malerba@gnome-db.org>
+diff --git a/libgda/sqlite/gda-sqlite-recordset.h b/libgda/sqlite/gda-sqlite-recordset.h
+index 156d04027..2499f61a3 100644
+--- a/libgda/sqlite/gda-sqlite-recordset.h
++++ b/libgda/sqlite/gda-sqlite-recordset.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 - 2002 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 - 2002 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2014 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/libgda/sqlite/gda-sqlite.h b/libgda/sqlite/gda-sqlite.h
+index 63d1323c9..46686bcd9 100644
+--- a/libgda/sqlite/gda-sqlite.h
++++ b/libgda/sqlite/gda-sqlite.h
+@@ -1,10 +1,10 @@
+ /*
+- * Copyright (C) 2001 - 2002 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 - 2002 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+  * Copyright (C) 2001 - 2014 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  * Copyright (C) 2005 Denis Fortin <denis.fortin@free.fr>
+- * Copyright (C) 2008 Przemys≈Çaw Grzegorczyk <pgrzegorczyk@gmail.com>
++ * Copyright (C) 2008 PrzemysƒÜ¬Çaw Grzegorczyk <pgrzegorczyk@gmail.com>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+diff --git a/libgda/sqlite/virtual/gda-vconnection-data-model-private.h b/libgda/sqlite/virtual/gda-vconnection-data-model-private.h
+index d7286a1d4..8d6ec27cf 100644
+--- a/libgda/sqlite/virtual/gda-vconnection-data-model-private.h
++++ b/libgda/sqlite/virtual/gda-vconnection-data-model-private.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/providers/firebird/gda-firebird.h b/providers/firebird/gda-firebird.h
+index 95671ecd3..45021dff1 100644
+--- a/providers/firebird/gda-firebird.h
++++ b/providers/firebird/gda-firebird.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2003 Rodrigo Moya <rodrigo@gnome-db.org>
+  * Copyright (C) 2001 - 2014 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 - 2003 Gonzalo Paniagua Javier <gonzalo@gnome-db.org>
+diff --git a/providers/jdbc/gda-jdbc.h b/providers/jdbc/gda-jdbc.h
+index 427242901..1e2c1f585 100644
+--- a/providers/jdbc/gda-jdbc.h
++++ b/providers/jdbc/gda-jdbc.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2003 Rodrigo Moya <rodrigo@gnome-db.org>
+  * Copyright (C) 2001 - 2014 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 - 2003 Gonzalo Paniagua Javier <gonzalo@gnome-db.org>
+diff --git a/providers/ldap/gdaprov-data-model-ldap.h b/providers/ldap/gdaprov-data-model-ldap.h
+index 234bb4b19..524fee8ea 100644
+--- a/providers/ldap/gdaprov-data-model-ldap.h
++++ b/providers/ldap/gdaprov-data-model-ldap.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2011 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/providers/mdb/gda-mdb-provider.h b/providers/mdb/gda-mdb-provider.h
+index ac39cd07a..028f5f1da 100644
+--- a/providers/mdb/gda-mdb-provider.h
++++ b/providers/mdb/gda-mdb-provider.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2003 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  *
+diff --git a/providers/mdb/gda-mdb.h b/providers/mdb/gda-mdb.h
+index 629b13908..f09440f22 100644
+--- a/providers/mdb/gda-mdb.h
++++ b/providers/mdb/gda-mdb.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2003 Rodrigo Moya <rodrigo@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 - 2003 Gonzalo Paniagua Javier <gonzalo@gnome-db.org>
+diff --git a/providers/mysql/gda-mysql-provider.h b/providers/mysql/gda-mysql-provider.h
+index 338f4c2fa..168e1e7a6 100644
+--- a/providers/mysql/gda-mysql-provider.h
++++ b/providers/mysql/gda-mysql-provider.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  * Copyright (C) 2005 Alan Knowles <alan@akbkhome.com>
+diff --git a/providers/mysql/gda-mysql-recordset.h b/providers/mysql/gda-mysql-recordset.h
+index 9d5222260..fa5e03422 100644
+--- a/providers/mysql/gda-mysql-recordset.h
++++ b/providers/mysql/gda-mysql-recordset.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2002 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 - 2003 Gonzalo Paniagua Javier <gonzalo@ximian.com>
+  * Copyright (C) 2005 Bas Driessen <bas.driessen@xobas.com>
+diff --git a/providers/mysql/gda-mysql.h b/providers/mysql/gda-mysql.h
+index 5e2f2ff90..6b9bebfbe 100644
+--- a/providers/mysql/gda-mysql.h
++++ b/providers/mysql/gda-mysql.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2004 Rodrigo Moya <rodrigo@gnome-db.org>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2014 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 - 2003 Gonzalo Paniagua Javier <gonzalo@src.gnome.org>
+  * Copyright (C) 2005 Alan Knowles <alan@akbkhome.com>
+diff --git a/providers/postgres/gda-postgres-recordset.h b/providers/postgres/gda-postgres-recordset.h
+index 2b5772bb1..fdee82d31 100644
+--- a/providers/postgres/gda-postgres-recordset.h
++++ b/providers/postgres/gda-postgres-recordset.h
+@@ -1,7 +1,7 @@
+ /*
+  * Copyright (C) 2000 Reinhard M√ºller <reinhard@src.gnome.org>
+  * Copyright (C) 2000 - 2004 Rodrigo Moya <rodrigo@ximian.com>
+- * Copyright (C) 2001 Carlos PerellÛ MarÌn <carlos@gnome-db.org>
++ * Copyright (C) 2001 Carlos Perell√≥ Mar√≠n <carlos@gnome-db.org>
+  * Copyright (C) 2001 - 2012 Vivien Malerba <malerba@gnome-db.org>
+  * Copyright (C) 2002 Gonzalo Paniagua Javier <gonzalo@gnome-db.org>
+  *
