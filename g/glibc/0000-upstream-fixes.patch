@@ -1,8 +1,200 @@
 diff --git a/ChangeLog b/ChangeLog
-index 8dbfc7eaff..26ebb2e7c9 100644
+index 8dbfc7eaff..eb9204d972 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,671 @@
+@@ -1,3 +1,863 @@
++2017-10-04  Florian Weimer  <fweimer@redhat.com>
++
++	* scripts/check-local-headers.sh: Ignore nspr4 header file
++	directory in addition to nspr.
++
++2017-10-04  Guido Trentalancia  <guido@trentalancia.net>
++
++	[BZ #17956]
++	* configure.ac (--enable-nss-crypt): Use NSPR include directory.
++	* configure: Regenerate.
++	* crypt/Makefile (nss-cpp-flags): New variable.
++	(CPPFLAGS-sha256-crypt.c, CPPFLAGS-sha512-crypt.c)
++	(CPPFLAGS-md5-crypt.c): Use it.
++	* scripts/check-local-headers.sh: Ignore nspr header file
++	directory.
++
++2017-10-18  Wilco Dijkstra  <wdijkstr@arm.com>
++
++	* malloc/malloc.c (malloc_state): Use int for have_fastchunks since
++	not all targets support atomics on bool.
++
++2017-10-17  Wilco Dijkstra  <wdijkstr@arm.com>
++
++	* malloc/malloc.c (FASTCHUNKS_BIT): Remove.
++	(have_fastchunks): Remove.
++	(clear_fastchunks): Remove.
++	(set_fastchunks): Remove.
++	(malloc_state): Add have_fastchunks.
++	(malloc_init_state): Use have_fastchunks.
++	(do_check_malloc_state): Remove incorrect invariant checks.
++	(_int_malloc): Use have_fastchunks.
++	(_int_free): Likewise.
++	(malloc_consolidate): Likewise.
++
++2017-10-17  Wilco Dijkstra  <wdijkstr@arm.com>
++
++	* malloc/malloc.c (tcache_put): Inline.
++	(tcache_get): Inline.
++
++2017-10-13  James Clarke  <jrtc27@jrtc27.com>
++
++	* sysdeps/powerpc/powerpc32/dl-machine.h (elf_machine_rela):
++	Assign sym_map to be map for local symbols, as TLS relocations
++	use sym_map to determine whether the symbol is defined and to
++	extract the TLS information.
++	* sysdeps/sparc/sparc32/dl-machine.h (elf_machine_rela): Likewise.
++	* sysdeps/sparc/sparc64/dl-machine.h (elf_machine_rela): Likewise.
++
++2017-08-23  H.J. Lu  <hongjiu.lu@intel.com>
++
++	* sysdeps/x86_64/fpu/libm-test-ulps: Regenerated.
++
++2017-11-07  Adhemerval Zanella  <adhemerval.zanella@linaro.org>
++
++	[BZ #22298]
++	* nptl/allocatestack.c (allocate_stack): Check if
++	__PTHREAD_MUTEX_HAVE_PREV is non-zero, instead if
++	__PTHREAD_MUTEX_HAVE_PREV is defined.
++	* nptl/descr.h (pthread): Likewise.
++	* nptl/nptl-init.c (__pthread_initialize_minimal_internal):
++	Likewise.
++	* nptl/pthread_create.c (START_THREAD_DEFN): Likewise.
++	* sysdeps/nptl/fork.c (__libc_fork): Likewise.
++	* sysdeps/nptl/pthread.h (PTHREAD_MUTEX_INITIALIZER): Likewise.
++	* sysdeps/nptl/bits/thread-shared-types.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION): New
++	defines.
++	(__pthread_internal_list): Check __PTHREAD_MUTEX_USE_UNION instead
++	of __WORDSIZE for internal layout.
++	(__pthread_mutex_s): Check __PTHREAD_MUTEX_NUSERS_AFTER_KIND instead
++	of __WORDSIZE for internal __nusers layout and __PTHREAD_MUTEX_USE_UNION
++	instead of __WORDSIZE whether to use an union for __spins and __list
++	fields.
++	(__PTHREAD_MUTEX_HAVE_PREV): Define also for __PTHREAD_MUTEX_USE_UNION
++	case.
++	* sysdeps/aarch64/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION): New
++	defines.
++	* sysdeps/alpha/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/arm/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/hppa/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/ia64/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/m68k/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/microblaze/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/mips/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/nios2/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/powerpc/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/s390/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/sh/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/sparc/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/tile/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++	* sysdeps/x86/nptl/bits/pthreadtypes-arch.h
++	(__PTHREAD_MUTEX_NUSERS_AFTER_KIND, __PTHREAD_MUTEX_USE_UNION):
++	Likewise.
++
++	* nptl/pthreadP.h (ASSERT_PTHREAD_STRING,
++	ASSERT_PTHREAD_INTERNAL_OFFSET): New macro.
++	* nptl/pthread_mutex_init.c (__pthread_mutex_init): Add build time
++	checks for internal pthread_mutex_t offsets.
++	* sysdeps/aarch64/nptl/pthread-offsets.h
++	(__PTHREAD_MUTEX_NUSERS_OFFSET, __PTHREAD_MUTEX_KIND_OFFSET,
++	__PTHREAD_MUTEX_SPINS_OFFSET, __PTHREAD_MUTEX_ELISION_OFFSET,
++	__PTHREAD_MUTEX_LIST_OFFSET): New macro.
++	* sysdeps/alpha/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/arm/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/hppa/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/i386/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/ia64/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/m68k/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/microblaze/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/mips/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/nios2/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/powerpc/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/s390/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/sh/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/sparc/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/tile/nptl/pthread-offsets.h: Likewise.
++	* sysdeps/x86_64/nptl/pthread-offsets.h: Likewise.
++
++	* sysdeps/unix/sysv/linux/spawni.c (__spawnix): Use 0 instead of
++	WNOHANG in waitpid call.
++
++	[BZ #22273]
++	* sysdeps/unix/sysv/linux/spawni.c (__spawnix): Handle the case where
++	the auxiliary process is terminated by a signal before calling _exit
++	or execve.
++
++2017-09-13  Adhemerval Zanella  <adhemerval.zanella@linaro.org>
++
++	* sysdeps/unix/sysv/linux/s390/s390-32/oldglob.c: New file.
++	* sysdeps/unix/sysv/linux/alpha/Makefile
++	[$(subdir) = csu] (sysdep_routines): Remove rule.
++
++2017-09-08  Adhemerval Zanella  <adhemerval.zanella@linaro.org>
++
++	* sysdeps/unix/sysv/linux/arm/glob64.c: Remove file.
++	* sysdeps/unix/sysv/linux/i386/glob64.c: Likewise.
++	* sysdeps/unix/sysv/linux/m68k/glob64.c: Likewise.
++	* sysdeps/unix/sysv/linux/mips/mips64/n64/glob64.c: Likewise.
++	* sysdeps/unix/sysv/linux/mips/mips64/n64/globfree64.c: Likewise.
++	* sysdeps/unix/sysv/linux/powerpc/powerpc32/glob64.c: Likewise.
++	* sysdeps/unix/sysv/linux/sparc/sparc32/glob64.c: Likewise.
++	* sysdeps/unix/sysv/linux/wordsize-64/glob64.c: Likewise.
++	* sysdeps/unix/sysv/linux/wordsize-64/globfree64.c: Likewise.
++	* sysdeps/unix/sysv/linux/x86_64/x32/glob.c: Likewise.
++	* sysdeps/unix/sysv/linux/x86_64/x32/globfree.c: Likewise.
++	* sysdeps/wordsize-64/glob.c: Likewise.
++	* sysdeps/wordsize-64/glob64.c: Likewise.
++	* sysdeps/wordsize-64/globfree.c: Likewise.
++	* sysdeps/wordsize-64/globfree64.c: Likewise.
++	* sysdeps/unix/sysv/linux/glob.c: New file.
++	* sysdeps/unix/sysv/linux/glob64.c: Likewise.
++	* sysdeps/unix/sysv/linux/globfree.c: Likewise.
++	* sysdeps/unix/sysv/linux/globfree64.c: Likewise.
++	* sysdeps/unix/sysv/linux/s390/s390-32/glob64.c: Likewise.
++	* sysdeps/unix/sysv/linux/oldglob.c [SHLIB_COMPAT]: Also
++	adds !GLOB_NO_OLD_VERSION as an extra condition.
++	* sysdeps/unix/sysv/linux/i386/alphasort64.c: Include olddirent.h
++	using relative path instead of absolute one.
++	* sysdeps/unix/sysv/linux/i386/getdents64.c: Likewise.
++	* sysdeps/unix/sysv/linux/i386/readdir64.c: Likewise.
++	* sysdeps/unix/sysv/linux/i386/readdir64_r.c: Likewise.
++	* sysdeps/unix/sysv/linux/i386/versionsort64.c: Likewise.
++	* sysdeps/unix/sysv/linux/i386/olddirent.h: Move to ...
++	* sysdeps/unix/sysv/linux//olddirent.h: ... here.
++
 +2017-10-26  Valery Reznic <valery_reznic@yahoo.com>
 +	    H.J. Lu  <hongjiu.lu@intel.com>
 +
@@ -698,10 +890,10 @@ index 9bb707c168..828a445f24 100644
  # Don't try to use -lc when making libc.so itself.
  # Also omits crti.o and crtn.o, which we do not want
 diff --git a/NEWS b/NEWS
-index 8295f20c0a..ea1c1f1c04 100644
+index 8295f20c0a..e7b62a8d46 100644
 --- a/NEWS
 +++ b/NEWS
-@@ -5,6 +5,54 @@ See the end for copying conditions.
+@@ -5,6 +5,55 @@ See the end for copying conditions.
  Please send GNU C library bug reports via <http://sourceware.org/bugzilla/>
  using `glibc' in the "product" field.
  
@@ -723,6 +915,7 @@ index 8295f20c0a..ea1c1f1c04 100644
 +The following bugs are resolved with this release:
 +
 +  [16750] ldd: Never run file directly.
++  [17956] crypt: Use NSPR header files in addition to NSS header files
 +  [21242] assert: Suppress pedantic warning caused by statement expression
 +  [21265] x86-64: Use fxsave/xsave/xsavec in _dl_runtime_resolve
 +  [21780] posix: Set p{read,write}v2 to return ENOTSUP
@@ -932,6 +1125,61 @@ index 0000000000..8c06402825
 +   <http://www.gnu.org/licenses/>.  */
 +
 +#include <tst-assert-c++.cc>
+diff --git a/configure b/configure
+index d8e1c50e11..47d8c75248 100755
+--- a/configure
++++ b/configure
+@@ -3547,8 +3547,12 @@ if test x$nss_crypt = xyes; then
+   if test $? -ne 0; then
+     as_fn_error $? "cannot find include directory with nss-config" "$LINENO" 5
+   fi
++  nspr_includes=-I$(nspr-config --includedir 2>/dev/null)
++  if test $? -ne 0; then
++    as_fn_error $? "cannot find include directory with nspr-config" "$LINENO" 5
++  fi
+   old_CFLAGS="$CFLAGS"
+-  CFLAGS="$CFLAGS $nss_includes"
++  CFLAGS="$CFLAGS $nss_includes $nspr_includes"
+ 
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+diff --git a/configure.ac b/configure.ac
+index 77456aa8d9..e8a1ab3562 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -330,8 +330,12 @@ if test x$nss_crypt = xyes; then
+   if test $? -ne 0; then
+     AC_MSG_ERROR([cannot find include directory with nss-config])
+   fi
++  nspr_includes=-I$(nspr-config --includedir 2>/dev/null)
++  if test $? -ne 0; then
++    AC_MSG_ERROR([cannot find include directory with nspr-config])
++  fi
+   old_CFLAGS="$CFLAGS"
+-  CFLAGS="$CFLAGS $nss_includes"
++  CFLAGS="$CFLAGS $nss_includes $nspr_includes"
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([typedef int PRBool;
+ #include <hasht.h>
+ #include <nsslowhash.h>
+diff --git a/crypt/Makefile b/crypt/Makefile
+index 0280fba8a7..8bbbf2a121 100644
+--- a/crypt/Makefile
++++ b/crypt/Makefile
+@@ -37,9 +37,11 @@ routines += $(libcrypt-routines)
+ endif
+ 
+ ifeq ($(nss-crypt),yes)
+-CPPFLAGS-sha256-crypt.c = -DUSE_NSS -I$(shell nss-config --includedir)
+-CPPFLAGS-sha512-crypt.c = -DUSE_NSS -I$(shell nss-config --includedir)
+-CPPFLAGS-md5-crypt.c = -DUSE_NSS -I$(shell nss-config --includedir)
++nss-cpp-flags := -DUSE_NSS \
++  -I$(shell nss-config --includedir) -I$(shell nspr-config --includedir)
++CPPFLAGS-sha256-crypt.c = $(nss-cpp-flags)
++CPPFLAGS-sha512-crypt.c = $(nss-cpp-flags)
++CPPFLAGS-md5-crypt.c = $(nss-cpp-flags)
+ LDLIBS-crypt.so = -lfreebl3
+ else
+ libcrypt-routines += md5 sha256 sha512
 diff --git a/elf/dl-tunables.c b/elf/dl-tunables.c
 index 231fb8ca93..d9975ef2d0 100644
 --- a/elf/dl-tunables.c
@@ -1138,10 +1386,38 @@ index e6dc9fbc68..63c981bf61 100644
    if (list->array == scratch)
      {
 diff --git a/malloc/malloc.c b/malloc/malloc.c
-index 54e406bcb6..01ec1571b9 100644
+index 54e406bcb6..dd9f699d97 100644
 --- a/malloc/malloc.c
 +++ b/malloc/malloc.c
-@@ -1658,6 +1658,9 @@ typedef struct malloc_chunk *mfastbinptr;
+@@ -1612,27 +1612,6 @@ typedef struct malloc_chunk *mfastbinptr;
+ 
+ #define FASTBIN_CONSOLIDATION_THRESHOLD  (65536UL)
+ 
+-/*
+-   Since the lowest 2 bits in max_fast don't matter in size comparisons,
+-   they are used as flags.
+- */
+-
+-/*
+-   FASTCHUNKS_BIT held in max_fast indicates that there are probably
+-   some fastbin chunks. It is set true on entering a chunk into any
+-   fastbin, and cleared only in malloc_consolidate.
+-
+-   The truth value is inverted so that have_fastchunks will be true
+-   upon startup (since statics are zero-filled), simplifying
+-   initialization checks.
+- */
+-
+-#define FASTCHUNKS_BIT        (1U)
+-
+-#define have_fastchunks(M)     (((M)->flags & FASTCHUNKS_BIT) == 0)
+-#define clear_fastchunks(M)    catomic_or (&(M)->flags, FASTCHUNKS_BIT)
+-#define set_fastchunks(M)      catomic_and (&(M)->flags, ~FASTCHUNKS_BIT)
+-
+ /*
+    NONCONTIGUOUS_BIT indicates that MORECORE does not return contiguous
+    regions.  Otherwise, contiguity is exploited in merging together,
+@@ -1658,6 +1637,9 @@ typedef struct malloc_chunk *mfastbinptr;
  #define arena_is_corrupt(A)	(((A)->flags & ARENA_CORRUPTION_BIT))
  #define set_arena_corrupt(A)	((A)->flags |= ARENA_CORRUPTION_BIT)
  
@@ -1151,7 +1427,7 @@ index 54e406bcb6..01ec1571b9 100644
  /*
     Set value of max_fast.
     Use impossibly small value if 0.
-@@ -1668,8 +1671,20 @@ typedef struct malloc_chunk *mfastbinptr;
+@@ -1668,13 +1650,36 @@ typedef struct malloc_chunk *mfastbinptr;
  #define set_max_fast(s) \
    global_max_fast = (((s) == 0)						      \
                       ? SMALLBIN_WIDTH : ((s + SIZE_SZ) & ~MALLOC_ALIGN_MASK))
@@ -1173,7 +1449,34 @@ index 54e406bcb6..01ec1571b9 100644
  
  /*
     ----------- Internal state representation and initialization -----------
-@@ -1797,9 +1812,6 @@ static struct malloc_par mp_ =
+  */
+ 
++/*
++   have_fastchunks indicates that there are probably some fastbin chunks.
++   It is set true on entering a chunk into any fastbin, and cleared early in
++   malloc_consolidate.  The value is approximate since it may be set when there
++   are no fastbin chunks, or it may be clear even if there are fastbin chunks
++   available.  Given it's sole purpose is to reduce number of redundant calls to
++   malloc_consolidate, it does not affect correctness.  As a result we can safely
++   use relaxed atomic accesses.
++ */
++
++
+ struct malloc_state
+ {
+   /* Serialize access.  */
+@@ -1683,6 +1688,10 @@ struct malloc_state
+   /* Flags (formerly in max_fast).  */
+   int flags;
+ 
++  /* Set if the fastbin chunks contain recently inserted free blocks.  */
++  /* Note this is a bool but not all targets support atomics on booleans.  */
++  int have_fastchunks;
++
+   /* Fastbins */
+   mfastbinptr fastbinsY[NFASTBINS];
+ 
+@@ -1797,9 +1806,6 @@ static struct malloc_par mp_ =
  #endif
  };
  
@@ -1183,7 +1486,28 @@ index 54e406bcb6..01ec1571b9 100644
  /*
     Initialize a malloc_state struct.
  
-@@ -2940,7 +2952,7 @@ typedef struct tcache_perthread_struct
+@@ -1829,7 +1835,7 @@ malloc_init_state (mstate av)
+   set_noncontiguous (av);
+   if (av == &main_arena)
+     set_max_fast (DEFAULT_MXFAST);
+-  av->flags |= FASTCHUNKS_BIT;
++  atomic_store_relaxed (&av->have_fastchunks, false);
+ 
+   av->top = initial_top (av);
+ }
+@@ -2194,11 +2200,6 @@ do_check_malloc_state (mstate av)
+         }
+     }
+ 
+-  if (total != 0)
+-    assert (have_fastchunks (av));
+-  else if (!have_fastchunks (av))
+-    assert (total == 0);
+-
+   /* check normal bins */
+   for (i = 1; i < NBINS; ++i)
+     {
+@@ -2940,12 +2941,12 @@ typedef struct tcache_perthread_struct
    tcache_entry *entries[TCACHE_MAX_BINS];
  } tcache_perthread_struct;
  
@@ -1192,7 +1516,22 @@ index 54e406bcb6..01ec1571b9 100644
  static __thread tcache_perthread_struct *tcache = NULL;
  
  /* Caller must ensure that we know tc_idx is valid and there's room
-@@ -2977,8 +2989,12 @@ tcache_thread_freeres (void)
+    for more chunks.  */
+-static void
++static __always_inline void
+ tcache_put (mchunkptr chunk, size_t tc_idx)
+ {
+   tcache_entry *e = (tcache_entry *) chunk2mem (chunk);
+@@ -2957,7 +2958,7 @@ tcache_put (mchunkptr chunk, size_t tc_idx)
+ 
+ /* Caller must ensure that we know tc_idx is valid and there's
+    available chunks to remove.  */
+-static void *
++static __always_inline void *
+ tcache_get (size_t tc_idx)
+ {
+   tcache_entry *e = tcache->entries[tc_idx];
+@@ -2977,8 +2978,12 @@ tcache_thread_freeres (void)
    if (!tcache)
      return;
  
@@ -1205,7 +1544,7 @@ index 54e406bcb6..01ec1571b9 100644
    for (i = 0; i < TCACHE_MAX_BINS; ++i)
      {
        while (tcache_tmp->entries[i])
-@@ -2990,8 +3006,6 @@ tcache_thread_freeres (void)
+@@ -2990,8 +2995,6 @@ tcache_thread_freeres (void)
      }
  
    __libc_free (tcache_tmp);
@@ -1213,6 +1552,51 @@ index 54e406bcb6..01ec1571b9 100644
 -  tcache_shutting_down = 1;
  }
  text_set_element (__libc_thread_subfreeres, tcache_thread_freeres);
+ 
+@@ -3687,7 +3690,7 @@ _int_malloc (mstate av, size_t bytes)
+   else
+     {
+       idx = largebin_index (nb);
+-      if (have_fastchunks (av))
++      if (atomic_load_relaxed (&av->have_fastchunks))
+         malloc_consolidate (av);
+     }
+ 
+@@ -4102,7 +4105,7 @@ _int_malloc (mstate av, size_t bytes)
+ 
+       /* When we are using atomic ops to free fast chunks we can get
+          here for all block sizes.  */
+-      else if (have_fastchunks (av))
++      else if (atomic_load_relaxed (&av->have_fastchunks))
+         {
+           malloc_consolidate (av);
+           /* restore original bin index */
+@@ -4228,7 +4231,7 @@ _int_free (mstate av, mchunkptr p, int have_lock)
+ 
+     free_perturb (chunk2mem(p), size - 2 * SIZE_SZ);
+ 
+-    set_fastchunks(av);
++    atomic_store_relaxed (&av->have_fastchunks, true);
+     unsigned int idx = fastbin_index(size);
+     fb = &fastbin (av, idx);
+ 
+@@ -4379,7 +4382,7 @@ _int_free (mstate av, mchunkptr p, int have_lock)
+     */
+ 
+     if ((unsigned long)(size) >= FASTBIN_CONSOLIDATION_THRESHOLD) {
+-      if (have_fastchunks(av))
++      if (atomic_load_relaxed (&av->have_fastchunks))
+ 	malloc_consolidate(av);
+ 
+       if (av == &main_arena) {
+@@ -4450,7 +4453,7 @@ static void malloc_consolidate(mstate av)
+   */
+ 
+   if (get_max_fast () != 0) {
+-    clear_fastchunks(av);
++    atomic_store_relaxed (&av->have_fastchunks, false);
+ 
+     unsorted_bin = unsorted_chunks(av);
  
 diff --git a/malloc/tst-dynarray.c b/malloc/tst-dynarray.c
 index 2206d75e31..d11f7bb8a3 100644
@@ -1859,6 +2243,113 @@ index 06523bfe9c..0c808216a4 100644
  # define __HAVE_GENERIC_SELECTION 1
  #else
  # define __HAVE_GENERIC_SELECTION 0
+diff --git a/nptl/allocatestack.c b/nptl/allocatestack.c
+index ce2e24af95..dff5d3469e 100644
+--- a/nptl/allocatestack.c
++++ b/nptl/allocatestack.c
+@@ -727,7 +727,7 @@ allocate_stack (const struct pthread_attr *attr, struct pthread **pdp,
+ 				  - offsetof (pthread_mutex_t,
+ 					      __data.__list.__next));
+   pd->robust_head.list_op_pending = NULL;
+-#ifdef __PTHREAD_MUTEX_HAVE_PREV
++#if __PTHREAD_MUTEX_HAVE_PREV
+   pd->robust_prev = &pd->robust_head;
+ #endif
+   pd->robust_head.list = &pd->robust_head;
+diff --git a/nptl/descr.h b/nptl/descr.h
+index c5ad0c8dba..c83b17b674 100644
+--- a/nptl/descr.h
++++ b/nptl/descr.h
+@@ -169,7 +169,7 @@ struct pthread
+   pid_t pid_ununsed;
+ 
+   /* List of robust mutexes the thread is holding.  */
+-#ifdef __PTHREAD_MUTEX_HAVE_PREV
++#if __PTHREAD_MUTEX_HAVE_PREV
+   void *robust_prev;
+   struct robust_list_head robust_head;
+ 
+diff --git a/nptl/nptl-init.c b/nptl/nptl-init.c
+index 29216077a2..869e926f17 100644
+--- a/nptl/nptl-init.c
++++ b/nptl/nptl-init.c
+@@ -297,7 +297,7 @@ __pthread_initialize_minimal_internal (void)
+ 
+   /* Initialize the robust mutex data.  */
+   {
+-#ifdef __PTHREAD_MUTEX_HAVE_PREV
++#if __PTHREAD_MUTEX_HAVE_PREV
+     pd->robust_prev = &pd->robust_head;
+ #endif
+     pd->robust_head.list = &pd->robust_head;
+diff --git a/nptl/pthreadP.h b/nptl/pthreadP.h
+index 6e7d6ff09e..c5ae04692e 100644
+--- a/nptl/pthreadP.h
++++ b/nptl/pthreadP.h
+@@ -647,4 +647,10 @@ check_stacksize_attr (size_t st)
+   return EINVAL;
+ }
+ 
++#define ASSERT_PTHREAD_STRING(x) __STRING (x)
++#define ASSERT_PTHREAD_INTERNAL_OFFSET(type, member, offset)		\
++  _Static_assert (offsetof (type, member) == offset,			\
++		  "offset of " #member " field of " #type " != "	\
++		  ASSERT_PTHREAD_STRING (offset))
++
+ #endif	/* pthreadP.h */
+diff --git a/nptl/pthread_create.c b/nptl/pthread_create.c
+index 2f8ada34d6..16c05c3a58 100644
+--- a/nptl/pthread_create.c
++++ b/nptl/pthread_create.c
+@@ -520,7 +520,7 @@ START_THREAD_DEFN
+ 
+ #ifndef __ASSUME_SET_ROBUST_LIST
+   /* If this thread has any robust mutexes locked, handle them now.  */
+-# ifdef __PTHREAD_MUTEX_HAVE_PREV
++# if __PTHREAD_MUTEX_HAVE_PREV
+   void *robust = pd->robust_head.list;
+ # else
+   __pthread_slist_t *robust = pd->robust_list.__next;
+@@ -538,7 +538,7 @@ START_THREAD_DEFN
+ 					 __list.__next));
+ 	  robust = *((void **) robust);
+ 
+-# ifdef __PTHREAD_MUTEX_HAVE_PREV
++# if __PTHREAD_MUTEX_HAVE_PREV
+ 	  this->__list.__prev = NULL;
+ # endif
+ 	  this->__list.__next = NULL;
+diff --git a/nptl/pthread_mutex_init.c b/nptl/pthread_mutex_init.c
+index 6f2fc808ff..e1f911bf29 100644
+--- a/nptl/pthread_mutex_init.c
++++ b/nptl/pthread_mutex_init.c
+@@ -23,6 +23,7 @@
+ #include <kernel-features.h>
+ #include "pthreadP.h"
+ #include <atomic.h>
++#include <pthread-offsets.h>
+ 
+ #include <stap-probe.h>
+ 
+@@ -58,6 +59,18 @@ __pthread_mutex_init (pthread_mutex_t *mutex,
+   const struct pthread_mutexattr *imutexattr;
+ 
+   assert (sizeof (pthread_mutex_t) <= __SIZEOF_PTHREAD_MUTEX_T);
++  ASSERT_PTHREAD_INTERNAL_OFFSET (pthread_mutex_t, __data.__nusers,
++				  __PTHREAD_MUTEX_NUSERS_OFFSET);
++  ASSERT_PTHREAD_INTERNAL_OFFSET (pthread_mutex_t, __data.__kind,
++				  __PTHREAD_MUTEX_KIND_OFFSET);
++  ASSERT_PTHREAD_INTERNAL_OFFSET (pthread_mutex_t, __data.__spins,
++				  __PTHREAD_MUTEX_SPINS_OFFSET);
++#if __PTHREAD_MUTEX_LOCK_ELISION
++  ASSERT_PTHREAD_INTERNAL_OFFSET (pthread_mutex_t, __data.__elision,
++				  __PTHREAD_MUTEX_ELISION_OFFSET);
++#endif
++  ASSERT_PTHREAD_INTERNAL_OFFSET (pthread_mutex_t, __data.__list,
++				  __PTHREAD_MUTEX_LIST_OFFSET);
+ 
+   imutexattr = ((const struct pthread_mutexattr *) mutexattr
+ 		?: &default_mutexattr);
 diff --git a/nss/Makefile b/nss/Makefile
 index d9f6d41181..8efb2a56fa 100644
 --- a/nss/Makefile
@@ -8311,6 +8802,19 @@ index 06ea3dbd14..da3325f80c 100644
  
  static int
  wrap_res_query (int type, unsigned char *answer, int answer_length)
+diff --git a/scripts/check-local-headers.sh b/scripts/check-local-headers.sh
+index 7859f613b2..0cde6e8e92 100755
+--- a/scripts/check-local-headers.sh
++++ b/scripts/check-local-headers.sh
+@@ -33,7 +33,7 @@ exec ${AWK} -v includedir="$includedir" '
+ BEGIN {
+   status = 0
+   exclude = "^" includedir \
+-    "/(.*-.*-.*/|.*-.*/|)(asm[-/]|arch|linux/|selinux/|mach/|mach_debug/|device/|hurd/(((hurd|ioctl)_types|paths)\\.h|ioctls\\.defs|ihash\\.h)|cthreads\\.h|gd|nss3/|c\\+\\+/|sys/(capability|sdt(|-config))\\.h|libaudit\\.h)"
++    "/(.*-.*-.*/|.*-.*/|)(asm[-/]|arch|linux/|selinux/|mach/|mach_debug/|device/|hurd/(((hurd|ioctl)_types|paths)\\.h|ioctls\\.defs|ihash\\.h)|cthreads\\.h|gd|nss3/|nspr4?/|c\\+\\+/|sys/(capability|sdt(|-config))\\.h|libaudit\\.h)"
+ }
+ /^[^ ]/ && $1 ~ /.*:/ { obj = $1 }
+ {
 diff --git a/scripts/gen-tunables.awk b/scripts/gen-tunables.awk
 index ccdd0c6c71..622199061a 100644
 --- a/scripts/gen-tunables.awk
@@ -9553,6 +10057,78 @@ index 0000000000..3a4e6a2a8e
 +
 +END (__memmove_falkor)
 +libc_hidden_builtin_def (__memmove_falkor)
+diff --git a/sysdeps/aarch64/nptl/bits/pthreadtypes-arch.h b/sysdeps/aarch64/nptl/bits/pthreadtypes-arch.h
+index d13a75db07..9ab23d0474 100644
+--- a/sysdeps/aarch64/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/aarch64/nptl/bits/pthreadtypes-arch.h
+@@ -45,6 +45,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION	0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  0
++#define __PTHREAD_MUTEX_USE_UNION          0
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/aarch64/nptl/pthread-offsets.h b/sysdeps/aarch64/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..16c6b0d9fd
+--- /dev/null
++++ b/sysdeps/aarch64/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++#define __PTHREAD_MUTEX_KIND_OFFSET     16
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     24
+diff --git a/sysdeps/alpha/nptl/bits/pthreadtypes-arch.h b/sysdeps/alpha/nptl/bits/pthreadtypes-arch.h
+index b6f6cb1347..429df10c0c 100644
+--- a/sysdeps/alpha/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/alpha/nptl/bits/pthreadtypes-arch.h
+@@ -33,6 +33,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  0
++#define __PTHREAD_MUTEX_USE_UNION          0
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/alpha/nptl/pthread-offsets.h b/sysdeps/alpha/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..16c6b0d9fd
+--- /dev/null
++++ b/sysdeps/alpha/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++#define __PTHREAD_MUTEX_KIND_OFFSET     16
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     24
+diff --git a/sysdeps/arm/nptl/bits/pthreadtypes-arch.h b/sysdeps/arm/nptl/bits/pthreadtypes-arch.h
+index 3f9eca4645..3911c8183d 100644
+--- a/sysdeps/arm/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/arm/nptl/bits/pthreadtypes-arch.h
+@@ -34,6 +34,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  1
++#define __PTHREAD_MUTEX_USE_UNION          1
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/arm/nptl/pthread-offsets.h b/sysdeps/arm/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..9617354dc7
+--- /dev/null
++++ b/sysdeps/arm/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++#define __PTHREAD_MUTEX_KIND_OFFSET     12
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     20
 diff --git a/sysdeps/gnu/glob64.c b/sysdeps/gnu/glob64.c
 index d1e4e6f0d5..52e97e2f6a 100644
 --- a/sysdeps/gnu/glob64.c
@@ -9585,6 +10161,30 @@ index 0000000000..f092d0bf8b
 +#include <posix/globfree.c>
 +
 +libc_hidden_def (globfree64)
+diff --git a/sysdeps/hppa/nptl/bits/pthreadtypes-arch.h b/sysdeps/hppa/nptl/bits/pthreadtypes-arch.h
+index c1585625d1..865a14ee4a 100644
+--- a/sysdeps/hppa/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/hppa/nptl/bits/pthreadtypes-arch.h
+@@ -48,6 +48,8 @@
+    pthread_mutex_t is larger than Linuxthreads.  */
+ #define __PTHREAD_COMPAT_PADDING_END  int __reserved[2];
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  1
++#define __PTHREAD_MUTEX_USE_UNION          1
+ 
+ #define __LOCK_ALIGNMENT __attribute__ ((__aligned__(16)))
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/hppa/nptl/pthread-offsets.h b/sysdeps/hppa/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..8ae01b9d95
+--- /dev/null
++++ b/sysdeps/hppa/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   32
++#define __PTHREAD_MUTEX_KIND_OFFSET     12
++#define __PTHREAD_MUTEX_SPINS_OFFSET    36
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     36
 diff --git a/sysdeps/i386/i686/fpu/multiarch/libm-test-ulps b/sysdeps/i386/i686/fpu/multiarch/libm-test-ulps
 index 81dd1a09ea..053f5ec972 100644
 --- a/sysdeps/i386/i686/fpu/multiarch/libm-test-ulps
@@ -9631,6 +10231,41 @@ index 81dd1a09ea..053f5ec972 100644
  
  Function: "log":
  double: 1
+diff --git a/sysdeps/i386/nptl/pthread-offsets.h b/sysdeps/i386/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..9617354dc7
+--- /dev/null
++++ b/sysdeps/i386/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++#define __PTHREAD_MUTEX_KIND_OFFSET     12
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     20
+diff --git a/sysdeps/ia64/nptl/bits/pthreadtypes-arch.h b/sysdeps/ia64/nptl/bits/pthreadtypes-arch.h
+index 631cb33d09..2a3bc75b20 100644
+--- a/sysdeps/ia64/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/ia64/nptl/bits/pthreadtypes-arch.h
+@@ -33,6 +33,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  0
++#define __PTHREAD_MUTEX_USE_UNION          0
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/ia64/nptl/pthread-offsets.h b/sysdeps/ia64/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..16c6b0d9fd
+--- /dev/null
++++ b/sysdeps/ia64/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++#define __PTHREAD_MUTEX_KIND_OFFSET     16
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     24
 diff --git a/sysdeps/ieee754/dbl-64/s_nearbyint.c b/sysdeps/ieee754/dbl-64/s_nearbyint.c
 index dec0c5d6ee..6e3f8316b1 100644
 --- a/sysdeps/ieee754/dbl-64/s_nearbyint.c
@@ -13678,10 +14313,219 @@ index 4a4f4ad024..cfa36a0c2a 100644
 +# endif
 +}
 +#endif /* __cplusplus */
+diff --git a/sysdeps/m68k/nptl/bits/pthreadtypes-arch.h b/sysdeps/m68k/nptl/bits/pthreadtypes-arch.h
+index 845b9e6c2b..966cc7569f 100644
+--- a/sysdeps/m68k/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/m68k/nptl/bits/pthreadtypes-arch.h
+@@ -35,6 +35,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  1
++#define __PTHREAD_MUTEX_USE_UNION          1
+ 
+ #define __LOCK_ALIGNMENT __attribute__ ((__aligned__ (4)))
+ #define __ONCE_ALIGNMENT __attribute__ ((__aligned__ (4)))
+diff --git a/sysdeps/m68k/nptl/pthread-offsets.h b/sysdeps/m68k/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..9617354dc7
+--- /dev/null
++++ b/sysdeps/m68k/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++#define __PTHREAD_MUTEX_KIND_OFFSET     12
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     20
+diff --git a/sysdeps/microblaze/nptl/bits/pthreadtypes-arch.h b/sysdeps/microblaze/nptl/bits/pthreadtypes-arch.h
+index d687e2c076..e44f2dcb6a 100644
+--- a/sysdeps/microblaze/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/microblaze/nptl/bits/pthreadtypes-arch.h
+@@ -35,6 +35,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  1
++#define __PTHREAD_MUTEX_USE_UNION          1
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/microblaze/nptl/pthread-offsets.h b/sysdeps/microblaze/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..9617354dc7
+--- /dev/null
++++ b/sysdeps/microblaze/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++#define __PTHREAD_MUTEX_KIND_OFFSET     12
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     20
 diff --git a/sysdeps/mips/bits/long-double.h b/sysdeps/mips/ieee754/bits/long-double.h
 similarity index 100%
 rename from sysdeps/mips/bits/long-double.h
 rename to sysdeps/mips/ieee754/bits/long-double.h
+diff --git a/sysdeps/mips/nptl/bits/pthreadtypes-arch.h b/sysdeps/mips/nptl/bits/pthreadtypes-arch.h
+index 6aa1bda172..f03389acc6 100644
+--- a/sysdeps/mips/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/mips/nptl/bits/pthreadtypes-arch.h
+@@ -42,6 +42,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  (_MIPS_SIM != _ABI64)
++#define __PTHREAD_MUTEX_USE_UNION          (_MIPS_SIM != _ABI64)
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/mips/nptl/pthread-offsets.h b/sysdeps/mips/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..0ac3eda3fb
+--- /dev/null
++++ b/sysdeps/mips/nptl/pthread-offsets.h
+@@ -0,0 +1,13 @@
++#if _MIPS_SIM == _ABI64
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++# define __PTHREAD_MUTEX_KIND_OFFSET     16
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     24
++#else
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++# define __PTHREAD_MUTEX_KIND_OFFSET     12
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     20
++#endif
+diff --git a/sysdeps/nios2/nptl/bits/pthreadtypes-arch.h b/sysdeps/nios2/nptl/bits/pthreadtypes-arch.h
+index e2732f9771..83f8684604 100644
+--- a/sysdeps/nios2/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/nios2/nptl/bits/pthreadtypes-arch.h
+@@ -35,6 +35,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  1
++#define __PTHREAD_MUTEX_USE_UNION          1
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/nios2/nptl/pthread-offsets.h b/sysdeps/nios2/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..9617354dc7
+--- /dev/null
++++ b/sysdeps/nios2/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++#define __PTHREAD_MUTEX_KIND_OFFSET     12
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     20
+diff --git a/sysdeps/nptl/bits/thread-shared-types.h b/sysdeps/nptl/bits/thread-shared-types.h
+index 68b82b6bd6..da4358a965 100644
+--- a/sysdeps/nptl/bits/thread-shared-types.h
++++ b/sysdeps/nptl/bits/thread-shared-types.h
+@@ -42,6 +42,25 @@
+ 				    the internal structure.
+    __PTHREAD_MUTEX_LOCK_ELISION   - 1 if the architecture supports lock
+ 				    elision or 0 otherwise.
++   __PTHREAD_MUTEX_NUSERS_AFTER_KIND - control where to put __nusers.  The
++				       preferred value for new architectures
++				       is 0.
++   __PTHREAD_MUTEX_USE_UNION      - control whether internal __spins and
++				    __list will be place inside a union for
++				    linuxthreads compatibility.
++				    The preferred value for new architectures
++				    is 0.
++
++   For a new port the preferred values for the required defines are:
++
++   #define __PTHREAD_COMPAT_PADDING_MID
++   #define __PTHREAD_COMPAT_PADDING_END
++   #define __PTHREAD_MUTEX_LOCK_ELISION         0
++   #define __PTHREAD_MUTEX_NUSERS_AFTER_KIND    0
++   #define __PTHREAD_MUTEX_USE_UNION            0
++
++   __PTHREAD_MUTEX_LOCK_ELISION can be set to 1 if the hardware plans to
++   eventually support lock elision using transactional memory.
+ 
+    The additional macro defines any constraint for the lock alignment
+    inside the thread structures:
+@@ -59,7 +78,7 @@
+ 
+ /* Common definition of pthread_mutex_t. */
+ 
+-#if __WORDSIZE == 64
++#if !__PTHREAD_MUTEX_USE_UNION
+ typedef struct __pthread_internal_list
+ {
+   struct __pthread_internal_list *__prev;
+@@ -74,7 +93,7 @@ typedef struct __pthread_internal_slist
+ 
+ /* Lock elision support.  */
+ #if __PTHREAD_MUTEX_LOCK_ELISION
+-# if __WORDSIZE == 64
++# if !__PTHREAD_MUTEX_USE_UNION
+ #  define __PTHREAD_SPINS_DATA	\
+   short __spins;		\
+   short __elision
+@@ -101,24 +120,27 @@ struct __pthread_mutex_s
+   int __lock __LOCK_ALIGNMENT;
+   unsigned int __count;
+   int __owner;
+-#if __WORDSIZE == 64
++#if !__PTHREAD_MUTEX_NUSERS_AFTER_KIND
+   unsigned int __nusers;
+ #endif
+   /* KIND must stay at this position in the structure to maintain
+      binary compatibility with static initializers.  */
+   int __kind;
+   __PTHREAD_COMPAT_PADDING_MID
+-#if __WORDSIZE == 64
++#if __PTHREAD_MUTEX_NUSERS_AFTER_KIND
++  unsigned int __nusers;
++#endif
++#if !__PTHREAD_MUTEX_USE_UNION
+   __PTHREAD_SPINS_DATA;
+   __pthread_list_t __list;
+ # define __PTHREAD_MUTEX_HAVE_PREV      1
+ #else
+-  unsigned int __nusers;
+   __extension__ union
+   {
+     __PTHREAD_SPINS_DATA;
+     __pthread_slist_t __list;
+   };
++# define __PTHREAD_MUTEX_HAVE_PREV      0
+ #endif
+   __PTHREAD_COMPAT_PADDING_END
+ };
+diff --git a/sysdeps/nptl/fork.c b/sysdeps/nptl/fork.c
+index 4bb87e2331..48676c2f48 100644
+--- a/sysdeps/nptl/fork.c
++++ b/sysdeps/nptl/fork.c
+@@ -166,7 +166,7 @@ __libc_fork (void)
+ 	 inherit the correct value from the parent.  We do not need to clear
+ 	 the pending operation because it must have been zero when fork was
+ 	 called.  */
+-# ifdef __PTHREAD_MUTEX_HAVE_PREV
++# if __PTHREAD_MUTEX_HAVE_PREV
+       self->robust_prev = &self->robust_head;
+ # endif
+       self->robust_head.list = &self->robust_head;
+diff --git a/sysdeps/nptl/pthread.h b/sysdeps/nptl/pthread.h
+index 632ea7bc36..2b2b386ab3 100644
+--- a/sysdeps/nptl/pthread.h
++++ b/sysdeps/nptl/pthread.h
+@@ -83,7 +83,7 @@ enum
+ #endif
+ 
+ 
+-#ifdef __PTHREAD_MUTEX_HAVE_PREV
++#if __PTHREAD_MUTEX_HAVE_PREV
+ # define PTHREAD_MUTEX_INITIALIZER \
+   { { 0, 0, 0, 0, 0, __PTHREAD_SPINS, { 0, 0 } } }
+ # ifdef __USE_GNU
 diff --git a/sysdeps/posix/getaddrinfo.c b/sysdeps/posix/getaddrinfo.c
 index efa7118498..2c4b6d6793 100644
 --- a/sysdeps/posix/getaddrinfo.c
@@ -14093,6 +14937,56 @@ index 0000000000..ee0db12a73
 +
 +  return result;
 +}
+diff --git a/sysdeps/powerpc/nptl/bits/pthreadtypes-arch.h b/sysdeps/powerpc/nptl/bits/pthreadtypes-arch.h
+index f29119b794..8158cb5abd 100644
+--- a/sysdeps/powerpc/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/powerpc/nptl/bits/pthreadtypes-arch.h
+@@ -42,6 +42,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    1
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  (__WORDSIZE != 64)
++#define __PTHREAD_MUTEX_USE_UNION          (__WORDSIZE != 64)
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/powerpc/nptl/pthread-offsets.h b/sysdeps/powerpc/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..bdda1f197e
+--- /dev/null
++++ b/sysdeps/powerpc/nptl/pthread-offsets.h
+@@ -0,0 +1,15 @@
++#include <bits/wordsize.h>
++
++#if __WORDSIZE == 64
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++# define __PTHREAD_MUTEX_KIND_OFFSET     16
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     24
++#else
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++# define __PTHREAD_MUTEX_KIND_OFFSET     12
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     20
++#endif
+diff --git a/sysdeps/powerpc/powerpc32/dl-machine.h b/sysdeps/powerpc/powerpc32/dl-machine.h
+index 1f8437ed9c..c19b3b7a16 100644
+--- a/sysdeps/powerpc/powerpc32/dl-machine.h
++++ b/sysdeps/powerpc/powerpc32/dl-machine.h
+@@ -310,7 +310,10 @@ elf_machine_rela (struct link_map *map, const Elf32_Rela *reloc,
+      against local symbols.  */
+   if (__builtin_expect (ELF32_ST_BIND (sym->st_info) == STB_LOCAL, 0)
+       && sym->st_shndx != SHN_UNDEF)
+-    value = map->l_addr;
++    {
++      sym_map = map;
++      value = map->l_addr;
++    }
+   else
+     {
+       sym_map = RESOLVE_MAP (&sym, version, r_type);
 diff --git a/sysdeps/powerpc/powerpc64/fpu/multiarch/s_finite.c b/sysdeps/powerpc/powerpc64/fpu/multiarch/s_finite.c
 index a5ec36b72f..7efc84b56a 100644
 --- a/sysdeps/powerpc/powerpc64/fpu/multiarch/s_finite.c
@@ -14311,6 +15205,156 @@ index 8ae928a3f4..cc682b2ed0 100644
  }
  
  #include <support/test-driver.c>
+diff --git a/sysdeps/s390/nptl/bits/pthreadtypes-arch.h b/sysdeps/s390/nptl/bits/pthreadtypes-arch.h
+index 3a9ac57625..1ae277367d 100644
+--- a/sysdeps/s390/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/s390/nptl/bits/pthreadtypes-arch.h
+@@ -45,6 +45,8 @@
+ #else
+ #define __PTHREAD_MUTEX_LOCK_ELISION	0
+ #endif
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  (__WORDSIZE != 64)
++#define __PTHREAD_MUTEX_USE_UNION          (__WORDSIZE != 64)
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/s390/nptl/pthread-offsets.h b/sysdeps/s390/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..bdda1f197e
+--- /dev/null
++++ b/sysdeps/s390/nptl/pthread-offsets.h
+@@ -0,0 +1,15 @@
++#include <bits/wordsize.h>
++
++#if __WORDSIZE == 64
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++# define __PTHREAD_MUTEX_KIND_OFFSET     16
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     24
++#else
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++# define __PTHREAD_MUTEX_KIND_OFFSET     12
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     20
++#endif
+diff --git a/sysdeps/sh/nptl/bits/pthreadtypes-arch.h b/sysdeps/sh/nptl/bits/pthreadtypes-arch.h
+index b2615fe314..e707751aa6 100644
+--- a/sysdeps/sh/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/sh/nptl/bits/pthreadtypes-arch.h
+@@ -34,6 +34,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  1
++#define __PTHREAD_MUTEX_USE_UNION          1
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/sh/nptl/pthread-offsets.h b/sysdeps/sh/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..9617354dc7
+--- /dev/null
++++ b/sysdeps/sh/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++#define __PTHREAD_MUTEX_KIND_OFFSET     12
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     20
+diff --git a/sysdeps/sparc/nptl/bits/pthreadtypes-arch.h b/sysdeps/sparc/nptl/bits/pthreadtypes-arch.h
+index 1e188cf91f..0f96f3711e 100644
+--- a/sysdeps/sparc/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/sparc/nptl/bits/pthreadtypes-arch.h
+@@ -43,6 +43,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  (__WORDSIZE != 64)
++#define __PTHREAD_MUTEX_USE_UNION          (__WORDSIZE != 64)
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/sparc/nptl/pthread-offsets.h b/sysdeps/sparc/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..bdda1f197e
+--- /dev/null
++++ b/sysdeps/sparc/nptl/pthread-offsets.h
+@@ -0,0 +1,15 @@
++#include <bits/wordsize.h>
++
++#if __WORDSIZE == 64
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++# define __PTHREAD_MUTEX_KIND_OFFSET     16
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     24
++#else
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++# define __PTHREAD_MUTEX_KIND_OFFSET     12
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     20
++#endif
+diff --git a/sysdeps/sparc/sparc32/dl-machine.h b/sysdeps/sparc/sparc32/dl-machine.h
+index 436e4e6cc3..debf67bd1b 100644
+--- a/sysdeps/sparc/sparc32/dl-machine.h
++++ b/sysdeps/sparc/sparc32/dl-machine.h
+@@ -376,6 +376,7 @@ elf_machine_rela (struct link_map *map, const Elf32_Rela *reloc,
+   if (__builtin_expect (ELF32_ST_BIND (sym->st_info) == STB_LOCAL, 0)
+       && sym->st_shndx != SHN_UNDEF)
+     {
++      sym_map = map;
+       value = map->l_addr;
+     }
+   else
+diff --git a/sysdeps/sparc/sparc64/dl-machine.h b/sysdeps/sparc/sparc64/dl-machine.h
+index c2871dca3a..e1ec7a532c 100644
+--- a/sysdeps/sparc/sparc64/dl-machine.h
++++ b/sysdeps/sparc/sparc64/dl-machine.h
+@@ -403,6 +403,7 @@ elf_machine_rela (struct link_map *map, const Elf64_Rela *reloc,
+   if (__builtin_expect (ELF64_ST_BIND (sym->st_info) == STB_LOCAL, 0)
+       && sym->st_shndx != SHN_UNDEF)
+     {
++      sym_map = map;
+       value = map->l_addr;
+     }
+   else
+diff --git a/sysdeps/tile/nptl/bits/pthreadtypes-arch.h b/sysdeps/tile/nptl/bits/pthreadtypes-arch.h
+index 145ee42ddb..054474f770 100644
+--- a/sysdeps/tile/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/tile/nptl/bits/pthreadtypes-arch.h
+@@ -43,6 +43,8 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    0
++#define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  (__WORDSIZE != 64)
++#define __PTHREAD_MUTEX_USE_UNION          (__WORDSIZE != 64)
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
+diff --git a/sysdeps/tile/nptl/pthread-offsets.h b/sysdeps/tile/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..bdda1f197e
+--- /dev/null
++++ b/sysdeps/tile/nptl/pthread-offsets.h
+@@ -0,0 +1,15 @@
++#include <bits/wordsize.h>
++
++#if __WORDSIZE == 64
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++# define __PTHREAD_MUTEX_KIND_OFFSET     16
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     24
++#else
++# define __PTHREAD_MUTEX_NUSERS_OFFSET   16
++# define __PTHREAD_MUTEX_KIND_OFFSET     12
++# define __PTHREAD_MUTEX_SPINS_OFFSET    20
++# define __PTHREAD_MUTEX_ELISION_OFFSET  22
++# define __PTHREAD_MUTEX_LIST_OFFSET     20
++#endif
 diff --git a/sysdeps/unix/sysv/linux/Makefile b/sysdeps/unix/sysv/linux/Makefile
 index 9d6a2de870..dbe6a36c57 100644
 --- a/sysdeps/unix/sysv/linux/Makefile
@@ -14381,6 +15425,18 @@ index c92b650984..73cb53da9a 100644
  struct cpu_features
  {
    uint64_t midr_el1;
+diff --git a/sysdeps/unix/sysv/linux/alpha/Makefile b/sysdeps/unix/sysv/linux/alpha/Makefile
+index 47bd189f94..50f4fb1183 100644
+--- a/sysdeps/unix/sysv/linux/alpha/Makefile
++++ b/sysdeps/unix/sysv/linux/alpha/Makefile
+@@ -1,7 +1,3 @@
+-ifeq ($(subdir),posix)
+-sysdep_routines += oldglob
+-endif
+-
+ ifeq ($(subdir),stdlib)
+ gen-as-const-headers += ucontext-offsets.sym
+ endif
 diff --git a/sysdeps/unix/sysv/linux/alpha/glob.c b/sysdeps/unix/sysv/linux/alpha/glob.c
 index 2d7d287a25..1b813c1cfd 100644
 --- a/sysdeps/unix/sysv/linux/alpha/glob.c
@@ -14439,34 +15495,261 @@ index 0000000000..98cf1c200b
 +
 +weak_alias (__new_globfree, globfree64)
 +libc_hidden_ver (__new_globfree, globfree64)
+diff --git a/sysdeps/unix/sysv/linux/arm/glob64.c b/sysdeps/unix/sysv/linux/arm/glob64.c
+deleted file mode 100644
+index 82a9a296a7..0000000000
+--- a/sysdeps/unix/sysv/linux/arm/glob64.c
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <sysdeps/unix/sysv/linux/i386/glob64.c>
+diff --git a/sysdeps/unix/sysv/linux/glob.c b/sysdeps/unix/sysv/linux/glob.c
+new file mode 100644
+index 0000000000..057ae7fe25
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/glob.c
+@@ -0,0 +1,28 @@
++/* Find pathnames matching a pattern.  Linux version.
++   Copyright (C) 2017 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++#include <sys/stat.h>
++#include <kernel_stat.h>
++
++#define glob64 __no_glob64_decl
++#include <posix/glob.c>
++#undef glob64
++
++#if XSTAT_IS_XSTAT64
++weak_alias (glob, glob64)
++#endif
+diff --git a/sysdeps/unix/sysv/linux/glob64.c b/sysdeps/unix/sysv/linux/glob64.c
+new file mode 100644
+index 0000000000..428bbacb11
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/glob64.c
+@@ -0,0 +1,51 @@
++/* Find pathnames matching a pattern.  Linux version.
++   Copyright (C) 2017 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++#include <sys/stat.h>
++#include <kernel_stat.h>
++
++#if !XSTAT_IS_XSTAT64
++# include <glob.h>
++# include <dirent.h>
++# include <sys/stat.h>
++
++# define dirent dirent64
++# define __readdir(dirp) __readdir64 (dirp)
++
++# define glob_t glob64_t
++# define glob(pattern, flags, errfunc, pglob) \
++  __glob64 (pattern, flags, errfunc, pglob)
++# define globfree(pglob) globfree64 (pglob)
++
++# undef stat
++# define stat stat64
++
++# define COMPILE_GLOB64	1
++
++# include <posix/glob.c>
++
++# include "shlib-compat.h"
++
++# ifdef GLOB_NO_OLD_VERSION
++strong_alias (__glob64, glob64)
++libc_hidden_def (glob64)
++# else
++versioned_symbol (libc, __glob64, glob64, GLIBC_2_2);
++libc_hidden_ver (__glob64, glob64)
++# endif
++#endif /* XSTAT_IS_XSTAT64  */
+diff --git a/sysdeps/unix/sysv/linux/globfree.c b/sysdeps/unix/sysv/linux/globfree.c
+new file mode 100644
+index 0000000000..48d4aec332
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/globfree.c
+@@ -0,0 +1,30 @@
++/* Frees the dynamically allocated storage from an earlier call to glob.
++   Linux version.
++   Copyright (C) 2017 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++#include <sys/stat.h>
++#include <kernel_stat.h>
++
++#define globfree64 __no_globfree64_decl
++#include <posix/globfree.c>
++#undef globfree64
++
++#if XSTAT_IS_XSTAT64
++weak_alias (globfree, globfree64)
++libc_hidden_ver (globfree, globfree64)
++#endif
+diff --git a/sysdeps/unix/sysv/linux/globfree64.c b/sysdeps/unix/sysv/linux/globfree64.c
+new file mode 100644
+index 0000000000..0020466372
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/globfree64.c
+@@ -0,0 +1,36 @@
++/* Frees the dynamically allocated storage from an earlier call to glob.
++   Linux version.
++   Copyright (C) 2017 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++#include <sys/stat.h>
++#include <kernel_stat.h>
++
++#if !XSTAT_IS_XSTAT64
++
++# include <glob.h>
++
++# define glob_t glob64_t
++# define globfree(pglob) globfree64 (pglob)
++
++# undef stat
++# define stat stat64
++
++# include <posix/globfree.c>
++
++libc_hidden_def (globfree64)
++#endif
+diff --git a/sysdeps/unix/sysv/linux/i386/alphasort64.c b/sysdeps/unix/sysv/linux/i386/alphasort64.c
+index d5fd47a9ae..04b29b6e0e 100644
+--- a/sysdeps/unix/sysv/linux/i386/alphasort64.c
++++ b/sysdeps/unix/sysv/linux/i386/alphasort64.c
+@@ -30,7 +30,7 @@ versioned_symbol (libc, __alphasort64, alphasort64, GLIBC_2_2);
+ 
+ #if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2)
+ 
+-#include <sysdeps/unix/sysv/linux/i386/olddirent.h>
++#include <olddirent.h>
+ 
+ int
+ __old_alphasort64 (const struct __old_dirent64 **a,
+diff --git a/sysdeps/unix/sysv/linux/i386/getdents64.c b/sysdeps/unix/sysv/linux/i386/getdents64.c
+index e8b257f059..2010bbf8df 100644
+--- a/sysdeps/unix/sysv/linux/i386/getdents64.c
++++ b/sysdeps/unix/sysv/linux/i386/getdents64.c
+@@ -28,7 +28,7 @@
+ 
+ #if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2)
+ 
+-#include <sysdeps/unix/sysv/linux/i386/olddirent.h>
++#include <olddirent.h>
+ 
+ #define __GETDENTS __old_getdents64
+ #define DIRENT_TYPE struct __old_dirent64
 diff --git a/sysdeps/unix/sysv/linux/i386/glob64.c b/sysdeps/unix/sysv/linux/i386/glob64.c
-index f68195137e..230f9fc037 100644
+deleted file mode 100644
+index f68195137e..0000000000
 --- a/sysdeps/unix/sysv/linux/i386/glob64.c
-+++ b/sysdeps/unix/sysv/linux/i386/glob64.c
-@@ -19,6 +19,7 @@
- #include <dirent.h>
- #include <glob.h>
- #include <sys/stat.h>
-+#include <shlib-compat.h>
- 
- #define dirent dirent64
- #define __readdir(dirp) __readdir64 (dirp)
-@@ -33,44 +34,9 @@
- #undef __stat
- #define __stat(file, buf) __xstat64 (_STAT_VER, file, buf)
- 
++++ /dev/null
+@@ -1,76 +0,0 @@
+-/* Two glob variants with 64-bit support, for dirent64 and __olddirent64.
+-   Copyright (C) 1998-2017 Free Software Foundation, Inc.
+-   This file is part of the GNU C Library.
+-
+-   The GNU C Library is free software; you can redistribute it and/or
+-   modify it under the terms of the GNU Lesser General Public
+-   License as published by the Free Software Foundation; either
+-   version 2.1 of the License, or (at your option) any later version.
+-
+-   The GNU C Library is distributed in the hope that it will be useful,
+-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-   Lesser General Public License for more details.
+-
+-   You should have received a copy of the GNU Lesser General Public
+-   License along with the GNU C Library; if not, see
+-   <http://www.gnu.org/licenses/>.  */
+-
+-#include <dirent.h>
+-#include <glob.h>
+-#include <sys/stat.h>
+-
+-#define dirent dirent64
+-#define __readdir(dirp) __readdir64 (dirp)
+-
+-#define glob_t glob64_t
+-#define glob(pattern, flags, errfunc, pglob) \
+-  __glob64 (pattern, flags, errfunc, pglob)
+-#define globfree(pglob) globfree64 (pglob)
+-
+-#undef stat
+-#define stat stat64
+-#undef __stat
+-#define __stat(file, buf) __xstat64 (_STAT_VER, file, buf)
+-
 -#define NO_GLOB_PATTERN_P 1
 -
- #define COMPILE_GLOB64	1
- 
- #include <posix/glob.c>
- 
+-#define COMPILE_GLOB64	1
+-
+-#include <posix/glob.c>
+-
 -#include "shlib-compat.h"
 -
 -libc_hidden_def (globfree64)
 -
- versioned_symbol (libc, __glob64, glob64, GLIBC_2_2);
- libc_hidden_ver (__glob64, glob64)
+-versioned_symbol (libc, __glob64, glob64, GLIBC_2_2);
+-libc_hidden_ver (__glob64, glob64)
 -
 -#if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2)
 -
@@ -14496,28 +15779,79 @@ index f68195137e..230f9fc037 100644
 -
 -compat_symbol (libc, __old_glob64, glob64, GLIBC_2_1);
 -#endif
-diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n64/globfree64.c b/sysdeps/unix/sysv/linux/mips/mips64/n64/globfree64.c
-new file mode 100644
-index 0000000000..abc35fdd2b
---- /dev/null
-+++ b/sysdeps/unix/sysv/linux/mips/mips64/n64/globfree64.c
-@@ -0,0 +1 @@
-+/* glob64 is in globfree64.c */
+diff --git a/sysdeps/unix/sysv/linux/i386/readdir64.c b/sysdeps/unix/sysv/linux/i386/readdir64.c
+index f80b6a7ba2..bd2375f9a6 100644
+--- a/sysdeps/unix/sysv/linux/i386/readdir64.c
++++ b/sysdeps/unix/sysv/linux/i386/readdir64.c
+@@ -31,7 +31,7 @@ versioned_symbol (libc, __readdir64, readdir64, GLIBC_2_2);
+ 
+ #if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2)
+ 
+-#include <sysdeps/unix/sysv/linux/i386/olddirent.h>
++#include <olddirent.h>
+ 
+ #define __READDIR attribute_compat_text_section __old_readdir64
+ #define __GETDENTS __old_getdents64
+diff --git a/sysdeps/unix/sysv/linux/i386/readdir64_r.c b/sysdeps/unix/sysv/linux/i386/readdir64_r.c
+index 344fd53d02..8c0262d1dc 100644
+--- a/sysdeps/unix/sysv/linux/i386/readdir64_r.c
++++ b/sysdeps/unix/sysv/linux/i386/readdir64_r.c
+@@ -31,7 +31,7 @@ versioned_symbol (libc, __readdir64_r, readdir64_r, GLIBC_2_2);
+ 
+ #if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2)
+ 
+-#include <sysdeps/unix/sysv/linux/i386/olddirent.h>
++#include <olddirent.h>
+ 
+ #define __READDIR_R attribute_compat_text_section __old_readdir64_r
+ #define __GETDENTS __old_getdents64
+diff --git a/sysdeps/unix/sysv/linux/i386/versionsort64.c b/sysdeps/unix/sysv/linux/i386/versionsort64.c
+index 3e1c6ea35b..87f2f9578d 100644
+--- a/sysdeps/unix/sysv/linux/i386/versionsort64.c
++++ b/sysdeps/unix/sysv/linux/i386/versionsort64.c
+@@ -30,7 +30,7 @@ versioned_symbol (libc, __versionsort64, versionsort64, GLIBC_2_2);
+ 
+ #if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2)
+ 
+-#include <sysdeps/unix/sysv/linux/i386/olddirent.h>
++#include <olddirent.h>
+ 
+ int
+ __old_versionsort64 (const struct __old_dirent64 **a,
+diff --git a/sysdeps/unix/sysv/linux/m68k/glob64.c b/sysdeps/unix/sysv/linux/m68k/glob64.c
+deleted file mode 100644
+index 82a9a296a7..0000000000
+--- a/sysdeps/unix/sysv/linux/m68k/glob64.c
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <sysdeps/unix/sysv/linux/i386/glob64.c>
+diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n64/glob64.c b/sysdeps/unix/sysv/linux/mips/mips64/n64/glob64.c
+deleted file mode 100644
+index 33918ea6a5..0000000000
+--- a/sysdeps/unix/sysv/linux/mips/mips64/n64/glob64.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* glob64 is in glob.c */
+diff --git a/sysdeps/unix/sysv/linux/i386/olddirent.h b/sysdeps/unix/sysv/linux/olddirent.h
+similarity index 100%
+rename from sysdeps/unix/sysv/linux/i386/olddirent.h
+rename to sysdeps/unix/sysv/linux/olddirent.h
 diff --git a/sysdeps/unix/sysv/linux/oldglob.c b/sysdeps/unix/sysv/linux/oldglob.c
 new file mode 100644
-index 0000000000..8233e57ce9
+index 0000000000..5402450f55
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/oldglob.c
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,43 @@
 +#include <shlib-compat.h>
 +
-+#if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2)
++#if SHLIB_COMPAT(libc, GLIBC_2_1, GLIBC_2_2) \
++    && !defined(GLOB_NO_OLD_VERSION)
 +
 +#include <dirent.h>
 +#include <glob.h>
 +#include <sys/stat.h>
 +
-+#include <sysdeps/unix/sysv/linux/i386/olddirent.h>
++#include <olddirent.h>
 +
 +int __old_glob64 (const char *__pattern, int __flags,
 +		  int (*__errfunc) (const char *, int),
@@ -14551,6 +15885,13 @@ index 0000000000..8233e57ce9
 +
 +compat_symbol (libc, __old_glob64, glob64, GLIBC_2_1);
 +#endif
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/glob64.c b/sysdeps/unix/sysv/linux/powerpc/powerpc32/glob64.c
+deleted file mode 100644
+index 82a9a296a7..0000000000
+--- a/sysdeps/unix/sysv/linux/powerpc/powerpc32/glob64.c
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <sysdeps/unix/sysv/linux/i386/glob64.c>
 diff --git a/sysdeps/unix/sysv/linux/preadv2.c b/sysdeps/unix/sysv/linux/preadv2.c
 index 11fe85eaa8..137e2dd791 100644
 --- a/sysdeps/unix/sysv/linux/preadv2.c
@@ -14639,10 +15980,33 @@ index def9a0bc57..d2800c6657 100644
        return -1;
      }
    return pwritev64 (fd, vector, count, offset);
+diff --git a/sysdeps/unix/sysv/linux/s390/s390-32/glob64.c b/sysdeps/unix/sysv/linux/s390/s390-32/glob64.c
+new file mode 100644
+index 0000000000..d220e22e30
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/s390/s390-32/glob64.c
+@@ -0,0 +1,2 @@
++#define GLOB_NO_OLD_VERSION
++#include <sysdeps/unix/sysv/linux/glob64.c>
+diff --git a/sysdeps/unix/sysv/linux/s390/s390-32/oldglob.c b/sysdeps/unix/sysv/linux/s390/s390-32/oldglob.c
+new file mode 100644
+index 0000000000..56d7d12ea6
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/s390/s390-32/oldglob.c
+@@ -0,0 +1,2 @@
++#define GLOB_NO_OLD_VERSION
++#include <sysdeps/unix/sysv/linux/oldglob.c>
 diff --git a/sysdeps/unix/sysv/linux/sparc/bits/long-double.h b/sysdeps/unix/sysv/linux/sparc/sparc32/bits/long-double.h
 similarity index 100%
 rename from sysdeps/unix/sysv/linux/sparc/bits/long-double.h
 rename to sysdeps/unix/sysv/linux/sparc/sparc32/bits/long-double.h
+diff --git a/sysdeps/unix/sysv/linux/sparc/sparc32/glob64.c b/sysdeps/unix/sysv/linux/sparc/sparc32/glob64.c
+deleted file mode 100644
+index 82a9a296a7..0000000000
+--- a/sysdeps/unix/sysv/linux/sparc/sparc32/glob64.c
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <sysdeps/unix/sysv/linux/i386/glob64.c>
 diff --git a/sysdeps/unix/sysv/linux/sparc/sparc64/bits/long-double.h b/sysdeps/unix/sysv/linux/sparc/sparc64/bits/long-double.h
 new file mode 100644
 index 0000000000..094e05124b
@@ -14675,6 +16039,65 @@ index 0000000000..094e05124b
 +#  define __NO_LONG_DOUBLE_MATH        1
 +# endif
 +#endif
+diff --git a/sysdeps/unix/sysv/linux/spawni.c b/sysdeps/unix/sysv/linux/spawni.c
+index c56f894a82..7d23df84d2 100644
+--- a/sysdeps/unix/sysv/linux/spawni.c
++++ b/sysdeps/unix/sysv/linux/spawni.c
+@@ -17,7 +17,6 @@
+    <http://www.gnu.org/licenses/>.  */
+ 
+ #include <spawn.h>
+-#include <assert.h>
+ #include <fcntl.h>
+ #include <paths.h>
+ #include <string.h>
+@@ -268,7 +267,6 @@ __spawni_child (void *arguments)
+   __sigprocmask (SIG_SETMASK, (attr->__flags & POSIX_SPAWN_SETSIGMASK)
+ 		 ? &attr->__ss : &args->oldmask, 0);
+ 
+-  args->err = 0;
+   args->exec (args->file, args->argv, args->envp);
+ 
+   /* This is compatibility function required to enable posix_spawn run
+@@ -339,7 +337,7 @@ __spawnix (pid_t * pid, const char *file,
+ 
+   /* Child must set args.err to something non-negative - we rely on
+      the parent and child sharing VM.  */
+-  args.err = -1;
++  args.err = 0;
+   args.file = file;
+   args.exec = exec;
+   args.fa = file_actions;
+@@ -362,12 +360,26 @@ __spawnix (pid_t * pid, const char *file,
+   new_pid = CLONE (__spawni_child, STACK (stack, stack_size), stack_size,
+ 		   CLONE_VM | CLONE_VFORK | SIGCHLD, &args);
+ 
++  /* It needs to collect the case where the auxiliary process was created
++     but failed to execute the file (due either any preparation step or
++     for execve itself).  */
+   if (new_pid > 0)
+     {
++      /* Also, it handles the unlikely case where the auxiliary process was
++	 terminated before calling execve as if it was successfully.  The
++	 args.err is set to 0 as default and changed to a positive value
++	 only in case of failure, so in case of premature termination
++	 due a signal args.err will remain zeroed and it will be up to
++	 caller to actually collect it.  */
+       ec = args.err;
+-      assert (ec >= 0);
+-      if (ec != 0)
+-	  __waitpid (new_pid, NULL, 0);
++      if (ec > 0)
++	/* There still an unlikely case where the child is cancelled after
++	   setting args.err, due to a positive error value.  Also there is
++	   possible pid reuse race (where the kernel allocated the same pid
++	   to an unrelated process).  Unfortunately due synchronization
++	   issues where the kernel might not have the process collected
++	   the waitpid below can not use WNOHANG.  */
++	__waitpid (new_pid, NULL, 0);
+     }
+   else
+     ec = -new_pid;
 diff --git a/sysdeps/unix/sysv/linux/tst-sysconf-iov_max-uapi.c b/sysdeps/unix/sysv/linux/tst-sysconf-iov_max-uapi.c
 new file mode 100644
 index 0000000000..1240b846e6
@@ -14754,49 +16177,42 @@ index 0000000000..dfdf3da484
 +}
 +
 +#include <support/test-driver.c>
-diff --git a/sysdeps/unix/sysv/linux/wordsize-64/globfree64.c b/sysdeps/unix/sysv/linux/wordsize-64/globfree64.c
-new file mode 100644
-index 0000000000..af035e1514
---- /dev/null
-+++ b/sysdeps/unix/sysv/linux/wordsize-64/globfree64.c
-@@ -0,0 +1,2 @@
-+/* This file is here so sysdeps/gnu/glob64.c doesn't take precedence.  */
-+#include <sysdeps/wordsize-64/globfree64.c>
-diff --git a/sysdeps/unix/sysv/linux/x86_64/x32/globfree.c b/sysdeps/unix/sysv/linux/x86_64/x32/globfree.c
-new file mode 100644
-index 0000000000..b76a761c17
---- /dev/null
-+++ b/sysdeps/unix/sysv/linux/x86_64/x32/globfree.c
-@@ -0,0 +1 @@
-+#include <sysdeps/wordsize-64/globfree.c>
+diff --git a/sysdeps/unix/sysv/linux/wordsize-64/glob64.c b/sysdeps/unix/sysv/linux/wordsize-64/glob64.c
+deleted file mode 100644
+index eab7703d5c..0000000000
+--- a/sysdeps/unix/sysv/linux/wordsize-64/glob64.c
++++ /dev/null
+@@ -1,2 +0,0 @@
+-/* This file is here so sysdeps/gnu/glob64.c doesn't take precedence.  */
+-#include <sysdeps/wordsize-64/glob64.c>
+diff --git a/sysdeps/unix/sysv/linux/x86_64/x32/glob.c b/sysdeps/unix/sysv/linux/x86_64/x32/glob.c
+deleted file mode 100644
+index e5427475f6..0000000000
+--- a/sysdeps/unix/sysv/linux/x86_64/x32/glob.c
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <sysdeps/wordsize-64/glob.c>
 diff --git a/sysdeps/wordsize-64/glob.c b/sysdeps/wordsize-64/glob.c
-index 082faf1c70..954e8d37e2 100644
+deleted file mode 100644
+index 082faf1c70..0000000000
 --- a/sysdeps/wordsize-64/glob.c
-+++ b/sysdeps/wordsize-64/glob.c
-@@ -4,5 +4,3 @@
- #undef glob64
- #undef globfree64
- weak_alias (glob, glob64)
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#define glob64 __no_glob64_decl
+-#define globfree64 __no_globfree64_decl
+-#include <posix/glob.c>
+-#undef glob64
+-#undef globfree64
+-weak_alias (glob, glob64)
 -weak_alias (globfree, globfree64)
 -libc_hidden_ver (globfree, globfree64)
-diff --git a/sysdeps/wordsize-64/globfree.c b/sysdeps/wordsize-64/globfree.c
-new file mode 100644
-index 0000000000..ec8c35b489
---- /dev/null
-+++ b/sysdeps/wordsize-64/globfree.c
-@@ -0,0 +1,5 @@
-+#define globfree64 __no_globfree64_decl
-+#include <posix/globfree.c>
-+#undef globfree64
-+weak_alias (globfree, globfree64)
-+libc_hidden_ver (globfree, globfree64)
-diff --git a/sysdeps/wordsize-64/globfree64.c b/sysdeps/wordsize-64/globfree64.c
-new file mode 100644
-index 0000000000..a0f57ff4b3
---- /dev/null
-+++ b/sysdeps/wordsize-64/globfree64.c
-@@ -0,0 +1 @@
-+/* globfree64 is in globfree.c */
+diff --git a/sysdeps/wordsize-64/glob64.c b/sysdeps/wordsize-64/glob64.c
+deleted file mode 100644
+index 33918ea6a5..0000000000
+--- a/sysdeps/wordsize-64/glob64.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* glob64 is in glob.c */
 diff --git a/sysdeps/x86/cpu-features-offsets.sym b/sysdeps/x86/cpu-features-offsets.sym
 index f6739fae81..33dd094e37 100644
 --- a/sysdeps/x86/cpu-features-offsets.sym
@@ -15131,6 +16547,24 @@ index 43ab8fe25b..0192feb850 100644
    }
  #endif
  #if !defined SHARED || defined PROCINFO_DECL
+diff --git a/sysdeps/x86/nptl/bits/pthreadtypes-arch.h b/sysdeps/x86/nptl/bits/pthreadtypes-arch.h
+index fd86806800..74d5f6d6e8 100644
+--- a/sysdeps/x86/nptl/bits/pthreadtypes-arch.h
++++ b/sysdeps/x86/nptl/bits/pthreadtypes-arch.h
+@@ -51,6 +51,13 @@
+ #define __PTHREAD_COMPAT_PADDING_MID
+ #define __PTHREAD_COMPAT_PADDING_END
+ #define __PTHREAD_MUTEX_LOCK_ELISION    1
++#ifdef __x86_64__
++# define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  0
++# define __PTHREAD_MUTEX_USE_UNION          0
++#else
++# define __PTHREAD_MUTEX_NUSERS_AFTER_KIND  1
++# define __PTHREAD_MUTEX_USE_UNION          1
++#endif
+ 
+ #define __LOCK_ALIGNMENT
+ #define __ONCE_ALIGNMENT
 diff --git a/sysdeps/x86_64/Makefile b/sysdeps/x86_64/Makefile
 index 132470d9cb..a7e26ac485 100644
 --- a/sysdeps/x86_64/Makefile
@@ -15727,9 +17161,18 @@ index 8db24c16ac..9ddaafee17 100644
  # if (LR_VECTOR_OFFSET % VEC_SIZE) != 0
  #  error LR_VECTOR_OFFSET must be multples of VEC_SIZE
 diff --git a/sysdeps/x86_64/fpu/libm-test-ulps b/sysdeps/x86_64/fpu/libm-test-ulps
-index c347642044..1e28aaa9f1 100644
+index c347642044..e7ec433b7b 100644
 --- a/sysdeps/x86_64/fpu/libm-test-ulps
 +++ b/sysdeps/x86_64/fpu/libm-test-ulps
+@@ -1305,7 +1305,7 @@ Function: "cos_vlen4_avx2":
+ double: 2
+ 
+ Function: "cos_vlen8":
+-double: 1
++double: 2
+ float: 1
+ 
+ Function: "cos_vlen8_avx2":
 @@ -1733,10 +1733,10 @@ ldouble: 3
  
  Function: Imaginary part of "ctan_upward":
@@ -15743,6 +17186,26 @@ index c347642044..1e28aaa9f1 100644
  ifloat128: 5
  ildouble: 3
  ldouble: 3
+@@ -2645,7 +2645,7 @@ Function: "sincos_vlen4_avx2":
+ double: 2
+ 
+ Function: "sincos_vlen8":
+-double: 1
++double: 2
+ float: 1
+ 
+ Function: "sincos_vlen8_avx2":
+diff --git a/sysdeps/x86_64/nptl/pthread-offsets.h b/sysdeps/x86_64/nptl/pthread-offsets.h
+new file mode 100644
+index 0000000000..16c6b0d9fd
+--- /dev/null
++++ b/sysdeps/x86_64/nptl/pthread-offsets.h
+@@ -0,0 +1,5 @@
++#define __PTHREAD_MUTEX_NUSERS_OFFSET   12
++#define __PTHREAD_MUTEX_KIND_OFFSET     16
++#define __PTHREAD_MUTEX_SPINS_OFFSET    20
++#define __PTHREAD_MUTEX_ELISION_OFFSET  22
++#define __PTHREAD_MUTEX_LIST_OFFSET     24
 diff --git a/sysdeps/x86_64/tst-platform-1.c b/sysdeps/x86_64/tst-platform-1.c
 new file mode 100644
 index 0000000000..76a02e4b6d
