@@ -130,7 +130,7 @@ Author: Sharmila Podury <sharmila.podury@brocade.com>
 -#ifdef HAVE_EVP_MD_CTX_CREATE
 +#ifdef HAVE_EVP_MD_CTX_NEW
 +    ctx = EVP_MD_CTX_new();
-+#elif defined HAVE_EVP_MD_CTX_CREATE
++#elif HAVE_EVP_MD_CTX_CREATE
      ctx = EVP_MD_CTX_create();
  #else
      ctx = malloc(sizeof(*ctx));
@@ -141,7 +141,7 @@ Author: Sharmila Podury <sharmila.podury@brocade.com>
 -#ifdef HAVE_EVP_MD_CTX_DESTROY
 +#ifdef HAVE_EVP_MD_CTX_FREE
 +        EVP_MD_CTX_free(ctx);
-+#elif defined HAVE_EVP_MD_CTX_DESTROY
++#elif HAVE_EVP_MD_CTX_DESTROY
          EVP_MD_CTX_destroy(ctx);
  #else
          EVP_MD_CTX_cleanup(ctx);
@@ -154,7 +154,7 @@ Author: Sharmila Podury <sharmila.podury@brocade.com>
 -#ifdef HAVE_EVP_MD_CTX_CREATE
 +#ifdef HAVE_EVP_MD_CTX_NEW
 +    cptr = EVP_MD_CTX_new();
-+#elif defined HAVE_EVP_MD_CTX_CREATE
++#elif HAVE_EVP_MD_CTX_CREATE
      cptr = EVP_MD_CTX_create();
  #else
      cptr = malloc(sizeof(*cptr));
@@ -165,7 +165,7 @@ Author: Sharmila Podury <sharmila.podury@brocade.com>
 -#ifdef HAVE_EVP_MD_CTX_DESTROY
 +#ifdef HAVE_EVP_MD_CTX_FREE
 +    EVP_MD_CTX_free(cptr);
-+#elif defined HAVE_EVP_MD_CTX_DESTROY
++#elif HAVE_EVP_MD_CTX_DESTROY
      EVP_MD_CTX_destroy(cptr);
  #else
  #if !defined(OLD_DES)
