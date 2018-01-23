@@ -1,0 +1,16 @@
+diff --git a/configure b/configure
+index 82055b2..52510b4 100755
+--- a/configure
++++ b/configure
+@@ -5266,6 +5266,11 @@ test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
+ 
+ 
+ eval static_datadir="$datadir"
++old_val=""
++until test "$static_datadir" = "$old_val"; do
++	old_val="$static_datadir"
++	eval static_datadir="$static_datadir"
++done
+ 
+ eval static_bindir="$bindir"
+ old_val=""
