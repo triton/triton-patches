@@ -1,17 +1,17 @@
-From feee4fb140ffd1b60126df9acda95cc16dbb5867 Mon Sep 17 00:00:00 2001
-From: "William A. Kennington III" <wak@google.com>
-Date: Wed, 28 Sep 2016 12:25:50 -0700
-Subject: [PATCH 2/3] Fix sharedlib loading
+From b7d77cdef586ecff0a800000e6632fac3d50c723 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Fri, 16 Feb 2018 15:13:35 -0800
+Subject: [PATCH 2/2] Fix sharedlib loading
 
 ---
  cmd/shlibsign/shlibsign.c |  2 ++
- coreconf/config.mk        |  8 ++++++++
+ coreconf/config.mk        |  3 +++
  lib/pk11wrap/pk11load.c   |  7 +++++++
  lib/util/secload.c        | 16 +++++++++++++++-
- 4 files changed, 32 insertions(+), 1 deletion(-)
+ 4 files changed, 27 insertions(+), 1 deletion(-)
 
 diff --git a/cmd/shlibsign/shlibsign.c b/cmd/shlibsign/shlibsign.c
-index d93fc42..1788cf6 100644
+index d93fc422d..1788cf676 100644
 --- a/cmd/shlibsign/shlibsign.c
 +++ b/cmd/shlibsign/shlibsign.c
 @@ -875,6 +875,8 @@ main(int argc, char **argv)
@@ -24,26 +24,21 @@ index d93fc42..1788cf6 100644
      if (!lib) {
          PR_fprintf(PR_STDERR, "loading softokn3 failed");
 diff --git a/coreconf/config.mk b/coreconf/config.mk
-index 09b733d..de7be69 100644
+index 55d95c30e..714852c86 100644
 --- a/coreconf/config.mk
 +++ b/coreconf/config.mk
-@@ -208,3 +208,11 @@ DEFINES += -DSSL_DISABLE_DEPRECATED_CIPHER_SUITE_NAMES
- # exported symbols, which causes problem when NSS is built as part of Mozilla.
- # So we add a NSS_SSL_ENABLE_ZLIB variable to allow Mozilla to turn this off.
- NSS_SSL_ENABLE_ZLIB = 1
-+
-+# Allow disabling PKCS11 bypass.
-+ifdef NSS_NO_PKCS11_BYPASS
-+DEFINES += -DNO_PKCS11_BYPASS
-+endif
+@@ -199,3 +199,6 @@ DEFINES += -DNO_NSPR_10_SUPPORT
+ 
+ # Hide old, deprecated, TLS cipher suite names when building NSS
+ DEFINES += -DSSL_DISABLE_DEPRECATED_CIPHER_SUITE_NAMES
 +
 +# Nix specific stuff.
 +DEFINES += -DNIX_NSS_LIBDIR=\"$(out)/lib/\"
 diff --git a/lib/pk11wrap/pk11load.c b/lib/pk11wrap/pk11load.c
-index f12d0fd..8491e6d 100644
+index d1f6ec442..9d38f8836 100644
 --- a/lib/pk11wrap/pk11load.c
 +++ b/lib/pk11wrap/pk11load.c
-@@ -440,6 +440,13 @@ secmod_LoadPKCS11Module(SECMODModule *mod, SECMODModule **oldModule)
+@@ -451,6 +451,13 @@ secmod_LoadPKCS11Module(SECMODModule *mod, SECMODModule **oldModule)
           * unload the library if anything goes wrong from here on out...
           */
          library = PR_LoadLibrary(mod->dllName);
@@ -58,7 +53,7 @@ index f12d0fd..8491e6d 100644
  
          if (library == NULL) {
 diff --git a/lib/util/secload.c b/lib/util/secload.c
-index 12efd2f..0c5001f 100644
+index 12efd2f75..0c5001fc6 100644
 --- a/lib/util/secload.c
 +++ b/lib/util/secload.c
 @@ -70,9 +70,14 @@ loader_LoadLibInReferenceDir(const char* referencePath, const char* name)
@@ -101,5 +96,5 @@ index 12efd2f..0c5001f 100644
          }
      }
 -- 
-2.11.0
+2.15.1
 
