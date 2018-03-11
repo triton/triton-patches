@@ -1,4 +1,4 @@
-From 10472a061a2767b6923cd7757c631b53816718f7 Mon Sep 17 00:00:00 2001
+From af96fef3bfd609653d9d8879b1603c08336dae82 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 3 Sep 2017 18:56:14 -0700
 Subject: [PATCH 1/2] Fix makefile paths
@@ -15,7 +15,7 @@ Subject: [PATCH 1/2] Fix makefile paths
  8 files changed, 14 insertions(+), 12 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 508d3f40e..a906e8d3f 100644
+index 90a1c9475..b3c4c7c82 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -11,10 +11,10 @@ endif
@@ -32,22 +32,22 @@ index 508d3f40e..a906e8d3f 100644
  endif
  
 diff --git a/include/Makefile.am b/include/Makefile.am
-index a94cad50d..a160fe23e 100644
+index 23e15dac4..968def092 100644
 --- a/include/Makefile.am
 +++ b/include/Makefile.am
-@@ -29,6 +29,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
+@@ -26,6 +26,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
  endif
  
  if CONFIG_KERNEL
 -kerneldir = @prefix@/src/zfs-$(VERSION)/include
 +kerneldir = @prefix@/include
- kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
+ kernel_HEADERS = $(COMMON_H)
  endif
 diff --git a/include/linux/Makefile.am b/include/linux/Makefile.am
-index 9bb0b3493..885d1b0ca 100644
+index 89c2689f6..d22323c25 100644
 --- a/include/linux/Makefile.am
 +++ b/include/linux/Makefile.am
-@@ -21,6 +21,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
+@@ -22,6 +22,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
  endif
  
  if CONFIG_KERNEL
@@ -56,10 +56,10 @@ index 9bb0b3493..885d1b0ca 100644
  kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
  endif
 diff --git a/include/sys/Makefile.am b/include/sys/Makefile.am
-index be606b8c6..3b248388f 100644
+index 8e18a8790..c01cc6789 100644
 --- a/include/sys/Makefile.am
 +++ b/include/sys/Makefile.am
-@@ -130,6 +130,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
+@@ -139,6 +139,6 @@ libzfs_HEADERS = $(COMMON_H) $(USER_H)
  endif
  
  if CONFIG_KERNEL
@@ -104,10 +104,10 @@ index 0859b9f67..b0c6eec8b 100644
  kernel_HEADERS = $(COMMON_H) $(KERNEL_H)
  endif
 diff --git a/module/Makefile.in b/module/Makefile.in
-index 093cf2286..d11bbb349 100644
+index 15c74e130..cde69f156 100644
 --- a/module/Makefile.in
 +++ b/module/Makefile.in
-@@ -33,6 +33,8 @@ modules:
+@@ -40,6 +40,8 @@ modules:
  		"*** - @SPL_OBJ@/module/@SPL_SYMBOLS@\n"; \
  		exit 1; \
  	fi
@@ -116,7 +116,7 @@ index 093cf2286..d11bbb349 100644
  	list='$(SUBDIR_TARGETS)'; for targetdir in $$list; do \
  		$(MAKE) -C $$targetdir; \
  	done
-@@ -50,15 +52,15 @@ clean:
+@@ -57,15 +59,15 @@ clean:
  modules_install:
  	@# Install the kernel modules
  	$(MAKE) -C @LINUX_OBJ@ SUBDIRS=`pwd` $@ \
@@ -137,5 +137,5 @@ index 093cf2286..d11bbb349 100644
  		depmod -ae -F $$sysmap @LINUX_VERSION@; \
  	fi
 -- 
-2.15.1
+2.16.2
 
