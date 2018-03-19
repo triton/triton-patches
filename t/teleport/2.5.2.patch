@@ -1,0 +1,176 @@
+diff --git a/lib/auth/tun.go b/lib/auth/tun.go
+index 13a7ced7..5a2a5c3b 100644
+--- a/lib/auth/tun.go
++++ b/lib/auth/tun.go
+@@ -154,8 +154,8 @@ func NewTunnel(addr utils.NetAddr,
+ 	if err != nil {
+ 		return nil, err
+ 	}
+-	tunnel.userCertChecker = ssh.CertChecker{IsAuthority: tunnel.isUserAuthority}
+-	tunnel.hostCertChecker = ssh.CertChecker{IsAuthority: tunnel.isHostAuthority}
++	tunnel.userCertChecker = ssh.CertChecker{IsUserAuthority: tunnel.isUserAuthority}
++	tunnel.hostCertChecker = ssh.CertChecker{IsHostAuthority: tunnel.isHostAuthority}
+ 	return tunnel, nil
+ }
+ 
+@@ -246,7 +246,7 @@ func (s *AuthTunnel) HandleNewChan(_ net.Conn, sconn *ssh.ServerConn, nch ssh.Ne
+ 
+ // isHostAuthority is called during checking the client key, to see if the signing
+ // key is the real host CA authority key.
+-func (s *AuthTunnel) isHostAuthority(auth ssh.PublicKey) bool {
++func (s *AuthTunnel) isHostAuthority(auth ssh.PublicKey, principal string) bool {
+ 	domainName, err := s.authServer.GetDomainName()
+ 	if err != nil {
+ 		return false
+diff --git a/lib/client/api.go b/lib/client/api.go
+index b61cd965..f53bacd1 100644
+--- a/lib/client/api.go
++++ b/lib/client/api.go
+@@ -86,10 +86,6 @@ func (p *ForwardedPort) ToString() string {
+ 	return net.JoinHostPort(p.SrcIP, sport) + ":" + net.JoinHostPort(p.DestHost, dport)
+ }
+ 
+-// HostKeyCallback is called by SSH client when it needs to check
+-// remote host key or certificate validity
+-type HostKeyCallback func(host string, ip net.Addr, key ssh.PublicKey) error
+-
+ // Config is a client config
+ type Config struct {
+ 	// Username is the Teleport account username (for logging into Teleport proxies)
+@@ -163,7 +159,7 @@ type Config struct {
+ 	// HostKeyCallback will be called to check host keys of the remote
+ 	// node, if not specified will be using CheckHostSignature function
+ 	// that uses local cache to validate hosts
+-	HostKeyCallback HostKeyCallback
++	HostKeyCallback ssh.HostKeyCallback
+ 
+ 	// KeyDir defines where temporary session keys will be stored.
+ 	// if empty, they'll go to ~/.tsh
+diff --git a/lib/client/client.go b/lib/client/client.go
+index 0a6e7c8c..8f81837f 100644
+--- a/lib/client/client.go
++++ b/lib/client/client.go
+@@ -51,7 +51,7 @@ type ProxyClient struct {
+ 	hostLogin       string
+ 	proxyAddress    string
+ 	proxyPrincipal  string
+-	hostKeyCallback utils.HostKeyCallback
++	hostKeyCallback ssh.HostKeyCallback
+ 	authMethod      ssh.AuthMethod
+ 	siteName        string
+ 	clientAddr      string
+diff --git a/lib/reversetunnel/agent.go b/lib/reversetunnel/agent.go
+index f8db1bc0..c2ec5a13 100644
+--- a/lib/reversetunnel/agent.go
++++ b/lib/reversetunnel/agent.go
+@@ -126,7 +126,7 @@ type Agent struct {
+ 	AgentConfig
+ 	ctx             context.Context
+ 	cancel          context.CancelFunc
+-	hostKeyCallback utils.HostKeyCallback
++	hostKeyCallback ssh.HostKeyCallback
+ 	authMethods     []ssh.AuthMethod
+ 	// state is the state of this agent
+ 	state string
+diff --git a/lib/reversetunnel/srv.go b/lib/reversetunnel/srv.go
+index 44171e1f..dc3b12c0 100644
+--- a/lib/reversetunnel/srv.go
++++ b/lib/reversetunnel/srv.go
+@@ -223,8 +223,8 @@ func NewServer(cfg Config) (Server, error) {
+ 	if err != nil {
+ 		return nil, err
+ 	}
+-	srv.hostCertChecker = ssh.CertChecker{IsAuthority: srv.isHostAuthority}
+-	srv.userCertChecker = ssh.CertChecker{IsAuthority: srv.isUserAuthority}
++	srv.hostCertChecker = ssh.CertChecker{IsHostAuthority: srv.isHostAuthority}
++	srv.userCertChecker = ssh.CertChecker{IsUserAuthority: srv.isUserAuthority}
+ 	srv.srv = s
+ 	go srv.periodicFunctions()
+ 	return srv, nil
+@@ -468,7 +468,7 @@ func (s *server) HandleNewChan(conn net.Conn, sconn *ssh.ServerConn, nch ssh.New
+ 
+ // isHostAuthority is called during checking the client key, to see if the signing
+ // key is the real host CA authority key.
+-func (s *server) isHostAuthority(auth ssh.PublicKey) bool {
++func (s *server) isHostAuthority(auth ssh.PublicKey, principal string) bool {
+ 	keys, err := s.getTrustedCAKeys(services.HostCA)
+ 	if err != nil {
+ 		s.Errorf("failed to retrieve trusted keys, err: %v", err)
+diff --git a/lib/services/saml.go b/lib/services/saml.go
+index 55bf6143..60128745 100644
+--- a/lib/services/saml.go
++++ b/lib/services/saml.go
+@@ -573,7 +573,7 @@ func (o *SAMLConnectorV2) GetServiceProvider(clock clockwork.Clock) (*saml2.SAML
+ 		}
+ 
+ 		for _, kd := range metadata.IDPSSODescriptor.KeyDescriptors {
+-			certData, err := base64.StdEncoding.DecodeString(kd.KeyInfo.X509Data.X509Certificate.Data)
++			certData, err := base64.StdEncoding.DecodeString(kd.KeyInfo.X509Data.X509Certificates[0].Data)
+ 			if err != nil {
+ 				return nil, trace.Wrap(err)
+ 			}
+@@ -584,7 +584,7 @@ func (o *SAMLConnectorV2) GetServiceProvider(clock clockwork.Clock) (*saml2.SAML
+ 			certStore.Roots = append(certStore.Roots, cert)
+ 		}
+ 		o.Spec.Issuer = metadata.EntityID
+-		o.Spec.SSO = metadata.IDPSSODescriptor.SingleSignOnService.Location
++		o.Spec.SSO = metadata.IDPSSODescriptor.SingleSignOnServices[0].Location
+ 	}
+ 	if o.Spec.Issuer == "" {
+ 		return nil, trace.BadParameter("no issuer or entityID set, either set issuer as a parameter or via entity_descriptor spec")
+diff --git a/lib/srv/authhandlers.go b/lib/srv/authhandlers.go
+index 9d703b26..d52dae4b 100644
+--- a/lib/srv/authhandlers.go
++++ b/lib/srv/authhandlers.go
+@@ -167,7 +167,7 @@ func (h *AuthHandlers) UserKeyAuth(conn ssh.ConnMetadata, key ssh.PublicKey) (*s
+ 		h.AuditLog.EmitAuditEvent(events.AuthAttemptEvent, fields)
+ 	}
+ 
+-	certChecker := ssh.CertChecker{IsAuthority: h.IsUserAuthority}
++	certChecker := ssh.CertChecker{IsUserAuthority: h.IsUserAuthority}
+ 	permissions, err := certChecker.Authenticate(conn, key)
+ 	if err != nil {
+ 		recordFailedLogin(err)
+diff --git a/lib/utils/cli.go b/lib/utils/cli.go
+index b095343e..e45c036a 100644
+--- a/lib/utils/cli.go
++++ b/lib/utils/cli.go
+@@ -43,7 +43,7 @@ const (
+ 
+ // InitLogger configures the global logger for a given purpose / verbosity level
+ func InitLogger(purpose LoggingPurpose, level log.Level) {
+-	log.StandardLogger().SetHooks(make(log.LevelHooks))
++	log.StandardLogger().Hooks = make(log.LevelHooks)
+ 	formatter := &trace.TextFormatter{DisableTimestamp: true}
+ 	log.SetFormatter(formatter)
+ 	log.SetLevel(level)
+@@ -74,7 +74,7 @@ func InitLoggerForTests() {
+ 
+ // SwitchLoggingtoSyslog tells the logger to send the output to syslog
+ func SwitchLoggingtoSyslog() {
+-	log.StandardLogger().SetHooks(make(log.LevelHooks))
++	log.StandardLogger().Hooks = make(log.LevelHooks)
+ 	hook, err := logrusSyslog.NewSyslogHook("", "", syslog.LOG_WARNING, "")
+ 	if err != nil {
+ 		// syslog not available
+diff --git a/lib/utils/utils.go b/lib/utils/utils.go
+index a01bf59c..d978785f 100644
+--- a/lib/utils/utils.go
++++ b/lib/utils/utils.go
+@@ -30,7 +30,6 @@ import (
+ 	"github.com/gravitational/teleport/lib/modules"
+ 	"github.com/gravitational/trace"
+ 	"github.com/pborman/uuid"
+-	"golang.org/x/crypto/ssh"
+ )
+ 
+ // StringsSet creates set of string (map[string]struct{})
+@@ -99,8 +98,6 @@ func SplitHostPort(hostname string) (string, string, error) {
+ 	return host, port, nil
+ }
+ 
+-type HostKeyCallback func(hostID string, remote net.Addr, key ssh.PublicKey) error
+-
+ func ReadPath(path string) ([]byte, error) {
+ 	s, err := filepath.Abs(path)
+ 	if err != nil {
