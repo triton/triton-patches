@@ -1,8 +1,8 @@
 diff --git a/libbb/appletlib.c b/libbb/appletlib.c
-index 9425c7bd4..ea2dd37ef 100644
+index 022455da4..7b3e84d1c 100644
 --- a/libbb/appletlib.c
 +++ b/libbb/appletlib.c
-@@ -287,7 +287,7 @@ void lbb_prepare(const char *applet
+@@ -322,7 +322,7 @@ void lbb_prepare(const char *applet
  	if (argv[1]
  	 && !argv[2]
  	 && strcmp(argv[1], "--help") == 0
@@ -11,16 +11,16 @@ index 9425c7bd4..ea2dd37ef 100644
  	) {
  		/* Special case. POSIX says "test --help"
  		 * should be no different from e.g. "test --foo".  */
-@@ -887,7 +887,7 @@ void FAST_FUNC run_applet_no_and_exit(int applet_no, char **argv)
+@@ -947,7 +947,7 @@ void FAST_FUNC run_applet_no_and_exit(int applet_no, const char *name, char **ar
  static NORETURN void run_applet_and_exit(const char *name, char **argv)
  {
  #  if ENABLE_BUSYBOX
 -	if (is_prefixed_with(name, "busybox"))
 +	if (strstr(name, "busybox") != NULL)
- 		exit(busybox_main(argv));
+ 		exit(busybox_main(/*unused:*/ 0, argv));
  #  endif
  #  if NUM_APPLETS > 0
-@@ -963,7 +963,7 @@ int main(int argc UNUSED_PARAM, char **argv)
+@@ -1023,7 +1023,7 @@ int main(int argc UNUSED_PARAM, char **argv)
  #if defined(SINGLE_APPLET_MAIN)
  
  	/* Only one applet is selected in .config */
@@ -29,7 +29,7 @@ index 9425c7bd4..ea2dd37ef 100644
  		/* "busybox <applet> <params>" should still work as expected */
  		argv++;
  	}
-@@ -981,7 +981,7 @@ int main(int argc UNUSED_PARAM, char **argv)
+@@ -1045,7 +1045,7 @@ int main(int argc UNUSED_PARAM, char **argv)
  
  	lbb_prepare("busybox" IF_FEATURE_INDIVIDUAL(, argv));
  # if !ENABLE_BUSYBOX
