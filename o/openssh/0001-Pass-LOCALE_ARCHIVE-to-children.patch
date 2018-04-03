@@ -1,0 +1,26 @@
+From 4c540698957316a195df80d1624db6493446f480 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Tue, 3 Apr 2018 01:25:45 -0700
+Subject: [PATCH] Pass LOCALE_ARCHIVE to children
+
+---
+ session.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/session.c b/session.c
+index 58826db1..6a01f9fd 100644
+--- a/session.c
++++ b/session.c
+@@ -1053,6 +1053,9 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
+ 	if (getenv("TZ"))
+ 		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
+ 
++	if (getenv("LOCALE_ARCHIVE"))
++		child_set_env(&env, &envsize, "LOCALE_ARCHIVE", getenv("LOCALE_ARCHIVE"));
++
+ 	/* Set custom environment options from pubkey authentication. */
+ 	if (options.permit_user_env) {
+ 		for (n = 0 ; n < auth_opts->nenv; n++) {
+-- 
+2.17.0.rc1.321.gba9d0f2565-goog
+
