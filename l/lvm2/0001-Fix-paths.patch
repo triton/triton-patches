@@ -1,0 +1,121 @@
+From d59234a8f8f8e4f49d444fe121d48b54d2b6eb5b Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Fri, 27 Jul 2018 15:32:52 -0700
+Subject: [PATCH] Fix paths
+
+---
+ man/lvmdump.8_main                            |  1 -
+ ...lk_availability_systemd_red_hat.service.in |  2 +-
+ scripts/blkdeactivate.sh.in                   | 20 ++++++++-----------
+ scripts/fsadm.sh                              |  1 -
+ ...vm2_activation_generator_systemd_red_hat.c |  2 +-
+ 5 files changed, 10 insertions(+), 16 deletions(-)
+
+diff --git a/man/lvmdump.8_main b/man/lvmdump.8_main
+index ec3dbb2ea..35e59c01c 100644
+--- a/man/lvmdump.8_main
++++ b/man/lvmdump.8_main
+@@ -102,7 +102,6 @@ database content (the output of 'udevadm info --export-db' command).
+ \fBLVM_BINARY\fP
+ The LVM2 binary to use.
+ Defaults to "lvm".
+-Sometimes you might need to set this to "/sbin/lvm.static", for example.
+ .TP
+ \fBDMSETUP_BINARY\fP
+ The dmsetup binary to use.
+diff --git a/scripts/blk_availability_systemd_red_hat.service.in b/scripts/blk_availability_systemd_red_hat.service.in
+index 1198baa2a..949f043b5 100644
+--- a/scripts/blk_availability_systemd_red_hat.service.in
++++ b/scripts/blk_availability_systemd_red_hat.service.in
+@@ -6,7 +6,7 @@ Conflicts=shutdown.target
+ 
+ [Service]
+ Type=oneshot
+-ExecStart=/usr/bin/true
++ExecStart=/run/current-system/sw/bin/true
+ ExecStop=@SBINDIR@/blkdeactivate -u -l wholevg -m disablequeueing -r wait
+ RemainAfterExit=yes
+ 
+diff --git a/scripts/blkdeactivate.sh.in b/scripts/blkdeactivate.sh.in
+index a4b8a8fb5..7adbd5370 100644
+--- a/scripts/blkdeactivate.sh.in
++++ b/scripts/blkdeactivate.sh.in
+@@ -34,10 +34,10 @@ TOOL=blkdeactivate
+ DEV_DIR="/dev"
+ SYS_BLK_DIR="/sys/block"
+ 
+-MDADM="/sbin/mdadm"
+-MOUNTPOINT="/bin/mountpoint"
+-MPATHD="/sbin/multipathd"
+-UMOUNT="/bin/umount"
++MDADM="/run/current-system/sw/bin/mdadm"
++MOUNTPOINT="/run/current-system/sw/bin/mountpoint"
++MPATHD="/run/current-system/sw/bin/multipathd"
++UMOUNT="/run/current-system/sw/bin/umount"
+ 
+ sbindir="@SBINDIR@"
+ DMSETUP="$sbindir/dmsetup"
+@@ -47,7 +47,7 @@ if "$UMOUNT" --help | grep -- "--all-targets" >"$DEV_DIR/null"; then
+ 	UMOUNT_OPTS="--all-targets "
+ else
+ 	UMOUNT_OPTS=""
+-	FINDMNT="/bin/findmnt -r --noheadings -u -o TARGET"
++	FINDMNT="/run/current-system/sw/bin/findmnt -r --noheadings -u -o TARGET"
+ 	FINDMNT_READ="read -r mnt"
+ fi
+ DMSETUP_OPTS=""
+@@ -55,10 +55,10 @@ LVM_OPTS=""
+ MDADM_OPTS=""
+ MPATHD_OPTS=""
+ 
+-LSBLK="/bin/lsblk -r --noheadings -o TYPE,KNAME,NAME,MOUNTPOINT"
++LSBLK="/run/current-system/sw/bin/lsblk -r --noheadings -o TYPE,KNAME,NAME,MOUNTPOINT"
+ LSBLK_VARS="local devtype local kname local name local mnt"
+ LSBLK_READ="read -r devtype kname name mnt"
+-SORT_MNT="/bin/sort -r -u -k 4"
++SORT_MNT="/run/current-system/sw/bin/sort -r -u -k 4"
+ 
+ # Do not show tool errors by default (only done/skipping summary
+ # message provided by this script) and no verbose mode by default.
+@@ -100,12 +100,8 @@ declare -A SKIP_VG_LIST=()
+ # (list is an associative array!)
+ #
+ declare -A SKIP_UMOUNT_LIST=(["/"]=1 \
+-                             ["/lib"]=1 ["/lib64"]=1 \
+-                             ["/bin"]=1 ["/sbin"]=1 \
+                              ["/var"]=1 ["/var/log"]=1 \
+-                             ["/usr"]=1 \
+-                             ["/usr/lib"]=1 ["/usr/lib64"]=1 \
+-                             ["/usr/sbin"]=1 ["/usr/bin"]=1)
++                             ["/nix"]=1 ["/nix/store"]=1)
+ # Bash can't properly handle '[' and ']' used as a subscript
+ # within the '()'initialization - it needs to be done separately!
+ SKIP_UMOUNT_LIST["[SWAP]"]=1
+diff --git a/scripts/fsadm.sh b/scripts/fsadm.sh
+index 28ca6709f..f7e551515 100755
+--- a/scripts/fsadm.sh
++++ b/scripts/fsadm.sh
+@@ -32,7 +32,6 @@
+ TOOL=fsadm
+ 
+ _SAVEPATH=$PATH
+-PATH="/sbin:/usr/sbin:/bin:/usr/sbin:$PATH"
+ 
+ # utilities
+ TUNE_EXT=tune2fs
+diff --git a/scripts/lvm2_activation_generator_systemd_red_hat.c b/scripts/lvm2_activation_generator_systemd_red_hat.c
+index 0f7f89c86..d99e91ad6 100644
+--- a/scripts/lvm2_activation_generator_systemd_red_hat.c
++++ b/scripts/lvm2_activation_generator_systemd_red_hat.c
+@@ -131,7 +131,7 @@ static int generate_unit(const char *dir, int unit, int sysinit_needed)
+ 		fprintf(f, "After=%s iscsi.service fcoe.service\n"
+ 			"Before=remote-fs-pre.target shutdown.target\n\n"
+ 			"[Service]\n"
+-			"ExecStartPre=/usr/bin/udevadm settle\n", unit_names[UNIT_MAIN]);
++			"ExecStartPre=/run/current-system/sw/bin/udevadm settle\n", unit_names[UNIT_MAIN]);
+ 	} else {
+ 		if (unit == UNIT_EARLY) {
+ 			fputs("After=systemd-udev-settle.service\n"
+-- 
+2.17.0
+
