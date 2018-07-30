@@ -1,16 +1,16 @@
 diff --git a/tools/llvm-config/CMakeLists.txt b/tools/llvm-config/CMakeLists.txt
-index d458771..86cf9d5 100644
+index f59402ac4b0..70522aa20ed 100644
 --- a/tools/llvm-config/CMakeLists.txt
 +++ b/tools/llvm-config/CMakeLists.txt
-@@ -10,6 +10,7 @@ add_llvm_tool(llvm-config
- 
+@@ -11,6 +11,7 @@ add_llvm_tool(llvm-config
  # Compute the substitution values for various items.
- get_property(LLVM_SYSTEM_LIBS_LIST TARGET LLVMSupport PROPERTY LLVM_SYSTEM_LIBS)
+ get_property(SUPPORT_SYSTEM_LIBS TARGET LLVMSupport PROPERTY LLVM_SYSTEM_LIBS)
+ get_property(WINDOWSMANIFEST_SYSTEM_LIBS TARGET LLVMWindowsManifest PROPERTY LLVM_SYSTEM_LIBS)
 +set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS 0)
- foreach(l ${LLVM_SYSTEM_LIBS_LIST})
+ foreach(l ${SUPPORT_SYSTEM_LIBS} ${WINDOWSMANIFEST_SYSTEM_LIBS})
    if(MSVC)
      set(SYSTEM_LIBS ${SYSTEM_LIBS} "${l}.lib")
-@@ -19,7 +20,13 @@ foreach(l ${LLVM_SYSTEM_LIBS_LIST})
+@@ -20,7 +21,13 @@ foreach(l ${SUPPORT_SYSTEM_LIBS} ${WINDOWSMANIFEST_SYSTEM_LIBS})
        set(SYSTEM_LIBS ${SYSTEM_LIBS} "${l}")
      else()
        # Otherwise assume it's a library name we need to link with.
