@@ -1,0 +1,269 @@
+From 63252e974630a8ed2c3b4c96be5d1f1a063673a6 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Tue, 31 Jul 2018 02:41:40 -0700
+Subject: [PATCH] Fix binary paths
+
+---
+ cmd/arc_summary/arc_summary.py                 | 2 +-
+ cmd/arc_summary/arc_summary3.py                | 2 +-
+ cmd/vdev_id/vdev_id                            | 2 +-
+ cmd/zpool/zpool_iter.c                         | 2 +-
+ cmd/ztest/ztest.c                              | 6 +++---
+ etc/init.d/zfs-functions.in                    | 2 +-
+ etc/sudoers.d/zfs                              | 2 +-
+ etc/systemd/system/zfs-import-cache.service.in | 2 +-
+ etc/systemd/system/zfs-import-scan.service.in  | 2 +-
+ etc/systemd/system/zfs-share.service.in        | 2 +-
+ lib/libshare/nfs.c                             | 6 +++---
+ lib/libzfs/libzfs_mount.c                      | 4 ++--
+ lib/libzfs/libzfs_util.c                       | 8 ++++----
+ udev/rules.d/90-zfs.rules.in                   | 4 ++--
+ 14 files changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/cmd/arc_summary/arc_summary.py b/cmd/arc_summary/arc_summary.py
+index f6dbb9bfb..cc51d3cf8 100755
+--- a/cmd/arc_summary/arc_summary.py
++++ b/cmd/arc_summary/arc_summary.py
+@@ -891,7 +891,7 @@ def _tunable_summary(Kstat):
+ 
+     if show_tunable_descriptions:
+ 
+-        command = ["/sbin/modinfo", "zfs", "-0"]
++        command = ["/run/current-system/sw/bin/modinfo", "zfs", "-0"]
+ 
+         try:
+             p = Popen(command, stdin=PIPE, stdout=PIPE,
+diff --git a/cmd/arc_summary/arc_summary3.py b/cmd/arc_summary/arc_summary3.py
+index adcb78122..6885e135c 100755
+--- a/cmd/arc_summary/arc_summary3.py
++++ b/cmd/arc_summary/arc_summary3.py
+@@ -291,7 +291,7 @@ def get_descriptions(request):
+     # We would prefer to do this with /sys/modules -- see the discussion at
+     # get_version() -- but there isn't a way to get the descriptions from
+     # there, so we fall back on modinfo
+-    command = ["/sbin/modinfo", request, "-0"]
++    command = ["/run/current-system/sw/bin/modinfo", request, "-0"]
+ 
+     # The recommended way to do this is with subprocess.run(). However,
+     # some installed versions of Python are < 3.5, so we offer them
+diff --git a/cmd/vdev_id/vdev_id b/cmd/vdev_id/vdev_id
+index 4c7b270a8..f3558aa72 100755
+--- a/cmd/vdev_id/vdev_id
++++ b/cmd/vdev_id/vdev_id
+@@ -88,7 +88,7 @@
+ # alias d1       /dev/disk/by-id/wwn-0x5000c5002de3b9ca
+ # alias d2       wwn-0x5000c5002def789e
+ 
+-PATH=/bin:/sbin:/usr/bin:/usr/sbin
++PATH=/run/current-system/sw/bin:/bin:/sbin:/usr/bin:/usr/sbin
+ CONFIG=/etc/zfs/vdev_id.conf
+ PHYS_PER_PORT=
+ DEV=
+diff --git a/cmd/zpool/zpool_iter.c b/cmd/zpool/zpool_iter.c
+index 019f0b136..4a67fae4d 100644
+--- a/cmd/zpool/zpool_iter.c
++++ b/cmd/zpool/zpool_iter.c
+@@ -478,7 +478,7 @@ vdev_run_cmd(vdev_cmd_data_t *data, char *cmd)
+ {
+ 	int rc;
+ 	char *argv[2] = {cmd, 0};
+-	char *env[5] = {"PATH=/bin:/sbin:/usr/bin:/usr/sbin", NULL, NULL, NULL,
++	char *env[5] = {"PATH=/run/current-system/sw/bin:/bin:/sbin:/usr/bin:/usr/sbin", NULL, NULL, NULL,
+ 	    NULL};
+ 	char **lines = NULL;
+ 	int lines_cnt = 0;
+diff --git a/cmd/ztest/ztest.c b/cmd/ztest/ztest.c
+index 5347a0abe..e5821d6a6 100644
+--- a/cmd/ztest/ztest.c
++++ b/cmd/ztest/ztest.c
+@@ -843,14 +843,14 @@ process_options(int argc, char **argv)
+ 		 * We want to extract <isa> to determine if we should use
+ 		 * 32 or 64 bit binaries.
+ 		 */
+-		bin = strstr(cmd, "/usr/bin/");
++		bin = strstr(cmd, "/run/current-system/sw/bin/");
+ 		ztest = strstr(bin, "/ztest");
+ 		isa = bin + 9;
+ 		isalen = ztest - isa;
+ 		(void) snprintf(zo->zo_alt_ztest, sizeof (zo->zo_alt_ztest),
+-		    "%s/usr/bin/%.*s/ztest", realaltdir, isalen, isa);
++		    "%s/run/current-system/sw/bin/%.*s/ztest", realaltdir, isalen, isa);
+ 		(void) snprintf(zo->zo_alt_libpath, sizeof (zo->zo_alt_libpath),
+-		    "%s/usr/lib/%.*s", realaltdir, isalen, isa);
++		    "%s/run/current-system/sw/lib/%.*s", realaltdir, isalen, isa);
+ 
+ 		if (0 != access(zo->zo_alt_ztest, X_OK)) {
+ 			ztest_dump_core = B_FALSE;
+diff --git a/etc/init.d/zfs-functions.in b/etc/init.d/zfs-functions.in
+index f5b74d458..ac03289a2 100644
+--- a/etc/init.d/zfs-functions.in
++++ b/etc/init.d/zfs-functions.in
+@@ -10,7 +10,7 @@
+ # licensing stansa) in the commit dated Mar 24, 2011:
+ #   https://github.com/zfsonlinux/pkg-zfs/commit/80a3ae582b59c0250d7912ba794dca9e669e605a
+ 
+-PATH=/sbin:/bin:/usr/bin:/usr/sbin
++PATH=/run/current-system/sw/bin:/sbin:/bin:/usr/bin:/usr/sbin
+ 
+ # Source function library
+ if [ -f /etc/rc.d/init.d/functions ]; then
+diff --git a/etc/sudoers.d/zfs b/etc/sudoers.d/zfs
+index f66ebad21..ce27fb28f 100644
+--- a/etc/sudoers.d/zfs
++++ b/etc/sudoers.d/zfs
+@@ -5,4 +5,4 @@
+ ## CAUTION: Any syntax error introduced here will break sudo.
+ ##
+ 
+-# ALL ALL = (root) NOPASSWD: /usr/sbin/smartctl -a /dev/[hsv]d[a-z0-9]*
++# ALL ALL = (root) NOPASSWD: /run/current-system/sw/bin/smartctl -a /dev/[hsv]d[a-z0-9]*
+diff --git a/etc/systemd/system/zfs-import-cache.service.in b/etc/systemd/system/zfs-import-cache.service.in
+index 44c26802b..b0f5c06a5 100644
+--- a/etc/systemd/system/zfs-import-cache.service.in
++++ b/etc/systemd/system/zfs-import-cache.service.in
+@@ -13,7 +13,7 @@ ConditionPathExists=@sysconfdir@/zfs/zpool.cache
+ Type=oneshot
+ RemainAfterExit=yes
+ ExecStart=@sbindir@/zpool import -c @sysconfdir@/zfs/zpool.cache -aN
+-ExecStartPost=/bin/bash -c "/bin/systemctl set-environment BOOTFS=$(@sbindir@/zpool list -H -o bootfs | /bin/awk '$1 != \"-\" {print; exit}')"
++ExecStartPost=/run/current-system/sw/bin/bash -c "/run/current-system/sw/bin/systemctl set-environment BOOTFS=$(@sbindir@/zpool list -H -o bootfs | /run/current-system/sw/bin/awk '$1 != \"-\" {print; exit}')"
+ 
+ [Install]
+ WantedBy=zfs-import.target
+diff --git a/etc/systemd/system/zfs-import-scan.service.in b/etc/systemd/system/zfs-import-scan.service.in
+index 44a50a76b..b4052a7e2 100644
+--- a/etc/systemd/system/zfs-import-scan.service.in
++++ b/etc/systemd/system/zfs-import-scan.service.in
+@@ -12,7 +12,7 @@ ConditionPathExists=!@sysconfdir@/zfs/zpool.cache
+ Type=oneshot
+ RemainAfterExit=yes
+ ExecStart=@sbindir@/zpool import -aN -o cachefile=none
+-ExecStartPost=/bin/bash -c "/bin/systemctl set-environment BOOTFS=$(@sbindir@/zpool list -H -o bootfs | /bin/awk '$1 != \"-\" {print; exit}')"
++ExecStartPost=/bin/bash -c "/run/current-system/sw/bin/systemctl set-environment BOOTFS=$(@sbindir@/zpool list -H -o bootfs | /run/current-system/sw/bin/awk '$1 != \"-\" {print; exit}')"
+ 
+ [Install]
+ WantedBy=zfs-import.target
+diff --git a/etc/systemd/system/zfs-share.service.in b/etc/systemd/system/zfs-share.service.in
+index 312547c26..9006a2fb6 100644
+--- a/etc/systemd/system/zfs-share.service.in
++++ b/etc/systemd/system/zfs-share.service.in
+@@ -10,7 +10,7 @@ PartOf=smb.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStartPre=-/bin/rm -f /etc/dfs/sharetab
++ExecStartPre=-/run/current-system/sw/bin/rm -f /etc/dfs/sharetab
+ ExecStart=@sbindir@/zfs share -a
+ 
+ [Install]
+diff --git a/lib/libshare/nfs.c b/lib/libshare/nfs.c
+index 5c8976e15..2720523b6 100644
+--- a/lib/libshare/nfs.c
++++ b/lib/libshare/nfs.c
+@@ -270,7 +270,7 @@ nfs_enable_share_one(const char *sharepath, const char *host,
+ 	fprintf(stderr, "sharing %s with opts %s\n", hostpath, opts);
+ #endif
+ 
+-	argv[0] = "/usr/sbin/exportfs";
++	argv[0] = "/run/current-system/sw/bin/exportfs";
+ 	argv[1] = "-i";
+ 	argv[2] = "-o";
+ 	argv[3] = opts;
+@@ -464,7 +464,7 @@ nfs_disable_share_one(const char *sharepath, const char *host,
+ 	fprintf(stderr, "unsharing %s\n", hostpath);
+ #endif
+ 
+-	argv[0] = "/usr/sbin/exportfs";
++	argv[0] = "/run/current-system/sw/bin/exportfs";
+ 	argv[1] = "-u";
+ 	argv[2] = hostpath;
+ 	argv[3] = NULL;
+@@ -715,7 +715,7 @@ nfs_check_exportfs(void)
+ 	if (dup2(nfs_exportfs_temp_fd, STDOUT_FILENO) < 0)
+ 		exit(1);
+ 
+-	rc = execlp("/usr/sbin/exportfs", "exportfs", "-v", NULL);
++	rc = execlp("/run/current-system/sw/bin/exportfs", "exportfs", "-v", NULL);
+ 
+ 	if (rc < 0) {
+ 		exit(1);
+diff --git a/lib/libzfs/libzfs_mount.c b/lib/libzfs/libzfs_mount.c
+index 59b98a284..b1d52b9ec 100644
+--- a/lib/libzfs/libzfs_mount.c
++++ b/lib/libzfs/libzfs_mount.c
+@@ -350,7 +350,7 @@ static int
+ do_mount(const char *src, const char *mntpt, char *opts)
+ {
+ 	char *argv[9] = {
+-	    "/bin/mount",
++	    "/run/current-system/sw/bin/mount",
+ 	    "--no-canonicalize",
+ 	    "-t", MNTTYPE_ZFS,
+ 	    "-o", opts,
+@@ -387,7 +387,7 @@ do_unmount(const char *mntpt, int flags)
+ 	char force_opt[] = "-f";
+ 	char lazy_opt[] = "-l";
+ 	char *argv[7] = {
+-	    "/bin/umount",
++	    "/run/current-system/sw/bin/umount",
+ 	    "-t", MNTTYPE_ZFS,
+ 	    NULL, NULL, NULL, NULL };
+ 	int rc, count = 3;
+diff --git a/lib/libzfs/libzfs_util.c b/lib/libzfs/libzfs_util.c
+index a19b34415..2439607e2 100644
+--- a/lib/libzfs/libzfs_util.c
++++ b/lib/libzfs/libzfs_util.c
+@@ -67,7 +67,7 @@ libzfs_error_init(int error)
+ 	switch (error) {
+ 	case ENXIO:
+ 		return (dgettext(TEXT_DOMAIN, "The ZFS modules are not "
+-		    "loaded.\nTry running '/sbin/modprobe zfs' as root "
++		    "loaded.\nTry running '/run/current-system/sw/bin/modprobe zfs' as root "
+ 		    "to load them.\n"));
+ 	case ENOENT:
+ 		return (dgettext(TEXT_DOMAIN, "/dev/zfs and /proc/self/mounts "
+@@ -75,7 +75,7 @@ libzfs_error_init(int error)
+ 		    "-t proc proc /proc' as root.\n"));
+ 	case ENOEXEC:
+ 		return (dgettext(TEXT_DOMAIN, "The ZFS modules cannot be "
+-		    "auto-loaded.\nTry running '/sbin/modprobe zfs' as "
++		    "auto-loaded.\nTry running '/run/current-system/sw/bin/modprobe zfs' as "
+ 		    "root to manually load them.\n"));
+ 	case EACCES:
+ 		return (dgettext(TEXT_DOMAIN, "Permission denied the "
+@@ -980,7 +980,7 @@ libzfs_envvar_is_set(char *envvar)
+ static int
+ libzfs_load_module(const char *module)
+ {
+-	char *argv[4] = {"/sbin/modprobe", "-q", (char *)module, (char *)0};
++	char *argv[4] = {"/run/current-system/sw/bin/modprobe", "-q", (char *)module, (char *)0};
+ 	char *load_str, *timeout_str;
+ 	long timeout = 10; /* seconds */
+ 	long busy_timeout = 10; /* milliseconds */
+@@ -999,7 +999,7 @@ libzfs_load_module(const char *module)
+ 		}
+ 
+ 		if (load) {
+-			if (libzfs_run_process("/sbin/modprobe", argv, 0))
++			if (libzfs_run_process("/run/current-system/sw/biin/modprobe", argv, 0))
+ 				return (ENOEXEC);
+ 
+ 			if (!libzfs_module_loaded(module))
+diff --git a/udev/rules.d/90-zfs.rules.in b/udev/rules.d/90-zfs.rules.in
+index 82f8cf1cf..6cf5638a2 100644
+--- a/udev/rules.d/90-zfs.rules.in
++++ b/udev/rules.d/90-zfs.rules.in
+@@ -1,8 +1,8 @@
+ SUBSYSTEM!="block|misc", GOTO="zfs_end"
+ ACTION!="add|change", GOTO="zfs_end"
+ 
+-ENV{ID_FS_TYPE}=="zfs", RUN+="/sbin/modprobe zfs"
+-ENV{ID_FS_TYPE}=="zfs_member", RUN+="/sbin/modprobe zfs"
++ENV{ID_FS_TYPE}=="zfs", RUN+="/run/current-system/sw/bin/modprobe zfs"
++ENV{ID_FS_TYPE}=="zfs_member", RUN+="/run/current-system/sw/bin/modprobe zfs"
+ 
+ KERNEL=="null", SYMLINK+="root"
+ SYMLINK=="null", SYMLINK+="root"
+-- 
+2.17.1
+
