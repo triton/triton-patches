@@ -1,0 +1,185 @@
+From 1a79ea3a74bfebab7f3d60274f87a53819029518 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 6 Aug 2018 11:35:14 -0700
+Subject: [PATCH 3/3] Remove nixpkgs references
+
+---
+ scripts/nix-profile-daemon.sh.in         |  4 ---
+ scripts/nix-profile.sh.in                | 12 -------
+ src/nix-build/nix-build.cc               | 41 +++---------------------
+ src/nix-prefetch-url/nix-prefetch-url.cc | 20 +-----------
+ src/nix/repl.cc                          |  8 +----
+ 5 files changed, 7 insertions(+), 78 deletions(-)
+
+diff --git a/scripts/nix-profile-daemon.sh.in b/scripts/nix-profile-daemon.sh.in
+index 445356da..0e9f7e78 100644
+--- a/scripts/nix-profile-daemon.sh.in
++++ b/scripts/nix-profile-daemon.sh.in
+@@ -27,10 +27,6 @@ if test -w $HOME; then
+       fi
+   fi
+ 
+-  # Subscribe the root user to the NixOS channel by default.
+-  if [ "$USER" = root -a ! -e $HOME/.nix-channels ]; then
+-      echo "https://nixos.org/channels/nixpkgs-unstable nixpkgs" > $HOME/.nix-channels
+-  fi
+ 
+   # Create the per-user garbage collector roots directory.
+   NIX_USER_GCROOTS_DIR=@localstatedir@/nix/gcroots/per-user/$USER
+diff --git a/scripts/nix-profile.sh.in b/scripts/nix-profile.sh.in
+index a5f52274..cc57e766 100644
+--- a/scripts/nix-profile.sh.in
++++ b/scripts/nix-profile.sh.in
+@@ -3,7 +3,6 @@ if [ -n "$HOME" ] && [ -n "$USER" ]; then
+     export PATH=@coreutils@
+ 
+     # Set up the per-user profile.
+-    # This part should be kept in sync with nixpkgs:nixos/modules/programs/shell.nix
+ 
+     NIX_LINK=$HOME/.nix-profile
+ 
+@@ -28,11 +27,6 @@ if [ -n "$HOME" ] && [ -n "$USER" ]; then
+             fi
+         fi
+ 
+-        # Subscribe the user to the unstable Nixpkgs channel by default.
+-        if [ ! -e "$HOME/.nix-channels" ]; then
+-            echo "https://nixos.org/channels/nixpkgs-unstable nixpkgs" > "$HOME/.nix-channels"
+-        fi
+-
+         # Create the per-user garbage collector roots directory.
+         __user_gcroots=@localstatedir@/nix/gcroots/per-user/"$USER"
+         mkdir -m 0755 -p "$__user_gcroots"
+@@ -51,13 +45,7 @@ if [ -n "$HOME" ] && [ -n "$USER" ]; then
+         unset __nix_defexpr
+     fi
+ 
+-    # Append ~/.nix-defexpr/channels/nixpkgs to $NIX_PATH so that
+-    # <nixpkgs> paths work when the user has fetched the Nixpkgs
+-    # channel.
+-    export NIX_PATH="${NIX_PATH:+$NIX_PATH:}nixpkgs=$HOME/.nix-defexpr/channels/nixpkgs"
+-
+     # Set up environment.
+-    # This part should be kept in sync with nixpkgs:nixos/modules/programs/environment.nix
+     NIX_PROFILES="@localstatedir@/nix/profiles/default $NIX_USER_PROFILE_DIR"
+ 
+     # Set $NIX_SSL_CERT_FILE so that Nixpkgs applications like curl work.
+diff --git a/src/nix-build/nix-build.cc b/src/nix-build/nix-build.cc
+index 01aafae6..3372ac43 100755
+--- a/src/nix-build/nix-build.cc
++++ b/src/nix-build/nix-build.cc
+@@ -234,8 +234,8 @@ void mainWrapped(int argc, char * * argv)
+ 
+     initPlugins();
+ 
+-    if (packages && fromArgs)
+-        throw UsageError("'-p' and '-E' are mutually exclusive");
++    if (packages)
++        throw UsageError("'-p' is not supported");
+ 
+     auto store = openStore();
+ 
+@@ -244,15 +244,7 @@ void mainWrapped(int argc, char * * argv)
+ 
+     Bindings & autoArgs = *myArgs.getAutoArgs(state);
+ 
+-    if (packages) {
+-        std::ostringstream joined;
+-        joined << "with import <nixpkgs> { }; (pkgs.runCommandCC or pkgs.runCommand) \"shell\" { buildInputs = [ ";
+-        for (const auto & i : left)
+-            joined << '(' << i << ") ";
+-        joined << "]; } \"\"";
+-        fromArgs = true;
+-        left = {joined.str()};
+-    } else if (!fromArgs) {
++    if (!fromArgs) {
+         if (left.empty() && runEnv && pathExists("shell.nix"))
+             left = {"shell.nix"};
+         if (left.empty())
+@@ -321,31 +313,8 @@ void mainWrapped(int argc, char * * argv)
+         PathSet pathsToBuild;
+ 
+         /* Figure out what bash shell to use. If $NIX_BUILD_SHELL
+-           is not set, then build bashInteractive from
+-           <nixpkgs>. */
+-        auto shell = getEnv("NIX_BUILD_SHELL", "");
+-
+-        if (shell == "") {
+-
+-            try {
+-                auto expr = state.parseExprFromString("(import <nixpkgs> {}).bashInteractive", absPath("."));
+-
+-                Value v;
+-                state.eval(expr, v);
+-
+-                auto drv = getDerivation(state, v, false);
+-                if (!drv)
+-                    throw Error("the 'bashInteractive' attribute in <nixpkgs> did not evaluate to a derivation");
+-
+-                pathsToBuild.insert(drv->queryDrvPath());
+-
+-                shell = drv->queryOutPath() + "/bin/bash";
+-
+-            } catch (Error & e) {
+-                printError("warning: %s; will use bash from your environment", e.what());
+-                shell = "bash";
+-            }
+-        }
++           is not set, then use bash from the env */
++        auto shell = getEnv("NIX_BUILD_SHELL", "bash");
+ 
+         // Build or fetch all dependencies of the derivation.
+         for (const auto & input : drv.inputDrvs)
+diff --git a/src/nix-prefetch-url/nix-prefetch-url.cc b/src/nix-prefetch-url/nix-prefetch-url.cc
+index fa7ee254..b6760e07 100644
+--- a/src/nix-prefetch-url/nix-prefetch-url.cc
++++ b/src/nix-prefetch-url/nix-prefetch-url.cc
+@@ -18,25 +18,7 @@ string resolveMirrorUri(EvalState & state, string uri)
+ {
+     if (string(uri, 0, 9) != "mirror://") return uri;
+ 
+-    string s(uri, 9);
+-    auto p = s.find('/');
+-    if (p == string::npos) throw Error("invalid mirror URI");
+-    string mirrorName(s, 0, p);
+-
+-    Value vMirrors;
+-    state.eval(state.parseExprFromString("import <nixpkgs/pkgs/build-support/fetchurl/mirrors.nix>", "."), vMirrors);
+-    state.forceAttrs(vMirrors);
+-
+-    auto mirrorList = vMirrors.attrs->find(state.symbols.create(mirrorName));
+-    if (mirrorList == vMirrors.attrs->end())
+-        throw Error(format("unknown mirror name '%1%'") % mirrorName);
+-    state.forceList(*mirrorList->value);
+-
+-    if (mirrorList->value->listSize() < 1)
+-        throw Error(format("mirror URI '%1%' did not expand to anything") % uri);
+-
+-    string mirror = state.forceString(*mirrorList->value->listElems()[0]);
+-    return mirror + (hasSuffix(mirror, "/") ? "" : "/") + string(s, p + 1);
++    throw Error("Mirror urls are unsupported currently");
+ }
+ 
+ 
+diff --git a/src/nix/repl.cc b/src/nix/repl.cc
+index f84774a5..f8053185 100644
+--- a/src/nix/repl.cc
++++ b/src/nix/repl.cc
+@@ -367,13 +367,7 @@ bool NixRepl::processLine(string line)
+         std::cout << showType(v) << std::endl;
+ 
+     } else if (command == ":u") {
+-        Value v, f, result;
+-        evalString(arg, v);
+-        evalString("drv: (import <nixpkgs> {}).runCommand \"shell\" { buildInputs = [ drv ]; } \"\"", f);
+-        state.callFunction(f, v, result, Pos());
+-
+-        Path drvPath = getDerivationPath(result);
+-        runProgram(settings.nixBinDir + "/nix-shell", Strings{drvPath});
++        throw Error(":u is currently unsupported");
+     }
+ 
+     else if (command == ":b" || command == ":i" || command == ":s") {
+-- 
+2.18.0.597.ga71716f1ad-goog
+
