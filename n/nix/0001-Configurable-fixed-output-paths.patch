@@ -1,23 +1,25 @@
-From 6a93444cef775b4bc6e37b145a8dd09ccbd9a1b2 Mon Sep 17 00:00:00 2001
+From 2918b3d2011e184bc69d7eda02495bfeb0010534 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 10:34:15 -0700
 Subject: [PATCH 1/4] Configurable fixed output paths
 
 ---
- src/libstore/build.cc   | 2 ++
+ src/libstore/build.cc   | 4 ++++
  src/libstore/globals.hh | 3 +++
- 2 files changed, 5 insertions(+)
+ 2 files changed, 7 insertions(+)
 
 diff --git a/src/libstore/build.cc b/src/libstore/build.cc
-index 6de437f3..5029fb78 100644
+index 6de437f3..8e9fbd91 100644
 --- a/src/libstore/build.cc
 +++ b/src/libstore/build.cc
-@@ -1888,6 +1888,8 @@ void DerivationGoal::startBuilder()
+@@ -1888,6 +1888,10 @@ void DerivationGoal::startBuilder()
          PathSet dirs = settings.sandboxPaths;
          PathSet dirs2 = settings.extraSandboxPaths;
          dirs.insert(dirs2.begin(), dirs2.end());
-+        if (fixedOutput)
-+          dirs.insert(PathSet(fixedOutputSandboxPaths));
++        if (fixedOutput) {
++          PathSet dirs3 = settings.fixedOutputSandboxPaths;
++          dirs.insert(dirs3.begin(), dirs3.end());
++        }
  
          dirsInChroot.clear();
  
