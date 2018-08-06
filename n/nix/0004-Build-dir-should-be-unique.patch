@@ -1,4 +1,4 @@
-From dddc1e3cc6faa5cc94ce6bddb148157ad252a07a Mon Sep 17 00:00:00 2001
+From 696a60b2b7e7d4ee88b2dd2f15670a425c263c9b Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 11:50:36 -0700
 Subject: [PATCH 4/4] Build dir should be unique
@@ -8,7 +8,7 @@ Subject: [PATCH 4/4] Build dir should be unique
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/libstore/build.cc b/src/libstore/build.cc
-index 5029fb78..c3578788 100644
+index 8e9fbd91..1acd045f 100644
 --- a/src/libstore/build.cc
 +++ b/src/libstore/build.cc
 @@ -1841,7 +1841,7 @@ void DerivationGoal::startBuilder()
