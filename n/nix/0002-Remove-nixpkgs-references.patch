@@ -1,0 +1,66 @@
+From 98472b35509536a62a787ca2f50619e7fe88d0b3 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 6 Aug 2018 10:41:34 -0700
+Subject: [PATCH 2/3] Remove nixpkgs references
+
+---
+ scripts/nix-profile-daemon.sh.in |  4 ----
+ scripts/nix-profile.sh.in        | 12 ------------
+ 2 files changed, 16 deletions(-)
+
+diff --git a/scripts/nix-profile-daemon.sh.in b/scripts/nix-profile-daemon.sh.in
+index 445356da..0e9f7e78 100644
+--- a/scripts/nix-profile-daemon.sh.in
++++ b/scripts/nix-profile-daemon.sh.in
+@@ -27,10 +27,6 @@ if test -w $HOME; then
+       fi
+   fi
+ 
+-  # Subscribe the root user to the NixOS channel by default.
+-  if [ "$USER" = root -a ! -e $HOME/.nix-channels ]; then
+-      echo "https://nixos.org/channels/nixpkgs-unstable nixpkgs" > $HOME/.nix-channels
+-  fi
+ 
+   # Create the per-user garbage collector roots directory.
+   NIX_USER_GCROOTS_DIR=@localstatedir@/nix/gcroots/per-user/$USER
+diff --git a/scripts/nix-profile.sh.in b/scripts/nix-profile.sh.in
+index a5f52274..cc57e766 100644
+--- a/scripts/nix-profile.sh.in
++++ b/scripts/nix-profile.sh.in
+@@ -3,7 +3,6 @@ if [ -n "$HOME" ] && [ -n "$USER" ]; then
+     export PATH=@coreutils@
+ 
+     # Set up the per-user profile.
+-    # This part should be kept in sync with nixpkgs:nixos/modules/programs/shell.nix
+ 
+     NIX_LINK=$HOME/.nix-profile
+ 
+@@ -28,11 +27,6 @@ if [ -n "$HOME" ] && [ -n "$USER" ]; then
+             fi
+         fi
+ 
+-        # Subscribe the user to the unstable Nixpkgs channel by default.
+-        if [ ! -e "$HOME/.nix-channels" ]; then
+-            echo "https://nixos.org/channels/nixpkgs-unstable nixpkgs" > "$HOME/.nix-channels"
+-        fi
+-
+         # Create the per-user garbage collector roots directory.
+         __user_gcroots=@localstatedir@/nix/gcroots/per-user/"$USER"
+         mkdir -m 0755 -p "$__user_gcroots"
+@@ -51,13 +45,7 @@ if [ -n "$HOME" ] && [ -n "$USER" ]; then
+         unset __nix_defexpr
+     fi
+ 
+-    # Append ~/.nix-defexpr/channels/nixpkgs to $NIX_PATH so that
+-    # <nixpkgs> paths work when the user has fetched the Nixpkgs
+-    # channel.
+-    export NIX_PATH="${NIX_PATH:+$NIX_PATH:}nixpkgs=$HOME/.nix-defexpr/channels/nixpkgs"
+-
+     # Set up environment.
+-    # This part should be kept in sync with nixpkgs:nixos/modules/programs/environment.nix
+     NIX_PROFILES="@localstatedir@/nix/profiles/default $NIX_USER_PROFILE_DIR"
+ 
+     # Set $NIX_SSL_CERT_FILE so that Nixpkgs applications like curl work.
+-- 
+2.18.0.597.ga71716f1ad-goog
+
