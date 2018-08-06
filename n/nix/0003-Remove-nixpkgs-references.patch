@@ -1,7 +1,7 @@
-From 1a79ea3a74bfebab7f3d60274f87a53819029518 Mon Sep 17 00:00:00 2001
+From a5a3aaec185a3dfc2980e91aff83613b7dcaf79c Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 11:35:14 -0700
-Subject: [PATCH 3/3] Remove nixpkgs references
+Subject: [PATCH 3/4] Remove nixpkgs references
 
 ---
  scripts/nix-profile-daemon.sh.in         |  4 ---
