@@ -1,0 +1,63 @@
+From f5d906ac508631030ecdd8d25f53b18329ccb46f Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 6 Aug 2018 10:50:31 -0700
+Subject: [PATCH 2/3] Remove hardcoded nixos.org references
+
+---
+ src/libstore/download.cc | 5 +----
+ src/libstore/globals.hh  | 8 ++++----
+ 2 files changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/src/libstore/download.cc b/src/libstore/download.cc
+index c443887f..6a93996b 100644
+--- a/src/libstore/download.cc
++++ b/src/libstore/download.cc
+@@ -38,10 +38,7 @@ double getTime()
+ 
+ std::string resolveUri(const std::string & uri)
+ {
+-    if (uri.compare(0, 8, "channel:") == 0)
+-        return "https://nixos.org/channels/" + std::string(uri, 8) + "/nixexprs.tar.xz";
+-    else
+-        return uri;
++    return uri;
+ }
+ 
+ ref<std::string> decodeContent(const std::string & encoding, ref<std::string> data)
+diff --git a/src/libstore/globals.hh b/src/libstore/globals.hh
+index 117404ec..a564e099 100644
+--- a/src/libstore/globals.hh
++++ b/src/libstore/globals.hh
+@@ -272,7 +272,7 @@ public:
+         "Whether to fail if repeated builds produce different output."};
+ 
+     Setting<Strings> trustedPublicKeys{this,
+-        {"cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="},
++        Strings(),
+         "trusted-public-keys",
+         "Trusted public keys for secure substitution.",
+         {"binary-cache-public-keys"}};
+@@ -296,9 +296,9 @@ public:
+         "listed in 'trusted-public-keys'."};
+ 
+     Setting<Strings> substituters{this,
+-        nixStore == "/nix/store" ? Strings{"https://cache.nixos.org/"} : Strings(),
++        Strings(),
+         "substituters",
+-        "The URIs of substituters (such as https://cache.nixos.org/).",
++        "The URIs of substituters.",
+         {"binary-caches"}};
+ 
+     // FIXME: provide a way to add to option values.
+@@ -359,7 +359,7 @@ public:
+         "setuid/setgid bits or with file capabilities."};
+ #endif
+ 
+-    Setting<Strings> hashedMirrors{this, {"http://tarballs.nixos.org/"}, "hashed-mirrors",
++    Setting<Strings> hashedMirrors{this, Strings(), "hashed-mirrors",
+         "A list of servers used by builtins.fetchurl to fetch files by hash."};
+ 
+     Setting<uint64_t> minFree{this, 0, "min-free",
+-- 
+2.18.0.597.ga71716f1ad-goog
+
