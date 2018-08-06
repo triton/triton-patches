@@ -1,7 +1,7 @@
 From c5daaee2f6e598692b9b390afeb4a2dca217261d Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 10:50:31 -0700
-Subject: [PATCH 2/4] Remove hardcoded nixos.org references
+Subject: [PATCH 2/8] Remove hardcoded nixos.org references
 
 ---
  src/libstore/download.cc | 5 +----
