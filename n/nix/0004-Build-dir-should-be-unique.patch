@@ -1,0 +1,25 @@
+From f0ad52c0ae10711c1c8851385bd8849587cf5a12 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 6 Aug 2018 11:50:36 -0700
+Subject: [PATCH 4/4] Build dir should be unique
+
+---
+ src/libstore/globals.hh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libstore/globals.hh b/src/libstore/globals.hh
+index a564e099..360f67da 100644
+--- a/src/libstore/globals.hh
++++ b/src/libstore/globals.hh
+@@ -247,7 +247,7 @@ public:
+     Setting<std::string> sandboxShmSize{this, "50%", "sandbox-dev-shm-size",
+         "The size of /dev/shm in the build sandbox."};
+ 
+-    Setting<Path> sandboxBuildDir{this, "/build", "sandbox-build-dir",
++    Setting<Path> sandboxBuildDir{this, "/nix-build-dir", "sandbox-build-dir",
+         "The build directory inside the sandbox."};
+ #endif
+ 
+-- 
+2.18.0.597.ga71716f1ad-goog
+
