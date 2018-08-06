@@ -1,0 +1,40 @@
+From 6a93444cef775b4bc6e37b145a8dd09ccbd9a1b2 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 6 Aug 2018 10:34:15 -0700
+Subject: [PATCH 1/4] Configurable fixed output paths
+
+---
+ src/libstore/build.cc   | 2 ++
+ src/libstore/globals.hh | 3 +++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/src/libstore/build.cc b/src/libstore/build.cc
+index 6de437f3..5029fb78 100644
+--- a/src/libstore/build.cc
++++ b/src/libstore/build.cc
+@@ -1888,6 +1888,8 @@ void DerivationGoal::startBuilder()
+         PathSet dirs = settings.sandboxPaths;
+         PathSet dirs2 = settings.extraSandboxPaths;
+         dirs.insert(dirs2.begin(), dirs2.end());
++        if (fixedOutput)
++          dirs.insert(PathSet(fixedOutputSandboxPaths));
+ 
+         dirsInChroot.clear();
+ 
+diff --git a/src/libstore/globals.hh b/src/libstore/globals.hh
+index 117404ec..e256e669 100644
+--- a/src/libstore/globals.hh
++++ b/src/libstore/globals.hh
+@@ -232,6 +232,9 @@ public:
+         "Additional paths to make available inside the build sandbox.",
+         {"build-extra-chroot-dirs", "build-extra-sandbox-paths"}};
+ 
++    Setting<PathSet> fixedOutputSandboxPaths{this, {}, "fixed-output-sandbox-paths",
++        "The paths to make available inside the build sandbox of fixed output derivations."};
++
+     Setting<bool> restrictEval{this, false, "restrict-eval",
+         "Whether to restrict file system access to paths in $NIX_PATH, "
+         "and network access to the URI prefixes listed in 'allowed-uris'."};
+-- 
+2.18.0.597.ga71716f1ad-goog
+
