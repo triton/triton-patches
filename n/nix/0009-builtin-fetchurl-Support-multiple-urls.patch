@@ -1,4 +1,4 @@
-From 05f58bf63185aebf42ac8c3d114608543814223b Mon Sep 17 00:00:00 2001
+From 4e94456f8b9658215563579bd30f5e73320ed273 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 12 Aug 2018 17:13:24 -0700
 Subject: [PATCH 9/9] builtin:fetchurl: Support multiple urls
