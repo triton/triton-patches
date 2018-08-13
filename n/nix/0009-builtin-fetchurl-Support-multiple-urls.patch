@@ -1,12 +1,12 @@
-From 436b2b575271b7cdd8fb005b757a8ffd19b7382a Mon Sep 17 00:00:00 2001
+From 43d361ba8c8ea7565408d67ef0ebae87f787aab0 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 12 Aug 2018 17:13:24 -0700
 Subject: [PATCH 9/9] builtin:fetchurl: Support multiple urls
 
 ---
  corepkgs/fetchurl.nix    |  7 +++----
- src/libstore/builtins.cc | 34 +++++++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 5 deletions(-)
+ src/libstore/builtins.cc | 37 ++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 39 insertions(+), 5 deletions(-)
 
 diff --git a/corepkgs/fetchurl.nix b/corepkgs/fetchurl.nix
 index 0ce1bab1..be3d62f7 100644
@@ -37,10 +37,10 @@ index 0ce1bab1..be3d62f7 100644
 +  urls = (if url != "" then [ url ] else [ ]) ++ urls;
  }
 diff --git a/src/libstore/builtins.cc b/src/libstore/builtins.cc
-index 4f106698..4f6a7963 100644
+index 4f106698..333ea8b8 100644
 --- a/src/libstore/builtins.cc
 +++ b/src/libstore/builtins.cc
-@@ -49,7 +49,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+@@ -49,7 +49,42 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
                  debug(e.what());
              }
  
@@ -56,16 +56,19 @@ index 4f106698..4f6a7963 100644
 +            size_t url_begin = 0;
 +            while (true)
 +            {
-+                size_t newline = urlsi->second.find(' ', url_begin);
-+                if (newline == std::string::npos)
-+                    newline = urlsi->second.size();
-+                if (url_begin < newline)
-+                    urls.push_back(urlsi->second.substr(url_begin, newline - url_begin));
-+                if (newline == urlsi->second.size())
++                size_t separator = urlsi->second.find(' ', url_begin);
++                if (separator == std::string::npos)
++                    separator = urlsi->second.size();
++                if (url_begin < separator)
++                    urls.push_back(urlsi->second.substr(url_begin, separator - url_begin));
++                if (separator == urlsi->second.size())
 +                    break;
-+                url_begin = newline + 1;
++                url_begin = separator + 1;
 +            }
 +        }
++
++        for (auto url : urls)
++            debug(format("builtin:fetchurl got url: %1%") % url);
 +
 +        for (auto url : urls)
 +            try {
