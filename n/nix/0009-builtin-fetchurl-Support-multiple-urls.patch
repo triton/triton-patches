@@ -1,12 +1,41 @@
-From 62596c663143b21c6beeb88b2cb7f7c91ea560ac Mon Sep 17 00:00:00 2001
+From 05f58bf63185aebf42ac8c3d114608543814223b Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 12 Aug 2018 17:13:24 -0700
 Subject: [PATCH 9/9] builtin:fetchurl: Support multiple urls
 
 ---
+ corepkgs/fetchurl.nix    |  7 +++----
  src/libstore/builtins.cc | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+ 2 files changed, 36 insertions(+), 5 deletions(-)
 
+diff --git a/corepkgs/fetchurl.nix b/corepkgs/fetchurl.nix
+index 0ce1bab1..54620077 100644
+--- a/corepkgs/fetchurl.nix
++++ b/corepkgs/fetchurl.nix
+@@ -1,5 +1,5 @@
+ { system ? "" # obsolete
+-, url
++, url ? "", urls ? [ ]
+ , md5 ? "", sha1 ? "", sha256 ? "", sha512 ? ""
+ , outputHash ?
+     if sha512 != "" then sha512 else if sha1 != "" then sha1 else if md5 != "" then md5 else sha256
+@@ -17,7 +17,7 @@ derivation {
+   inherit outputHashAlgo outputHash;
+   outputHashMode = if unpack || executable then "recursive" else "flat";
+ 
+-  inherit name url executable unpack;
++  inherit name executable unpack;
+ 
+   system = "builtin";
+ 
+@@ -32,6 +32,5 @@ derivation {
+     "http_proxy" "https_proxy" "ftp_proxy" "all_proxy" "no_proxy"
+   ];
+ 
+-  # To make "nix-prefetch-url" work.
+-  urls = [ url ];
++  urls = (if (url != "") then [ url ] else [ ]) ++ urls;
+ }
 diff --git a/src/libstore/builtins.cc b/src/libstore/builtins.cc
 index 4f106698..d8807781 100644
 --- a/src/libstore/builtins.cc
