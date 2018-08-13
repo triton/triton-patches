@@ -1,4 +1,4 @@
-From 4e94456f8b9658215563579bd30f5e73320ed273 Mon Sep 17 00:00:00 2001
+From 436b2b575271b7cdd8fb005b757a8ffd19b7382a Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 12 Aug 2018 17:13:24 -0700
 Subject: [PATCH 9/9] builtin:fetchurl: Support multiple urls
@@ -9,7 +9,7 @@ Subject: [PATCH 9/9] builtin:fetchurl: Support multiple urls
  2 files changed, 36 insertions(+), 5 deletions(-)
 
 diff --git a/corepkgs/fetchurl.nix b/corepkgs/fetchurl.nix
-index 0ce1bab1..54620077 100644
+index 0ce1bab1..be3d62f7 100644
 --- a/corepkgs/fetchurl.nix
 +++ b/corepkgs/fetchurl.nix
 @@ -1,5 +1,5 @@
@@ -34,10 +34,10 @@ index 0ce1bab1..54620077 100644
  
 -  # To make "nix-prefetch-url" work.
 -  urls = [ url ];
-+  urls = (if (url != "") then [ url ] else [ ]) ++ urls;
++  urls = (if url != "" then [ url ] else [ ]) ++ urls;
  }
 diff --git a/src/libstore/builtins.cc b/src/libstore/builtins.cc
-index 4f106698..d8807781 100644
+index 4f106698..4f6a7963 100644
 --- a/src/libstore/builtins.cc
 +++ b/src/libstore/builtins.cc
 @@ -49,7 +49,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
@@ -56,7 +56,7 @@ index 4f106698..d8807781 100644
 +            size_t url_begin = 0;
 +            while (true)
 +            {
-+                size_t newline = urlsi->second.find('\n', url_begin);
++                size_t newline = urlsi->second.find(' ', url_begin);
 +                if (newline == std::string::npos)
 +                    newline = urlsi->second.size();
 +                if (url_begin < newline)
