@@ -1,0 +1,57 @@
+From 62596c663143b21c6beeb88b2cb7f7c91ea560ac Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sun, 12 Aug 2018 17:13:24 -0700
+Subject: [PATCH 9/9] builtin:fetchurl: Support multiple urls
+
+---
+ src/libstore/builtins.cc | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/src/libstore/builtins.cc b/src/libstore/builtins.cc
+index 4f106698..d8807781 100644
+--- a/src/libstore/builtins.cc
++++ b/src/libstore/builtins.cc
+@@ -49,7 +49,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+                 debug(e.what());
+             }
+ 
+-    if (!data) data = fetch(getAttr("url"));
++    if (!data) {
++        std::vector<std::string> urls;
++        auto urli = drv.env.find("url");
++        if (urli != drv.env.end() && urli->second.size() > 0)
++            urls.push_back(urli->second);
++        auto urlsi = drv.env.find("urls");
++        if (urlsi != drv.env.end())
++        {
++            size_t url_begin = 0;
++            while (true)
++            {
++                size_t newline = urlsi->second.find('\n', url_begin);
++                if (newline == std::string::npos)
++                    newline = urlsi->second.size();
++                if (url_begin < newline)
++                    urls.push_back(urlsi->second.substr(url_begin, newline - url_begin));
++                if (newline == urlsi->second.size())
++                    break;
++                url_begin = newline + 1;
++            }
++        }
++
++        for (auto url : urls)
++            try {
++                data = fetch(url);
++                break;
++            } catch (Error & e) {
++                debug(e.what());
++            }
++    }
++
++    if (!data)
++        throw Error("Failed to fetch data, maybe missing URLs.");
+ 
+     Path storePath = getAttr("out");
+ 
+-- 
+2.18.0
+
