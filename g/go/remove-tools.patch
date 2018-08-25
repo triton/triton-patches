@@ -1,12 +1,12 @@
 diff --git a/src/go/build/gc.go b/src/go/build/gc.go
-index e2be2cbb1d..4c20e42edf 100644
+index e2be2cbb1d..fb7001d601 100644
 --- a/src/go/build/gc.go
 +++ b/src/go/build/gc.go
 @@ -17,6 +17,10 @@ import (
  
  // getToolDir returns the default value of ToolDir.
  func getToolDir() string {
-+	s := gogetenv("GOTOOLDIR")
++	s := os.Getenv("GOTOOLDIR")
 +	if s != "" {
 +		return s
 +	}
