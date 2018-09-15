@@ -1,8 +1,8 @@
-diff --git a/crypto/include/internal/cryptlib.h b/crypto/include/internal/cryptlib.h
-index 91267b7..182aa85 100644
---- a/crypto/include/internal/cryptlib.h
-+++ b/crypto/include/internal/cryptlib.h
-@@ -42,7 +42,7 @@ DEFINE_LHASH_OF(MEM);
+diff --git a/include/internal/cryptlib.h b/include/internal/cryptlib.h
+index a608735187..b41e52628f 100644
+--- a/include/internal/cryptlib.h
++++ b/include/internal/cryptlib.h
+@@ -56,7 +56,7 @@ DEFINE_LHASH_OF(MEM);
  # ifndef OPENSSL_SYS_VMS
  #  define X509_CERT_AREA          OPENSSLDIR
  #  define X509_CERT_DIR           OPENSSLDIR "/certs"
