@@ -1,12 +1,12 @@
-From 43d361ba8c8ea7565408d67ef0ebae87f787aab0 Mon Sep 17 00:00:00 2001
+From 854d31c7a8f035cf2029cc8b261233f638118701 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 12 Aug 2018 17:13:24 -0700
-Subject: [PATCH 9/9] builtin:fetchurl: Support multiple urls
+Subject: [PATCH 09/10] builtin:fetchurl: Support multiple urls
 
 ---
- corepkgs/fetchurl.nix    |  7 +++----
- src/libstore/builtins.cc | 37 ++++++++++++++++++++++++++++++++++++-
- 2 files changed, 39 insertions(+), 5 deletions(-)
+ corepkgs/fetchurl.nix             |  7 +++----
+ src/libstore/builtins/fetchurl.cc | 34 ++++++++++++++++++++++++++++++-
+ 2 files changed, 36 insertions(+), 5 deletions(-)
 
 diff --git a/corepkgs/fetchurl.nix b/corepkgs/fetchurl.nix
 index 0ce1bab1..be3d62f7 100644
@@ -36,54 +36,51 @@ index 0ce1bab1..be3d62f7 100644
 -  urls = [ url ];
 +  urls = (if url != "" then [ url ] else [ ]) ++ urls;
  }
-diff --git a/src/libstore/builtins.cc b/src/libstore/builtins.cc
-index 4f106698..333ea8b8 100644
---- a/src/libstore/builtins.cc
-+++ b/src/libstore/builtins.cc
-@@ -49,7 +49,42 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
-                 debug(e.what());
+diff --git a/src/libstore/builtins/fetchurl.cc b/src/libstore/builtins/fetchurl.cc
+index 454ea56c..6b62d4b9 100644
+--- a/src/libstore/builtins/fetchurl.cc
++++ b/src/libstore/builtins/fetchurl.cc
+@@ -69,7 +69,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
              }
  
--    if (!data) data = fetch(getAttr("url"));
-+    if (!data) {
-+        std::vector<std::string> urls;
-+        auto urli = drv.env.find("url");
-+        if (urli != drv.env.end() && urli->second.size() > 0)
-+            urls.push_back(urli->second);
-+        auto urlsi = drv.env.find("urls");
-+        if (urlsi != drv.env.end())
+     /* Otherwise try the specified URL. */
+-    fetch(mainUrl);
++    std::vector<std::string> urls;
++    auto urli = drv.env.find("url");
++    if (urli != drv.env.end() && urli->second.size() > 0)
++        urls.push_back(urli->second);
++    auto urlsi = drv.env.find("urls");
++    if (urlsi != drv.env.end())
++    {
++        size_t url_begin = 0;
++        while (true)
 +        {
-+            size_t url_begin = 0;
-+            while (true)
-+            {
-+                size_t separator = urlsi->second.find(' ', url_begin);
-+                if (separator == std::string::npos)
-+                    separator = urlsi->second.size();
-+                if (url_begin < separator)
-+                    urls.push_back(urlsi->second.substr(url_begin, separator - url_begin));
-+                if (separator == urlsi->second.size())
-+                    break;
-+                url_begin = separator + 1;
-+            }
-+        }
-+
-+        for (auto url : urls)
-+            debug(format("builtin:fetchurl got url: %1%") % url);
-+
-+        for (auto url : urls)
-+            try {
-+                data = fetch(url);
++            size_t separator = urlsi->second.find(' ', url_begin);
++            if (separator == std::string::npos)
++                separator = urlsi->second.size();
++            if (url_begin < separator)
++                urls.push_back(urlsi->second.substr(url_begin, separator - url_begin));
++            if (separator == urlsi->second.size())
 +                break;
-+            } catch (Error & e) {
-+                debug(e.what());
-+            }
++            url_begin = separator + 1;
++        }
 +    }
 +
-+    if (!data)
-+        throw Error("Failed to fetch data, maybe missing URLs.");
++    for (auto url : urls)
++        debug(format("builtin:fetchurl using url: %1%") % url);
++
++    for (auto url : urls)
++        try {
++            fetch(url);
++            return;
++        } catch (Error & e) {
++            debug(e.what());
++        }
++
++    throw Error("Failed to fetch data, maybe missing URLs.");
+ }
  
-     Path storePath = getAttr("out");
- 
+ }
 -- 
-2.18.0
+2.19.0.605.g01d371f741-goog
 
