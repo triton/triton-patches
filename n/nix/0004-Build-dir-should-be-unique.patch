@@ -1,17 +1,17 @@
-From 696a60b2b7e7d4ee88b2dd2f15670a425c263c9b Mon Sep 17 00:00:00 2001
+From 40e8b3c4b42166e4e7e5adba66035b2fb018e5e2 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 11:50:36 -0700
-Subject: [PATCH 4/8] Build dir should be unique
+Subject: [PATCH 04/10] Build dir should be unique
 
 ---
  src/libstore/build.cc | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/libstore/build.cc b/src/libstore/build.cc
-index 8e9fbd91..1acd045f 100644
+index 2af1ce08..2ae429a7 100644
 --- a/src/libstore/build.cc
 +++ b/src/libstore/build.cc
-@@ -1841,7 +1841,7 @@ void DerivationGoal::startBuilder()
+@@ -1857,7 +1857,7 @@ void DerivationGoal::startBuilder()
      /* In a sandbox, for determinism, always use the same temporary
         directory. */
  #if __linux__
@@ -21,5 +21,5 @@ index 8e9fbd91..1acd045f 100644
      tmpDirInSandbox = tmpDir;
  #endif
 -- 
-2.18.0.597.ga71716f1ad-goog
+2.19.0.605.g01d371f741-goog
 
