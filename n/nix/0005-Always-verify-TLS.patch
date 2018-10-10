@@ -1,29 +1,30 @@
-From 176c144603760cdcae9cd341ec896b8221dbf88b Mon Sep 17 00:00:00 2001
+From 156d735d3bcdc8286c3c87a7a7ad9faf73fa3016 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 14:52:56 -0700
-Subject: [PATCH 5/8] Always verify TLS
+Subject: [PATCH 05/10] Always verify TLS
 
 ---
- src/libstore/builtins.cc | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ src/libstore/builtins/fetchurl.cc | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/src/libstore/builtins.cc b/src/libstore/builtins.cc
-index 4ca4a838..4f106698 100644
---- a/src/libstore/builtins.cc
-+++ b/src/libstore/builtins.cc
-@@ -23,10 +23,9 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
-     };
+diff --git a/src/libstore/builtins/fetchurl.cc b/src/libstore/builtins/fetchurl.cc
+index 92aec63a..454ea56c 100644
+--- a/src/libstore/builtins/fetchurl.cc
++++ b/src/libstore/builtins/fetchurl.cc
+@@ -33,11 +33,9 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+     auto fetch = [&](const std::string & url) {
  
-     auto fetch = [&](const string & url) {
--        /* No need to do TLS verification, because we check the hash of
--           the result anyway. */
-+        /* Always verify TLS in case the output hash is copied */
-         DownloadRequest request(url);
--        request.verifyTLS = false;
-+        request.verifyTLS = true;
-         request.decompress = false;
+         auto source = sinkToSource([&](Sink & sink) {
+-
+-            /* No need to do TLS verification, because we check the hash of
+-               the result anyway. */
++            /* Always verify TLS in case the output hash is copied */
+             DownloadRequest request(url);
+-            request.verifyTLS = false;
++            request.verifyTLS = true;
+             request.decompress = false;
  
-         /* Note: have to use a fresh downloader here because we're in
+             auto decompressor = makeDecompressionSink(
 -- 
-2.18.0.597.ga71716f1ad-goog
+2.19.0.605.g01d371f741-goog
 
