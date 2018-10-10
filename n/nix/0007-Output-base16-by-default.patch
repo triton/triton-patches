@@ -1,0 +1,25 @@
+From ddf968ecc391a09345bb85d3296b9f5662f4231a Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 6 Aug 2018 15:24:23 -0700
+Subject: [PATCH 07/10] Output base16 by default
+
+---
+ src/libutil/hash.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libutil/hash.cc b/src/libutil/hash.cc
+index 9d82f13a..0c1bccc9 100644
+--- a/src/libutil/hash.cc
++++ b/src/libutil/hash.cc
+@@ -98,7 +98,7 @@ static string printHash32(const Hash & hash)
+ 
+ string printHash16or32(const Hash & hash)
+ {
+-    return hash.to_string(hash.type == htMD5 ? Base16 : Base32, false);
++    return hash.to_string(hash.type == htMD5 ? Base16 : Base16, false);
+ }
+ 
+ 
+-- 
+2.19.0.605.g01d371f741-goog
+
