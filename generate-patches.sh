@@ -11,7 +11,7 @@ else
 fi
 
 echo
-for file in $(find "$directory" -type f | sort); do
+for file in $(find "$directory${2+/$2}" -type f | sort); do
   echo "    (fetchTritonPatch {"
   echo "      rev = \"$(git rev-parse HEAD)\";"
   echo "      file = \"$file\";"
