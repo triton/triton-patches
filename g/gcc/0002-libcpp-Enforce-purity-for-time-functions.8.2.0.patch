@@ -1,0 +1,72 @@
+From e87b7411d0c2fcac1126dd60d1ee1c584cd2f35e Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Tue, 3 Jan 2017 19:49:06 -0800
+Subject: [PATCH 2/4] libcpp: Enforce purity for time functions
+
+---
+ libcpp/macro.c | 34 ++++++++++++++++++++++++++++++----
+ 1 file changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/libcpp/macro.c b/libcpp/macro.c
+index 5d6b8aa11d2..03744d33fb4 100644
+--- a/libcpp/macro.c
++++ b/libcpp/macro.c
+@@ -412,10 +412,33 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node,
+ 		   the date and time of the last modification 
+ 		   of the current source file. The string constant 
+ 		   looks like "Sun Sep 16 01:03:52 1973".  */
++		time_t tt;
+ 		struct tm *tb = NULL;
+-		struct stat *st = _cpp_get_file_stat (file);
+-		if (st)
+-		  tb = localtime (&st->st_mtime);
++
++		/* Allow the date and time to be set externally by an exported
++		   environment variable to enable reproducible builds. */
++		if (enforce_purity)
++		  {
++		    /* Set a reproducible timestamp for __DATE__ and __TIME__ macro
++		       if SOURCE_DATE_EPOCH is defined.  */
++		    if (pfile->source_date_epoch == (time_t) -2
++			&& pfile->cb.get_source_date_epoch != NULL)
++		      pfile->source_date_epoch = pfile->cb.get_source_date_epoch (pfile);
++
++		    if (pfile->source_date_epoch >= (time_t) 0)
++		      tb = gmtime (&pfile->source_date_epoch);
++
++		    if (tb == NULL)
++		      cpp_error (pfile, CPP_DL_ERROR,
++				 "enforcing purity but missing SOURCE_DATE_EPOCH");
++		  }
++		else
++		  {
++		    struct stat *st = _cpp_get_file_stat (file);
++		    if (st)
++		      tb = localtime (&st->st_mtime);
++		  }
++
+ 		if (tb)
+ 		  {
+ 		    char *str = asctime (tb);
+@@ -519,7 +542,7 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node,
+ 
+ 	  if (pfile->source_date_epoch >= (time_t) 0)
+ 	    tb = gmtime (&pfile->source_date_epoch);
+-	  else
++	  else if (!enforce_purity)
+ 	    {
+ 	      /* (time_t) -1 is a legitimate value for "number of seconds
+ 		 since the Epoch", so we have to do a little dance to
+@@ -529,6 +552,9 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node,
+ 	      if (tt != (time_t)-1 || errno == 0)
+ 		tb = localtime (&tt);
+ 	    }
++	  else
++	    cpp_error (pfile, CPP_DL_ERROR,
++		       "enforcing purity but didn't get a SOURCE_DATE_EPOCH");
+ 
+ 	  if (tb)
+ 	    {
+-- 
+2.18.0
+
