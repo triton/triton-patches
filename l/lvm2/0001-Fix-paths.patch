@@ -1,4 +1,4 @@
-From d59234a8f8f8e4f49d444fe121d48b54d2b6eb5b Mon Sep 17 00:00:00 2001
+From 2f392f0ec0943550b3f90ac4cb2583ac6bbdee4a Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Fri, 27 Jul 2018 15:32:52 -0700
 Subject: [PATCH] Fix paths
@@ -24,7 +24,7 @@ index ec3dbb2ea..35e59c01c 100644
  \fBDMSETUP_BINARY\fP
  The dmsetup binary to use.
 diff --git a/scripts/blk_availability_systemd_red_hat.service.in b/scripts/blk_availability_systemd_red_hat.service.in
-index 1198baa2a..949f043b5 100644
+index 9462072cc..c07b09123 100644
 --- a/scripts/blk_availability_systemd_red_hat.service.in
 +++ b/scripts/blk_availability_systemd_red_hat.service.in
 @@ -6,7 +6,7 @@ Conflicts=shutdown.target
@@ -104,18 +104,18 @@ index 28ca6709f..f7e551515 100755
  # utilities
  TUNE_EXT=tune2fs
 diff --git a/scripts/lvm2_activation_generator_systemd_red_hat.c b/scripts/lvm2_activation_generator_systemd_red_hat.c
-index 0f7f89c86..d99e91ad6 100644
+index 5dc39ae03..f0a045dea 100644
 --- a/scripts/lvm2_activation_generator_systemd_red_hat.c
 +++ b/scripts/lvm2_activation_generator_systemd_red_hat.c
-@@ -131,7 +131,7 @@ static int generate_unit(const char *dir, int unit, int sysinit_needed)
- 		fprintf(f, "After=%s iscsi.service fcoe.service\n"
+@@ -163,7 +163,7 @@ static int generate_unit(struct generator *gen, int unit)
+ 		fprintf(f, "After=%s iscsi.service fcoe.service rbdmap.service\n"
  			"Before=remote-fs-pre.target shutdown.target\n\n"
  			"[Service]\n"
--			"ExecStartPre=/usr/bin/udevadm settle\n", unit_names[UNIT_MAIN]);
-+			"ExecStartPre=/run/current-system/sw/bin/udevadm settle\n", unit_names[UNIT_MAIN]);
+-			"ExecStartPre=/usr/bin/udevadm settle\n", _unit_names[UNIT_MAIN]);
++			"ExecStartPre=/run/current-system/sw/bin/udevadm settle\n", _unit_names[UNIT_MAIN]);
  	} else {
- 		if (unit == UNIT_EARLY) {
+ 		if (unit == UNIT_EARLY)
  			fputs("After=systemd-udev-settle.service\n"
 -- 
-2.17.0
+2.18.0
 
