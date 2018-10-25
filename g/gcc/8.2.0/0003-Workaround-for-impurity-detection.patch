@@ -1,7 +1,7 @@
-From 3c4e6a321c2de66267693d3826a88e2b182f7858 Mon Sep 17 00:00:00 2001
+From ff05552aa8c37bacba3e5b554239da4571cfd325 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sat, 24 Mar 2018 22:44:10 -0700
-Subject: [PATCH 3/4] Workaround for impurity detection
+Subject: [PATCH 3/5] Workaround for impurity detection
 
 ---
  gcc/c-family/c-ada-spec.c | 4 ++--
@@ -23,5 +23,5 @@ index 30fdb59d55c..772bf40583b 100644
    else
      base = lbasename (file);
 -- 
-2.18.0
+2.19.1.568.g152ad8e336-goog
 
