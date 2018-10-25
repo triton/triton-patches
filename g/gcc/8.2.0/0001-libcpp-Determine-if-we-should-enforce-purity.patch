@@ -1,7 +1,7 @@
-From 57c0558390cdf33ffcac067c4b6faf737db4e951 Mon Sep 17 00:00:00 2001
+From 4331bb5677959821b2bbd2bf1ca5123d41fbf3e4 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Tue, 13 Mar 2018 15:08:07 -0700
-Subject: [PATCH 1/4] libcpp: Determine if we should enforce purity
+Subject: [PATCH 1/5] libcpp: Determine if we should enforce purity
 
 ---
  libcpp/macro.c | 1 +
@@ -20,5 +20,5 @@ index 776af7bd00e..5d6b8aa11d2 100644
    switch (node->value.builtin)
      {
 -- 
-2.18.0
+2.19.1.568.g152ad8e336-goog
 
