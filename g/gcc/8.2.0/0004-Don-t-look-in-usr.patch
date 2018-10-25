@@ -1,7 +1,7 @@
-From 5268e205102de68f6f06f7db5ae6ae7105369fe0 Mon Sep 17 00:00:00 2001
+From a35f7a9138b35f5764557b1a30aec967b6008b08 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Tue, 3 Jan 2017 19:49:45 -0800
-Subject: [PATCH 4/4] Don't look in /usr
+Subject: [PATCH 4/5] Don't look in /usr
 
 ---
  gcc/cppdefault.c | 2 ++
@@ -39,5 +39,5 @@ index a716f708259..1c51a6b8896 100644
  
  #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
 -- 
-2.18.0
+2.19.1.568.g152ad8e336-goog
 
