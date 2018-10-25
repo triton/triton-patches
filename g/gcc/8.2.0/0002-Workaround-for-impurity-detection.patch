@@ -1,0 +1,27 @@
+From 55004460bba2293d4cd57815433bc8b1dbbbc582 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sat, 24 Mar 2018 22:44:10 -0700
+Subject: [PATCH 2/4] Workaround for impurity detection
+
+---
+ gcc/c-family/c-ada-spec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/c-family/c-ada-spec.c b/gcc/c-family/c-ada-spec.c
+index 30fdb59d55c..772bf40583b 100644
+--- a/gcc/c-family/c-ada-spec.c
++++ b/gcc/c-family/c-ada-spec.c
+@@ -940,8 +940,8 @@ get_ada_package (const char *file)
+   int i;
+   size_t plen;
+ 
+-  s = strstr (file, "/include/");
+-  if (s)
++  s = strstr (file, "/includ");
++  if (s && s[7] == 'e' && s[8] == '/')
+     base = s + 9;
+   else
+     base = lbasename (file);
+-- 
+2.19.1.568.g152ad8e336-goog
+
