@@ -1,0 +1,42 @@
+From dc4f0b7597425ea95e12fecf0a67903fd4db88dd Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Thu, 25 Oct 2018 03:23:44 -0700
+Subject: [PATCH 1/5] libcpp: Enforce purity BT_TIMESTAMP
+
+If we have a SOURCE_DATE_EPOCH, make sure we are using UTC for
+BT_TIMESTAMPS. We also want to make sure we clamp the BT_TIMESTAMP to
+the SOURCE_DATE_EPOCH in the worst case.
+---
+ libcpp/macro.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/libcpp/macro.c b/libcpp/macro.c
+index 776af7bd00e..8a9e317b276 100644
+--- a/libcpp/macro.c
++++ b/libcpp/macro.c
+@@ -414,7 +414,21 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node,
+ 		struct tm *tb = NULL;
+ 		struct stat *st = _cpp_get_file_stat (file);
+ 		if (st)
+-		  tb = localtime (&st->st_mtime);
++		{
++		  /* Set a reproducible timestamp for __DATE__ and __TIME__ macro
++		     if SOURCE_DATE_EPOCH is defined.  */
++		  if (pfile->source_date_epoch == (time_t) -2
++		      && pfile->cb.get_source_date_epoch != NULL)
++		    pfile->source_date_epoch = pfile->cb.get_source_date_epoch (pfile);
++
++		  if (pfile->source_date_epoch >= (time_t) 0)
++		    if (pfile->source_date_epoch >= st->st_mtime)
++		      tb = gmtime (&st->st_mtime);
++		    else
++		      tb = gmtime (&pfile->source_date_epoch);
++		  else
++		    tb = localtime (&st->st_mtime);
++		}
+ 		if (tb)
+ 		  {
+ 		    char *str = asctime (tb);
+-- 
+2.19.1.568.g152ad8e336-goog
+
