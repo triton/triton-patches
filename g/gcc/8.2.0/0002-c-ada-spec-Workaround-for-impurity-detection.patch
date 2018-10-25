@@ -1,0 +1,31 @@
+From 02a9a579abc7badaaa75376579e7a9b6918af696 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sat, 24 Mar 2018 22:44:10 -0700
+Subject: [PATCH 2/5] c-ada-spec: Workaround for impurity detection
+
+Our scripts for detecting if bad directories paths have been written
+into our gcc binaries by accident will always get tripped up over these.
+We know this use of the directory is fine so we are effectively
+whitelisting it.
+---
+ gcc/c-family/c-ada-spec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/c-family/c-ada-spec.c b/gcc/c-family/c-ada-spec.c
+index 30fdb59d55c..772bf40583b 100644
+--- a/gcc/c-family/c-ada-spec.c
++++ b/gcc/c-family/c-ada-spec.c
+@@ -940,8 +940,8 @@ get_ada_package (const char *file)
+   int i;
+   size_t plen;
+ 
+-  s = strstr (file, "/include/");
+-  if (s)
++  s = strstr (file, "/includ");
++  if (s && s[7] == 'e' && s[8] == '/')
+     base = s + 9;
+   else
+     base = lbasename (file);
+-- 
+2.19.1.568.g152ad8e336-goog
+
