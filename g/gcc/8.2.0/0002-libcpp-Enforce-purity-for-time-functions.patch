@@ -1,7 +1,7 @@
-From e87b7411d0c2fcac1126dd60d1ee1c584cd2f35e Mon Sep 17 00:00:00 2001
+From 500e6d2c8578f21fd412d96a1939f1661dbb9f8f Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Tue, 3 Jan 2017 19:49:06 -0800
-Subject: [PATCH 2/4] libcpp: Enforce purity for time functions
+Subject: [PATCH 2/5] libcpp: Enforce purity for time functions
 
 ---
  libcpp/macro.c | 34 ++++++++++++++++++++++++++++++----
@@ -68,5 +68,5 @@ index 5d6b8aa11d2..03744d33fb4 100644
  	  if (tb)
  	    {
 -- 
-2.18.0
+2.19.1.568.g152ad8e336-goog
 
