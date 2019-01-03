@@ -1,0 +1,71 @@
+From f344a6632936498275c49739f75d67ab27bebb7e Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sat, 29 Dec 2018 12:43:52 -0800
+Subject: [PATCH 4/4] nsswitch: Try system paths for modules
+
+Since nss modules are specified by the system, we want to make sure that
+we load the module from a system location. Otherwise we fall back to our
+pure locations.
+---
+ nss/nsswitch.c | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/nss/nsswitch.c b/nss/nsswitch.c
+index 3c48b4b85e..d1b4407d25 100644
+--- a/nss/nsswitch.c
++++ b/nss/nsswitch.c
+@@ -333,6 +333,42 @@ known_compare (const void *p1, const void *p2)
+ 
+ 
+ #if !defined DO_STATIC_NSS || defined SHARED
++/* Concat paths for dlopen */
++static void *
++dlopen_concat (const char *prefix, const char *shlib_name)
++{
++  char abs_name[strlen(prefix) + strlen(shlib_name) + 1];
++  __stpcpy (__stpcpy (abs_name, prefix), shlib_name);
++  return __libc_dlopen (abs_name);
++}
++
++/* Try and dlopen library from normal paths */
++static void *
++nss_dlopen (const char *shlib_name)
++{
++  void *lib = NULL;
++
++  /* Try system locations */
++  lib = dlopen_concat("/run/current-system/nss/lib/", shlib_name);
++  if (lib != NULL)
++    return lib;
++
++  lib = dlopen_concat("/usr/lib/", shlib_name);
++  if (lib != NULL)
++    return lib;
++
++  lib = dlopen_concat("/lib/", shlib_name);
++  if (lib != NULL)
++    return lib;
++
++  /* Try fallback loading using standard dlopen */
++  lib = __libc_dlopen (shlib_name);
++  if (lib != NULL)
++    return lib;
++
++  return NULL;
++}
++
+ /* Load library.  */
+ static int
+ nss_load_library (service_user *ni)
+@@ -366,7 +402,7 @@ nss_load_library (service_user *ni)
+ 			  ".so"),
+ 		__nss_shlib_revision);
+ 
+-      ni->library->lib_handle = __libc_dlopen (shlib_name);
++      ni->library->lib_handle = nss_dlopen (shlib_name);
+       if (ni->library->lib_handle == NULL)
+ 	{
+ 	  /* Failed to load the library.  */
+-- 
+2.20.1
+
