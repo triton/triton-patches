@@ -1,0 +1,28 @@
+From f367eba78590dc54726336e43a34e7b20be678c8 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sat, 29 Dec 2018 11:20:09 -0800
+Subject: [PATCH 3/4] timezone: Fix zoneinfo path for triton
+
+This is just needed for the zic(8) tool so we don't need to worry about
+supporting normal distros which use /usr/share/zoneinfo since they will
+have their own zic(8) or can specify a path manually.
+---
+ timezone/tzfile.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/timezone/tzfile.h b/timezone/tzfile.h
+index 0e51dce1d7..58810860f9 100644
+--- a/timezone/tzfile.h
++++ b/timezone/tzfile.h
+@@ -20,7 +20,7 @@
+ */
+ 
+ #ifndef TZDIR
+-#define TZDIR	"/usr/local/etc/zoneinfo" /* Time zone object file directory */
++#define TZDIR	"/run/current-system/sw/share/zoneinfo" /* Time zone object file directory */
+ #endif /* !defined TZDIR */
+ 
+ #ifndef TZDEFAULT
+-- 
+2.20.1
+
