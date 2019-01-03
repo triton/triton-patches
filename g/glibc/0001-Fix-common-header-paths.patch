@@ -1,0 +1,104 @@
+From c857edff094b35800e73dd4f5d3a0d596169127d Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Fri, 28 Dec 2018 21:24:38 -0800
+Subject: [PATCH 1/4] Fix common header paths
+
+---
+ sysdeps/generic/paths.h         | 10 +++++-----
+ sysdeps/unix/confstr.h          |  2 +-
+ sysdeps/unix/sysv/linux/paths.h | 10 +++++-----
+ 3 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/sysdeps/generic/paths.h b/sysdeps/generic/paths.h
+index 893b4c2286..680ddb11b8 100644
+--- a/sysdeps/generic/paths.h
++++ b/sysdeps/generic/paths.h
+@@ -33,10 +33,10 @@
+ #define	_PATHS_H_
+ 
+ /* Default search path. */
+-#define	_PATH_DEFPATH	"/usr/bin:/bin"
++#define	_PATH_DEFPATH	"/run/current-system/sw/bin:/usr/bin:/bin"
+ /* All standard utilities path. */
+ #define	_PATH_STDPATH \
+-	"/usr/bin:/bin:/usr/sbin:/sbin"
++	"/run/current-system/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+ 
+ #define	_PATH_BSHELL	"/bin/sh"
+ #define	_PATH_CONSOLE	"/dev/console"
+@@ -48,21 +48,21 @@
+ #define	_PATH_KMEM	"/dev/kmem"
+ #define	_PATH_LASTLOG	"/var/log/lastlog"
+ #define	_PATH_MAILDIR	"/var/mail"
+-#define	_PATH_MAN	"/usr/share/man"
++#define	_PATH_MAN	"/run/current-system/sw/share/man"
+ #define	_PATH_MEM	"/dev/mem"
+ #define	_PATH_MNTTAB	"/etc/fstab"
+ #define	_PATH_MOUNTED	"/var/run/mtab"
+ #define	_PATH_NOLOGIN	"/etc/nologin"
+ #define	_PATH_PRESERVE	"/var/lib"
+ #define	_PATH_RWHODIR	"/var/spool/rwho"
+-#define	_PATH_SENDMAIL	"/usr/sbin/sendmail"
++#define	_PATH_SENDMAIL	"/run/current-system/sw/bin/sendmail"
+ #define	_PATH_SHADOW	"/etc/shadow"
+ #define	_PATH_SHELLS	"/etc/shells"
+ #define	_PATH_TTY	"/dev/tty"
+ #define	_PATH_UNIX	"/vmunix"
+ #define	_PATH_UTMP	"/var/run/utmp"
+ #define	_PATH_UTMP_DB	"/var/run/utmp.db"
+-#define	_PATH_VI	"/usr/bin/vi"
++#define	_PATH_VI	"/run/current-system/sw/bin/vi"
+ #define	_PATH_WTMP	"/var/log/wtmp"
+ 
+ /* Provide trailing slash, since mostly used for building pathnames. */
+diff --git a/sysdeps/unix/confstr.h b/sysdeps/unix/confstr.h
+index 15859c3b27..21cafe6cb2 100644
+--- a/sysdeps/unix/confstr.h
++++ b/sysdeps/unix/confstr.h
+@@ -1 +1 @@
+-#define	CS_PATH	"/bin:/usr/bin"
++#define	CS_PATH	"/run/current-system/sw/bin:/bin:/usr/bin"
+diff --git a/sysdeps/unix/sysv/linux/paths.h b/sysdeps/unix/sysv/linux/paths.h
+index 1342ab3a96..3e6b7f2944 100644
+--- a/sysdeps/unix/sysv/linux/paths.h
++++ b/sysdeps/unix/sysv/linux/paths.h
+@@ -33,10 +33,10 @@
+ #define	_PATHS_H_
+ 
+ /* Default search path. */
+-#define	_PATH_DEFPATH	"/usr/bin:/bin"
++#define	_PATH_DEFPATH	"/run/current-system/sw/bin:/usr/bin:/bin"
+ /* All standard utilities path. */
+ #define	_PATH_STDPATH \
+-	"/usr/bin:/bin:/usr/sbin:/sbin"
++	"/run/current-system/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+ 
+ #define	_PATH_BSHELL	"/bin/sh"
+ #define	_PATH_CONSOLE	"/dev/console"
+@@ -49,20 +49,20 @@
+ #define	_PATH_KMEM	"/dev/kmem"
+ #define	_PATH_LASTLOG	"/var/log/lastlog"
+ #define	_PATH_MAILDIR	"/var/mail"
+-#define	_PATH_MAN	"/usr/share/man"
++#define	_PATH_MAN	"/run/current-system/sw/share/man"
+ #define	_PATH_MEM	"/dev/mem"
+ #define	_PATH_MNTTAB	"/etc/fstab"
+ #define	_PATH_MOUNTED	"/etc/mtab"
+ #define	_PATH_NOLOGIN	"/etc/nologin"
+ #define	_PATH_PRESERVE	"/var/lib"
+ #define	_PATH_RWHODIR	"/var/spool/rwho"
+-#define	_PATH_SENDMAIL	"/usr/sbin/sendmail"
++#define	_PATH_SENDMAIL	"/run/current-system/sw/bin/sendmail"
+ #define	_PATH_SHADOW	"/etc/shadow"
+ #define	_PATH_SHELLS	"/etc/shells"
+ #define	_PATH_TTY	"/dev/tty"
+ #define	_PATH_UNIX	"/boot/vmlinux"
+ #define	_PATH_UTMP	"/var/run/utmp"
+-#define	_PATH_VI	"/usr/bin/vi"
++#define	_PATH_VI	"/run/current-system/sw/bin/vi"
+ #define	_PATH_WTMP	"/var/log/wtmp"
+ 
+ /* Provide trailing slash, since mostly used for building pathnames. */
+-- 
+2.20.1
+
