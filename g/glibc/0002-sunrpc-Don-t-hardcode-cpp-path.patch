@@ -1,0 +1,69 @@
+From f5be64b327739d426e21691009ffa4b1adb3bf47 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sat, 29 Dec 2018 10:57:20 -0800
+Subject: [PATCH 2/4] sunrpc: Don't hardcode cpp path
+
+Our cpp binary is never going to exist in a standard FHS path. Just use
+the cpp in path.
+---
+ sunrpc/rpc_main.c | 23 +----------------------
+ 1 file changed, 1 insertion(+), 22 deletions(-)
+
+diff --git a/sunrpc/rpc_main.c b/sunrpc/rpc_main.c
+index c6607848cc..64d00b4f52 100644
+--- a/sunrpc/rpc_main.c
++++ b/sunrpc/rpc_main.c
+@@ -78,7 +78,7 @@ static const char *cmdname;
+ 
+ static const char *svcclosetime = "120";
+ static int cppDefined;	/* explicit path for C preprocessor */
+-static const char *CPP = "/lib/cpp";
++static const char *CPP = "cpp";
+ static const char CPPFLAGS[] = "-C";
+ static char *pathbuf;
+ static int cpp_pid;
+@@ -107,7 +107,6 @@ static char *extendfile (const char *file, const char *ext);
+ static void open_output (const char *infile, const char *outfile);
+ static void add_warning (void);
+ static void clear_args (void);
+-static void find_cpp (void);
+ static void open_input (const char *infile, const char *define);
+ static int check_nettype (const char *name, const char *list_to_check[]);
+ static void c_output (const char *infile, const char *define,
+@@ -322,25 +321,6 @@ clear_args (void)
+   argcount = FIXEDARGS;
+ }
+ 
+-/* make sure that a CPP exists */
+-static void
+-find_cpp (void)
+-{
+-  struct stat64 buf;
+-
+-  if (stat64 (CPP, &buf) == 0)
+-    return;
+-
+-  if (cppDefined) /* user specified cpp but it does not exist */
+-    {
+-      fprintf (stderr, _ ("cannot find C preprocessor: %s\n"), CPP);
+-      crash ();
+-    }
+-
+-  /* fall back to system CPP */
+-  CPP = "cpp";
+-}
+-
+ /*
+  * Open input file with given define for C-preprocessor
+  */
+@@ -359,7 +339,6 @@ open_input (const char *infile, const char *define)
+   switch (cpp_pid)
+     {
+     case 0:
+-      find_cpp ();
+       putarg (0, CPP);
+       putarg (1, CPPFLAGS);
+       addarg (define);
+-- 
+2.20.1
+
