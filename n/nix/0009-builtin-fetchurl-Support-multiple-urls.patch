@@ -1,12 +1,12 @@
-From 854d31c7a8f035cf2029cc8b261233f638118701 Mon Sep 17 00:00:00 2001
+From 96aab327233d70f4fecd65934f3c5330fe89a058 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 12 Aug 2018 17:13:24 -0700
-Subject: [PATCH 09/10] builtin:fetchurl: Support multiple urls
+Subject: [PATCH 9/9] builtin:fetchurl: Support multiple urls
 
 ---
- corepkgs/fetchurl.nix             |  7 +++----
- src/libstore/builtins/fetchurl.cc | 34 ++++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 5 deletions(-)
+ corepkgs/fetchurl.nix             |  7 +++---
+ src/libstore/builtins/fetchurl.cc | 37 ++++++++++++++++++++++++++++---
+ 2 files changed, 37 insertions(+), 7 deletions(-)
 
 diff --git a/corepkgs/fetchurl.nix b/corepkgs/fetchurl.nix
 index 0ce1bab1..be3d62f7 100644
@@ -37,10 +37,27 @@ index 0ce1bab1..be3d62f7 100644
 +  urls = (if url != "" then [ url ] else [ ]) ++ urls;
  }
 diff --git a/src/libstore/builtins/fetchurl.cc b/src/libstore/builtins/fetchurl.cc
-index 454ea56c..6b62d4b9 100644
+index 454ea56c..931482b9 100644
 --- a/src/libstore/builtins/fetchurl.cc
 +++ b/src/libstore/builtins/fetchurl.cc
-@@ -69,7 +69,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+@@ -23,7 +23,6 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+     };
+ 
+     Path storePath = getAttr("out");
+-    auto mainUrl = getAttr("url");
+     bool unpack = get(drv.env, "unpack", "") == "1";
+ 
+     /* Note: have to use a fresh downloader here because we're in
+@@ -39,7 +38,7 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+             request.decompress = false;
+ 
+             auto decompressor = makeDecompressionSink(
+-                unpack && hasSuffix(mainUrl, ".xz") ? "xz" : "none", sink);
++                unpack && hasSuffix(url, ".xz") ? "xz" : "none", sink);
+             downloader->download(std::move(request), *decompressor);
+             decompressor->finish();
+         });
+@@ -69,7 +68,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
              }
  
      /* Otherwise try the specified URL. */
@@ -82,5 +99,5 @@ index 454ea56c..6b62d4b9 100644
  
  }
 -- 
-2.19.0.605.g01d371f741-goog
+2.20.1
 
