@@ -1,7 +1,7 @@
-From fcb494df8186ebad4b0048ab5b42bf3712db17f4 Mon Sep 17 00:00:00 2001
+From 865635d391917c6d15f5bf9d6fbcbcf2bafbdbed Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 10:50:31 -0700
-Subject: [PATCH 02/10] Remove hardcoded nixos.org references
+Subject: [PATCH 2/8] Remove hardcoded nixos.org references
 
 ---
  src/libstore/download.cc | 5 +----
@@ -9,7 +9,7 @@ Subject: [PATCH 02/10] Remove hardcoded nixos.org references
  2 files changed, 5 insertions(+), 8 deletions(-)
 
 diff --git a/src/libstore/download.cc b/src/libstore/download.cc
-index f44f1836..7b2d8299 100644
+index 467f570b..ca86b01f 100644
 --- a/src/libstore/download.cc
 +++ b/src/libstore/download.cc
 @@ -52,10 +52,7 @@ static GlobalConfig::Register r1(&downloadSettings);
@@ -25,10 +25,10 @@ index f44f1836..7b2d8299 100644
  
  struct CurlDownloader : public Downloader
 diff --git a/src/libstore/globals.hh b/src/libstore/globals.hh
-index 32004358..125184a6 100644
+index c2346ca9..3c569140 100644
 --- a/src/libstore/globals.hh
 +++ b/src/libstore/globals.hh
-@@ -241,7 +241,7 @@ public:
+@@ -249,7 +249,7 @@ public:
          "Whether to fail if repeated builds produce different output."};
  
      Setting<Strings> trustedPublicKeys{this,
@@ -37,8 +37,8 @@ index 32004358..125184a6 100644
          "trusted-public-keys",
          "Trusted public keys for secure substitution.",
          {"binary-cache-public-keys"}};
-@@ -265,9 +265,9 @@ public:
-         "or using hacks like qemu-user."};
+@@ -277,9 +277,9 @@ public:
+         "Optional features that this system implements (like \"kvm\")."};
  
      Setting<Strings> substituters{this,
 -        nixStore == "/nix/store" ? Strings{"https://cache.nixos.org/"} : Strings(),
@@ -49,7 +49,7 @@ index 32004358..125184a6 100644
          {"binary-caches"}};
  
      // FIXME: provide a way to add to option values.
-@@ -324,7 +324,7 @@ public:
+@@ -336,7 +336,7 @@ public:
          "setuid/setgid bits or with file capabilities."};
  #endif
  
@@ -59,5 +59,5 @@ index 32004358..125184a6 100644
  
      Setting<uint64_t> minFree{this, 0, "min-free",
 -- 
-2.19.0.605.g01d371f741-goog
+2.20.1
 
