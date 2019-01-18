@@ -1,0 +1,103 @@
+From a6e4a9629b9225f1fee17fcad6cfced3d17003d7 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sun, 12 Aug 2018 17:13:24 -0700
+Subject: [PATCH 8/8] builtin:fetchurl: Support multiple urls
+
+---
+ corepkgs/fetchurl.nix             |  7 +++---
+ src/libstore/builtins/fetchurl.cc | 37 ++++++++++++++++++++++++++++---
+ 2 files changed, 37 insertions(+), 7 deletions(-)
+
+diff --git a/corepkgs/fetchurl.nix b/corepkgs/fetchurl.nix
+index a84777f5..6ef4c173 100644
+--- a/corepkgs/fetchurl.nix
++++ b/corepkgs/fetchurl.nix
+@@ -1,5 +1,5 @@
+ { system ? "" # obsolete
+-, url
++, url ? "", urls ? [ ]
+ , hash ? "" # an SRI ash
+ 
+ # Legacy hash specification
+@@ -21,7 +21,7 @@ derivation {
+   inherit outputHashAlgo outputHash;
+   outputHashMode = if unpack || executable then "recursive" else "flat";
+ 
+-  inherit name url executable unpack;
++  inherit name executable unpack;
+ 
+   system = "builtin";
+ 
+@@ -36,6 +36,5 @@ derivation {
+     "http_proxy" "https_proxy" "ftp_proxy" "all_proxy" "no_proxy"
+   ];
+ 
+-  # To make "nix-prefetch-url" work.
+-  urls = [ url ];
++  urls = (if url != "" then [ url ] else [ ]) ++ urls;
+ }
+diff --git a/src/libstore/builtins/fetchurl.cc b/src/libstore/builtins/fetchurl.cc
+index 454ea56c..931482b9 100644
+--- a/src/libstore/builtins/fetchurl.cc
++++ b/src/libstore/builtins/fetchurl.cc
+@@ -23,7 +23,6 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+     };
+ 
+     Path storePath = getAttr("out");
+-    auto mainUrl = getAttr("url");
+     bool unpack = get(drv.env, "unpack", "") == "1";
+ 
+     /* Note: have to use a fresh downloader here because we're in
+@@ -39,7 +38,7 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+             request.decompress = false;
+ 
+             auto decompressor = makeDecompressionSink(
+-                unpack && hasSuffix(mainUrl, ".xz") ? "xz" : "none", sink);
++                unpack && hasSuffix(url, ".xz") ? "xz" : "none", sink);
+             downloader->download(std::move(request), *decompressor);
+             decompressor->finish();
+         });
+@@ -69,7 +68,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+             }
+ 
+     /* Otherwise try the specified URL. */
+-    fetch(mainUrl);
++    std::vector<std::string> urls;
++    auto urli = drv.env.find("url");
++    if (urli != drv.env.end() && urli->second.size() > 0)
++        urls.push_back(urli->second);
++    auto urlsi = drv.env.find("urls");
++    if (urlsi != drv.env.end())
++    {
++        size_t url_begin = 0;
++        while (true)
++        {
++            size_t separator = urlsi->second.find(' ', url_begin);
++            if (separator == std::string::npos)
++                separator = urlsi->second.size();
++            if (url_begin < separator)
++                urls.push_back(urlsi->second.substr(url_begin, separator - url_begin));
++            if (separator == urlsi->second.size())
++                break;
++            url_begin = separator + 1;
++        }
++    }
++
++    for (auto url : urls)
++        debug(format("builtin:fetchurl using url: %1%") % url);
++
++    for (auto url : urls)
++        try {
++            fetch(url);
++            return;
++        } catch (Error & e) {
++            debug(e.what());
++        }
++
++    throw Error("Failed to fetch data, maybe missing URLs.");
+ }
+ 
+ }
+-- 
+2.20.1
+
