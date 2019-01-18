@@ -1,7 +1,7 @@
-From 98d01381d4874fc75145923f8e1ea26bec8ee298 Mon Sep 17 00:00:00 2001
+From e446785e0118bfb0fe85175cb4f084d5d2ead2ce Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 11:35:14 -0700
-Subject: [PATCH 03/10] Remove nixpkgs references
+Subject: [PATCH 3/8] Remove nixpkgs references
 
 ---
  scripts/nix-profile-daemon.sh.in         |  4 ---
@@ -12,7 +12,7 @@ Subject: [PATCH 03/10] Remove nixpkgs references
  5 files changed, 7 insertions(+), 78 deletions(-)
 
 diff --git a/scripts/nix-profile-daemon.sh.in b/scripts/nix-profile-daemon.sh.in
-index 87d9fe50..cd1d8613 100644
+index 6940969c..687c3ae5 100644
 --- a/scripts/nix-profile-daemon.sh.in
 +++ b/scripts/nix-profile-daemon.sh.in
 @@ -27,10 +27,6 @@ if test -w $HOME; then
@@ -65,10 +65,10 @@ index a5f52274..cc57e766 100644
  
      # Set $NIX_SSL_CERT_FILE so that Nixpkgs applications like curl work.
 diff --git a/src/nix-build/nix-build.cc b/src/nix-build/nix-build.cc
-index 94d3a275..bca78515 100755
+index 11ea3b1f..708bba3d 100755
 --- a/src/nix-build/nix-build.cc
 +++ b/src/nix-build/nix-build.cc
-@@ -239,8 +239,8 @@ void mainWrapped(int argc, char * * argv)
+@@ -237,8 +237,8 @@ static void _main(int argc, char * * argv)
  
      initPlugins();
  
@@ -79,7 +79,7 @@ index 94d3a275..bca78515 100755
  
      auto store = openStore();
  
-@@ -249,15 +249,7 @@ void mainWrapped(int argc, char * * argv)
+@@ -247,15 +247,7 @@ static void _main(int argc, char * * argv)
  
      Bindings & autoArgs = *myArgs.getAutoArgs(*state);
  
@@ -96,7 +96,7 @@ index 94d3a275..bca78515 100755
          if (left.empty() && runEnv && pathExists("shell.nix"))
              left = {"shell.nix"};
          if (left.empty())
-@@ -332,31 +324,8 @@ void mainWrapped(int argc, char * * argv)
+@@ -330,31 +322,8 @@ static void _main(int argc, char * * argv)
          PathSet pathsToBuild;
  
          /* Figure out what bash shell to use. If $NIX_BUILD_SHELL
@@ -131,10 +131,10 @@ index 94d3a275..bca78515 100755
          // Build or fetch all dependencies of the derivation.
          for (const auto & input : drv.inputDrvs)
 diff --git a/src/nix-prefetch-url/nix-prefetch-url.cc b/src/nix-prefetch-url/nix-prefetch-url.cc
-index a3b02572..f86fee97 100644
+index f54706a8..7a8121dc 100644
 --- a/src/nix-prefetch-url/nix-prefetch-url.cc
 +++ b/src/nix-prefetch-url/nix-prefetch-url.cc
-@@ -22,25 +22,7 @@ string resolveMirrorUri(EvalState & state, string uri)
+@@ -25,25 +25,7 @@ string resolveMirrorUri(EvalState & state, string uri)
  {
      if (string(uri, 0, 9) != "mirror://") return uri;
  
@@ -162,10 +162,10 @@ index a3b02572..f86fee97 100644
  
  
 diff --git a/src/nix/repl.cc b/src/nix/repl.cc
-index b71e6f90..e1c205a1 100644
+index dd3d9ed9..3d08fad1 100644
 --- a/src/nix/repl.cc
 +++ b/src/nix/repl.cc
-@@ -372,13 +372,7 @@ bool NixRepl::processLine(string line)
+@@ -427,13 +427,7 @@ bool NixRepl::processLine(string line)
          std::cout << showType(v) << std::endl;
  
      } else if (command == ":u") {
@@ -181,5 +181,5 @@ index b71e6f90..e1c205a1 100644
  
      else if (command == ":b" || command == ":i" || command == ":s") {
 -- 
-2.19.0.605.g01d371f741-goog
+2.20.1
 
