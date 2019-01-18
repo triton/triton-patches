@@ -1,7 +1,7 @@
-From 156d735d3bcdc8286c3c87a7a7ad9faf73fa3016 Mon Sep 17 00:00:00 2001
+From 2dd1d5cc97c8afe72365153e929b0cfa6e49624e Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 14:52:56 -0700
-Subject: [PATCH 05/10] Always verify TLS
+Subject: [PATCH 5/8] Always verify TLS
 
 ---
  src/libstore/builtins/fetchurl.cc | 6 ++----
@@ -26,5 +26,5 @@ index 92aec63a..454ea56c 100644
  
              auto decompressor = makeDecompressionSink(
 -- 
-2.19.0.605.g01d371f741-goog
+2.20.1
 
