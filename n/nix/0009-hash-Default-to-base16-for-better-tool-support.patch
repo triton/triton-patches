@@ -1,0 +1,25 @@
+From a6f646e5c3f766d839dd04ebe503109fa8c636fa Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sun, 20 Jan 2019 18:54:38 -0800
+Subject: [PATCH 9/9] hash: Default to base16 for better tool support
+
+---
+ src/libutil/hash.hh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libutil/hash.hh b/src/libutil/hash.hh
+index 2dbc3b63..a40ddb1b 100644
+--- a/src/libutil/hash.hh
++++ b/src/libutil/hash.hh
+@@ -79,7 +79,7 @@ struct Hash
+     /* Return a string representation of the hash, in base-16, base-32
+        or base-64. By default, this is prefixed by the hash type
+        (e.g. "sha256:"). */
+-    std::string to_string(Base base = Base32, bool includeType = true) const;
++    std::string to_string(Base base = Base16, bool includeType = true) const;
+ };
+ 
+ 
+-- 
+2.20.1
+
