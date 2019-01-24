@@ -1,11 +1,11 @@
-From 63252e974630a8ed2c3b4c96be5d1f1a063673a6 Mon Sep 17 00:00:00 2001
+From a9397d4c9cae9fef1ceccf65123886cee2ac3261 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Tue, 31 Jul 2018 02:41:40 -0700
 Subject: [PATCH] Fix binary paths
 
 ---
- cmd/arc_summary/arc_summary.py                 | 2 +-
- cmd/arc_summary/arc_summary3.py                | 2 +-
+ cmd/arc_summary/arc_summary2                   | 2 +-
+ cmd/arc_summary/arc_summary3                   | 2 +-
  cmd/vdev_id/vdev_id                            | 2 +-
  cmd/zpool/zpool_iter.c                         | 2 +-
  cmd/ztest/ztest.c                              | 6 +++---
@@ -20,11 +20,11 @@ Subject: [PATCH] Fix binary paths
  udev/rules.d/90-zfs.rules.in                   | 4 ++--
  14 files changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/cmd/arc_summary/arc_summary.py b/cmd/arc_summary/arc_summary.py
-index f6dbb9bfb..cc51d3cf8 100755
---- a/cmd/arc_summary/arc_summary.py
-+++ b/cmd/arc_summary/arc_summary.py
-@@ -891,7 +891,7 @@ def _tunable_summary(Kstat):
+diff --git a/cmd/arc_summary/arc_summary2 b/cmd/arc_summary/arc_summary2
+index ab4a3c574..cbf333e47 100755
+--- a/cmd/arc_summary/arc_summary2
++++ b/cmd/arc_summary/arc_summary2
+@@ -933,7 +933,7 @@ def _tunable_summary(Kstat):
  
      if show_tunable_descriptions:
  
@@ -33,11 +33,11 @@ index f6dbb9bfb..cc51d3cf8 100755
  
          try:
              p = Popen(command, stdin=PIPE, stdout=PIPE,
-diff --git a/cmd/arc_summary/arc_summary3.py b/cmd/arc_summary/arc_summary3.py
-index adcb78122..6885e135c 100755
---- a/cmd/arc_summary/arc_summary3.py
-+++ b/cmd/arc_summary/arc_summary3.py
-@@ -291,7 +291,7 @@ def get_descriptions(request):
+diff --git a/cmd/arc_summary/arc_summary3 b/cmd/arc_summary/arc_summary3
+index e67cd90f7..3d3b87fc3 100755
+--- a/cmd/arc_summary/arc_summary3
++++ b/cmd/arc_summary/arc_summary3
+@@ -298,7 +298,7 @@ def get_descriptions(request):
      # We would prefer to do this with /sys/modules -- see the discussion at
      # get_version() -- but there isn't a way to get the descriptions from
      # there, so we fall back on modinfo
@@ -47,7 +47,7 @@ index adcb78122..6885e135c 100755
      # The recommended way to do this is with subprocess.run(). However,
      # some installed versions of Python are < 3.5, so we offer them
 diff --git a/cmd/vdev_id/vdev_id b/cmd/vdev_id/vdev_id
-index 4c7b270a8..f3558aa72 100755
+index 3796ab488..8e1aa3b88 100755
 --- a/cmd/vdev_id/vdev_id
 +++ b/cmd/vdev_id/vdev_id
 @@ -88,7 +88,7 @@
@@ -60,10 +60,10 @@ index 4c7b270a8..f3558aa72 100755
  PHYS_PER_PORT=
  DEV=
 diff --git a/cmd/zpool/zpool_iter.c b/cmd/zpool/zpool_iter.c
-index 019f0b136..4a67fae4d 100644
+index 9927a9deb..5a99fe2a1 100644
 --- a/cmd/zpool/zpool_iter.c
 +++ b/cmd/zpool/zpool_iter.c
-@@ -478,7 +478,7 @@ vdev_run_cmd(vdev_cmd_data_t *data, char *cmd)
+@@ -479,7 +479,7 @@ vdev_run_cmd(vdev_cmd_data_t *data, char *cmd)
  {
  	int rc;
  	char *argv[2] = {cmd, 0};
@@ -73,10 +73,10 @@ index 019f0b136..4a67fae4d 100644
  	char **lines = NULL;
  	int lines_cnt = 0;
 diff --git a/cmd/ztest/ztest.c b/cmd/ztest/ztest.c
-index 5347a0abe..e5821d6a6 100644
+index e080f7bb4..a38f5108c 100644
 --- a/cmd/ztest/ztest.c
 +++ b/cmd/ztest/ztest.c
-@@ -843,14 +843,14 @@ process_options(int argc, char **argv)
+@@ -919,14 +919,14 @@ process_options(int argc, char **argv)
  		 * We want to extract <isa> to determine if we should use
  		 * 32 or 64 bit binaries.
  		 */
@@ -95,7 +95,7 @@ index 5347a0abe..e5821d6a6 100644
  		if (0 != access(zo->zo_alt_ztest, X_OK)) {
  			ztest_dump_core = B_FALSE;
 diff --git a/etc/init.d/zfs-functions.in b/etc/init.d/zfs-functions.in
-index f5b74d458..ac03289a2 100644
+index 490503e91..6d23a065d 100644
 --- a/etc/init.d/zfs-functions.in
 +++ b/etc/init.d/zfs-functions.in
 @@ -10,7 +10,7 @@
@@ -188,10 +188,10 @@ index 5c8976e15..2720523b6 100644
  	if (rc < 0) {
  		exit(1);
 diff --git a/lib/libzfs/libzfs_mount.c b/lib/libzfs/libzfs_mount.c
-index 59b98a284..b1d52b9ec 100644
+index 649c232aa..2e9ae6fb1 100644
 --- a/lib/libzfs/libzfs_mount.c
 +++ b/lib/libzfs/libzfs_mount.c
-@@ -350,7 +350,7 @@ static int
+@@ -356,7 +356,7 @@ static int
  do_mount(const char *src, const char *mntpt, char *opts)
  {
  	char *argv[9] = {
@@ -200,7 +200,7 @@ index 59b98a284..b1d52b9ec 100644
  	    "--no-canonicalize",
  	    "-t", MNTTYPE_ZFS,
  	    "-o", opts,
-@@ -387,7 +387,7 @@ do_unmount(const char *mntpt, int flags)
+@@ -393,7 +393,7 @@ do_unmount(const char *mntpt, int flags)
  	char force_opt[] = "-f";
  	char lazy_opt[] = "-l";
  	char *argv[7] = {
@@ -210,7 +210,7 @@ index 59b98a284..b1d52b9ec 100644
  	    NULL, NULL, NULL, NULL };
  	int rc, count = 3;
 diff --git a/lib/libzfs/libzfs_util.c b/lib/libzfs/libzfs_util.c
-index a19b34415..2439607e2 100644
+index d7401cdf4..9f1337db1 100644
 --- a/lib/libzfs/libzfs_util.c
 +++ b/lib/libzfs/libzfs_util.c
 @@ -67,7 +67,7 @@ libzfs_error_init(int error)
@@ -231,7 +231,7 @@ index a19b34415..2439607e2 100644
  		    "root to manually load them.\n"));
  	case EACCES:
  		return (dgettext(TEXT_DOMAIN, "Permission denied the "
-@@ -980,7 +980,7 @@ libzfs_envvar_is_set(char *envvar)
+@@ -893,7 +893,7 @@ libzfs_envvar_is_set(char *envvar)
  static int
  libzfs_load_module(const char *module)
  {
@@ -240,15 +240,15 @@ index a19b34415..2439607e2 100644
  	char *load_str, *timeout_str;
  	long timeout = 10; /* seconds */
  	long busy_timeout = 10; /* milliseconds */
-@@ -999,7 +999,7 @@ libzfs_load_module(const char *module)
+@@ -912,7 +912,7 @@ libzfs_load_module(const char *module)
  		}
  
  		if (load) {
 -			if (libzfs_run_process("/sbin/modprobe", argv, 0))
 +			if (libzfs_run_process("/run/current-system/sw/biin/modprobe", argv, 0))
  				return (ENOEXEC);
+ 		}
  
- 			if (!libzfs_module_loaded(module))
 diff --git a/udev/rules.d/90-zfs.rules.in b/udev/rules.d/90-zfs.rules.in
 index 82f8cf1cf..6cf5638a2 100644
 --- a/udev/rules.d/90-zfs.rules.in
@@ -265,5 +265,5 @@ index 82f8cf1cf..6cf5638a2 100644
  KERNEL=="null", SYMLINK+="root"
  SYMLINK=="null", SYMLINK+="root"
 -- 
-2.17.1
+2.20.1
 
