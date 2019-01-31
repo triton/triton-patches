@@ -1,4 +1,4 @@
-From f5be64b327739d426e21691009ffa4b1adb3bf47 Mon Sep 17 00:00:00 2001
+From 3a5dbf745e2eef7669ac79a3d5c035d1284e5477 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sat, 29 Dec 2018 10:57:20 -0800
 Subject: [PATCH 2/4] sunrpc: Don't hardcode cpp path
@@ -65,5 +65,5 @@ index c6607848cc..64d00b4f52 100644
        putarg (1, CPPFLAGS);
        addarg (define);
 -- 
-2.20.1
+2.20.1.495.gaa96b0ce6b-goog
 
