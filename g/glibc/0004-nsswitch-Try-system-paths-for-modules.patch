@@ -1,4 +1,4 @@
-From f344a6632936498275c49739f75d67ab27bebb7e Mon Sep 17 00:00:00 2001
+From ba39f356daceccbffe998543a12fa5014aeedd96 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sat, 29 Dec 2018 12:43:52 -0800
 Subject: [PATCH 4/4] nsswitch: Try system paths for modules
@@ -11,7 +11,7 @@ pure locations.
  1 file changed, 37 insertions(+), 1 deletion(-)
 
 diff --git a/nss/nsswitch.c b/nss/nsswitch.c
-index 3c48b4b85e..d1b4407d25 100644
+index 3d828f9a21..0d8f14f930 100644
 --- a/nss/nsswitch.c
 +++ b/nss/nsswitch.c
 @@ -333,6 +333,42 @@ known_compare (const void *p1, const void *p2)
@@ -67,5 +67,5 @@ index 3c48b4b85e..d1b4407d25 100644
  	{
  	  /* Failed to load the library.  */
 -- 
-2.20.1
+2.20.1.495.gaa96b0ce6b-goog
 
