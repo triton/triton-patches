@@ -1,4 +1,4 @@
-From c857edff094b35800e73dd4f5d3a0d596169127d Mon Sep 17 00:00:00 2001
+From 571ea8d6b0a7a9ab479624a19a0d52a22ec45b61 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Fri, 28 Dec 2018 21:24:38 -0800
 Subject: [PATCH 1/4] Fix common header paths
@@ -100,5 +100,5 @@ index 1342ab3a96..3e6b7f2944 100644
  
  /* Provide trailing slash, since mostly used for building pathnames. */
 -- 
-2.20.1
+2.20.1.495.gaa96b0ce6b-goog
 
