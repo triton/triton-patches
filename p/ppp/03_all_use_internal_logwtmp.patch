@@ -3,8 +3,8 @@ utilities from sys-apps/coreutils to not detect authorized users
 
 Patch by: Sergey Popov <pinkbyte@gentoo.org>
 
---- a/pppd/sys-linux.c     2014-06-16 16:45:48.447810715 +0400
-+++ b/pppd/sys-linux.c  2014-06-16 16:47:10.614805857 +0400
+--- a/pppd/sys-linux.c
++++ b/pppd/sys-linux.c
 @@ -2196,7 +2197,6 @@
      return ok;
  }

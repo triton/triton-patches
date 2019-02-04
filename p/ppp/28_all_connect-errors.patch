@@ -1,6 +1,5 @@
-diff -Nru ppp-2.4.5.orig/pppd/pathnames.h ppp-2.4.5/pppd/pathnames.h
---- ppp-2.4.5.orig/pppd/pathnames.h	2010-08-08 10:06:57.000000000 +0200
-+++ ppp-2.4.5/pppd/pathnames.h	2010-08-08 10:53:51.000000000 +0200
+--- ppp-2.4.5/pppd/pathnames.h
++++ ppp-2.4.5/pppd/pathnames.h
 @@ -29,7 +29,7 @@
  #define _PATH_AUTHDOWN	 _ROOT_PATH "/etc/ppp/auth-down"
  #define _PATH_AUTHFAIL	 _ROOT_PATH "/etc/ppp/auth-fail"

@@ -1,6 +1,5 @@
-diff -Nru ppp-2.4.5.orig/pppd/lcp.c ppp-2.4.5/pppd/lcp.c
---- ppp-2.4.5.orig/pppd/lcp.c	2009-11-16 23:26:07.000000000 +0100
-+++ ppp-2.4.5/pppd/lcp.c	2010-11-27 10:46:26.000000000 +0100
+--- ppp-2.4.5/pppd/lcp.c
++++ ppp-2.4.5/pppd/lcp.c
 @@ -73,6 +73,7 @@
   */
  int	lcp_echo_interval = 0; 	/* Interval between LCP echo-requests */
@@ -41,9 +40,8 @@ diff -Nru ppp-2.4.5.orig/pppd/lcp.c ppp-2.4.5/pppd/lcp.c
       * Make and send the echo request frame.
       */
      if (f->state == OPENED) {
-diff -Nru ppp-2.4.5.orig/pppd/pppd.8 ppp-2.4.5/pppd/pppd.8
---- ppp-2.4.5.orig/pppd/pppd.8	2009-11-16 23:26:07.000000000 +0100
-+++ ppp-2.4.5/pppd/pppd.8	2010-11-27 10:44:58.000000000 +0100
+--- ppp-2.4.5/pppd/pppd.8
++++ ppp-2.4.5/pppd/pppd.8
 @@ -549,6 +549,11 @@
  dynamic IP address option (i.e. set /proc/sys/net/ipv4/ip_dynaddr to
  1) in demand mode if the local address changes.
