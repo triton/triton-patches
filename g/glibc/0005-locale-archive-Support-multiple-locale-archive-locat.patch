@@ -1,0 +1,238 @@
+From 6fa1a89d8f06995c86762682014df5581304f45f Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 21 Jan 2019 12:47:02 -0800
+Subject: [PATCH 1/2] locale-archive: Support multiple locale archive locations
+
+---
+ include/locale.h             |  6 ++++
+ locale/Versions              |  3 ++
+ locale/loadarchive.c         | 65 +++++++++++++++++++++++++++++++++---
+ locale/programs/locale.c     | 11 +++---
+ locale/programs/locarchive.c | 20 +++++++----
+ 5 files changed, 88 insertions(+), 17 deletions(-)
+
+diff --git a/include/locale.h b/include/locale.h
+index 8091e1dc80..3cfa0d749b 100644
+--- a/include/locale.h
++++ b/include/locale.h
+@@ -19,6 +19,12 @@ extern const struct __locale_struct _nl_C_locobj attribute_hidden;
+ /* Now define the internal interfaces.  */
+ extern struct lconv *__localeconv (void);
+ 
++/* Locale archive handling.  */
++extern int locale_open_archive (int flags);
++libc_hidden_proto (locale_open_archive)
++extern const char *locale_get_archive (void);
++libc_hidden_proto (locale_get_archive)
++
+ /* Fetch the name of the current locale set in the given category.  */
+ extern const char *__current_locale_name (int category) attribute_hidden;
+ 
+diff --git a/locale/Versions b/locale/Versions
+index 72119349c1..d8f6839104 100644
+--- a/locale/Versions
++++ b/locale/Versions
+@@ -70,5 +70,8 @@ libc {
+     # global variables
+     __collate_element_hash; __collate_element_strings;
+     __collate_symbol_classes; __collate_symbol_hash; __collate_symbol_strings;
++
++    # Triton functions
++    locale_open_archive; locale_get_archive;
+   }
+ }
+diff --git a/locale/loadarchive.c b/locale/loadarchive.c
+index 803c1cf2a4..5e04afc137 100644
+--- a/locale/loadarchive.c
++++ b/locale/loadarchive.c
+@@ -41,9 +41,6 @@
+ #undef compute_hashval
+ 
+ 
+-/* Name of the locale archive file.  */
+-static const char archfname[] = COMPLOCALEDIR "/locale-archive";
+-
+ /* Size of initial mapping window, optimal if large enough to
+    cover the header plus the initial locale.  */
+ #define ARCHIVE_MAPPING_WINDOW	(2 * 1024 * 1024)
+@@ -202,7 +199,7 @@ _nl_load_locale_from_archive (int category, const char **namep)
+       archmapped = &headmap;
+ 
+       /* The archive has never been opened.  */
+-      fd = __open_nocancel (archfname, O_RDONLY|O_LARGEFILE|O_CLOEXEC);
++      fd = locale_open_archive (O_RDONLY|O_LARGEFILE|O_CLOEXEC);
+       if (fd < 0)
+ 	/* Cannot open the archive, for whatever reason.  */
+ 	return NULL;
+@@ -397,7 +394,7 @@ _nl_load_locale_from_archive (int category, const char **namep)
+ 	  if (fd == -1)
+ 	    {
+ 	      struct stat64 st;
+-	      fd = __open_nocancel (archfname,
++	      fd = locale_open_archive (
+ 				    O_RDONLY|O_LARGEFILE|O_CLOEXEC);
+ 	      if (fd == -1)
+ 		/* Cannot open the archive, for whatever reason.  */
+@@ -498,6 +495,64 @@ _nl_load_locale_from_archive (int category, const char **namep)
+   return lia->data[category];
+ }
+ 
++static const char *__locale_archive = NULL;
++
++int locale_open_archive (int flags)
++{
++  int r;
++
++  /* Try the environment path  */
++  __locale_archive = __libc_secure_getenv ("LOCALE_ARCHIVE");
++  if (__locale_archive)
++    {
++      r = __open_nocancel (__locale_archive, flags);
++      if (r >= 0)
++	return r;
++    }
++
++  /* Try the triton path  */
++  __locale_archive = "/run/current-system/locale/lib/locale/locale-archive";
++  r = __open_nocancel (__locale_archive, flags);
++  if (r >= 0)
++    return r;
++
++  /* Try the standard unix path  */
++  __locale_archive = "/usr/lib/locale/locale-archive";
++  r = __open_nocancel (__locale_archive, flags);
++  if (r >= 0)
++    return r;
++
++  /* Finally fall-back to our built-in archive */
++  __locale_archive = COMPLOCALEDIR "/locale-archive";
++  r = __open_nocancel (__locale_archive, flags);
++  if (r >= 0)
++    return r;
++
++  __locale_archive = NULL;
++  return r;
++}
++libc_hidden_def (locale_open_archive)
++
++const char *locale_get_archive (void)
++{
++  if (__locale_archive)
++    return __locale_archive;
++
++  /* Try to open an archive if we don't have one  */
++  __close_nocancel_nostatus (locale_open_archive (O_RDONLY));
++  if (__locale_archive)
++    return __locale_archive;
++
++  /* Fall-back to the environment  */
++  __locale_archive = __libc_secure_getenv ("LOCALE_ARCHIVE");
++  if (__locale_archive)
++    return __locale_archive;
++
++  /* Worst case we just return something generic  */
++  return "/lib/locale/locale-archive";
++}
++libc_hidden_def (locale_get_archive)
++
+ void __libc_freeres_fn_section
+ _nl_archive_subfreeres (void)
+ {
+diff --git a/locale/programs/locale.c b/locale/programs/locale.c
+index 8af0d78a77..eed338452b 100644
+--- a/locale/programs/locale.c
++++ b/locale/programs/locale.c
+@@ -46,8 +46,6 @@
+ #include "../locarchive.h"
+ #include <programs/xmalloc.h>
+ 
+-#define ARCHIVE_NAME COMPLOCALEDIR "/locale-archive"
+-
+ /* If set print the name of the category.  */
+ static int show_category_name;
+ 
+@@ -643,10 +641,13 @@ write_archive_locales (void **all_datap, char *linebuf)
+   char *addr = MAP_FAILED;
+   int fd, ret = 0;
+   uint32_t cnt;
++  char archive_name[PATH_MAX+1];
+ 
+-  fd = open64 (ARCHIVE_NAME, O_RDONLY);
++  fd = locale_open_archive (O_RDONLY);
+   if (fd < 0)
+     return 0;
++  strncpy (archive_name, locale_get_archive (), PATH_MAX);
++  archive_name[PATH_MAX] = '\0';
+ 
+   if (fstat64 (fd, &st) < 0 || st.st_size < sizeof (*head))
+     goto error_out;
+@@ -699,8 +700,8 @@ write_archive_locales (void **all_datap, char *linebuf)
+ 	  if (cnt)
+ 	    putchar_unlocked ('\n');
+ 
+-	  printf ("locale: %-15.15s archive: " ARCHIVE_NAME "\n%s\n",
+-		  names[cnt].name, linebuf);
++	  printf ("locale: %-15.15s archive: %s\n%s\n",
++		  archive_name, names[cnt].name, linebuf);
+ 
+ 	  locrec = (struct locrecent *) (addr + names[cnt].locrec_offset);
+ 
+diff --git a/locale/programs/locarchive.c b/locale/programs/locarchive.c
+index e6310b18be..7e125d8076 100644
+--- a/locale/programs/locarchive.c
++++ b/locale/programs/locarchive.c
+@@ -57,8 +57,6 @@
+ 
+ extern const char *output_prefix;
+ 
+-#define ARCHIVE_NAME COMPLOCALEDIR "/locale-archive"
+-
+ static const char *locnames[] =
+   {
+ #define DEFINE_CATEGORY(category, category_name, items, a) \
+@@ -340,12 +338,16 @@ enlarge_archive (struct locarhandle *ah, const struct locarhead *head)
+   struct namehashent *oldnamehashtab;
+   struct locarhandle new_ah;
+   size_t prefix_len = output_prefix ? strlen (output_prefix) : 0;
+-  char archivefname[prefix_len + sizeof (ARCHIVE_NAME)];
+-  char fname[prefix_len + sizeof (ARCHIVE_NAME) + sizeof (".XXXXXX") - 1];
++  char archivefname[PATH_MAX + 1];
++  char fname[PATH_MAX + 1];
++  const char *locale_archive_path;
+ 
+   if (output_prefix)
+     memcpy (archivefname, output_prefix, prefix_len);
+-  strcpy (archivefname + prefix_len, ARCHIVE_NAME);
++  locale_archive_path = locale_get_archive ();
++  if (!locale_archive_path)
++    error (EXIT_FAILURE, 0, _("cannot find locale archive path"));
++  strcpy (archivefname + prefix_len, locale_archive_path);
+   strcpy (stpcpy (fname, archivefname), ".XXXXXX");
+ 
+   /* Not all of the old file has to be mapped.  Change this now this
+@@ -563,8 +565,9 @@ open_archive (struct locarhandle *ah, bool readonly)
+   struct locarhead head;
+   int retry = 0;
+   size_t prefix_len = output_prefix ? strlen (output_prefix) : 0;
+-  char default_fname[prefix_len + sizeof (ARCHIVE_NAME)];
++  char default_fname[PATH_MAX + 1];
+   const char *archivefname = ah->fname;
++  const char *locale_archive_path;
+ 
+   /* If ah has a non-NULL fname open that otherwise open the default.  */
+   if (archivefname == NULL)
+@@ -572,7 +575,10 @@ open_archive (struct locarhandle *ah, bool readonly)
+       archivefname = default_fname;
+       if (output_prefix)
+         memcpy (default_fname, output_prefix, prefix_len);
+-      strcpy (default_fname + prefix_len, ARCHIVE_NAME);
++      locale_archive_path = locale_get_archive ();
++      if (!locale_archive_path)
++        error (EXIT_FAILURE, 0, _("cannot find locale archive path"));
++      strcpy (default_fname + prefix_len, locale_archive_path);
+     }
+ 
+   while (1)
+-- 
+2.20.1
+
