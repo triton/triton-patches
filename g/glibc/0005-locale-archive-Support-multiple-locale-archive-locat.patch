@@ -1,15 +1,15 @@
-From 6fa1a89d8f06995c86762682014df5581304f45f Mon Sep 17 00:00:00 2001
+From 09c703d6507fa3cf95b247e152318a4a894d6e1d Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 21 Jan 2019 12:47:02 -0800
-Subject: [PATCH 1/2] locale-archive: Support multiple locale archive locations
+Subject: [PATCH 5/6] locale-archive: Support multiple locale archive locations
 
 ---
  include/locale.h             |  6 ++++
  locale/Versions              |  3 ++
- locale/loadarchive.c         | 65 +++++++++++++++++++++++++++++++++---
- locale/programs/locale.c     | 11 +++---
- locale/programs/locarchive.c | 20 +++++++----
- 5 files changed, 88 insertions(+), 17 deletions(-)
+ locale/loadarchive.c         | 60 +++++++++++++++++++++++++++++++++---
+ locale/programs/locale.c     | 11 ++++---
+ locale/programs/locarchive.c | 20 +++++++-----
+ 5 files changed, 83 insertions(+), 17 deletions(-)
 
 diff --git a/include/locale.h b/include/locale.h
 index 8091e1dc80..3cfa0d749b 100644
@@ -42,7 +42,7 @@ index 72119349c1..d8f6839104 100644
    }
  }
 diff --git a/locale/loadarchive.c b/locale/loadarchive.c
-index 803c1cf2a4..5e04afc137 100644
+index 803c1cf2a4..3f29c18d35 100644
 --- a/locale/loadarchive.c
 +++ b/locale/loadarchive.c
 @@ -41,9 +41,6 @@
@@ -73,7 +73,7 @@ index 803c1cf2a4..5e04afc137 100644
  				    O_RDONLY|O_LARGEFILE|O_CLOEXEC);
  	      if (fd == -1)
  		/* Cannot open the archive, for whatever reason.  */
-@@ -498,6 +495,64 @@ _nl_load_locale_from_archive (int category, const char **namep)
+@@ -498,6 +495,59 @@ _nl_load_locale_from_archive (int category, const char **namep)
    return lia->data[category];
  }
  
@@ -117,11 +117,6 @@ index 803c1cf2a4..5e04afc137 100644
 +
 +const char *locale_get_archive (void)
 +{
-+  if (__locale_archive)
-+    return __locale_archive;
-+
-+  /* Try to open an archive if we don't have one  */
-+  __close_nocancel_nostatus (locale_open_archive (O_RDONLY));
 +  if (__locale_archive)
 +    return __locale_archive;
 +
