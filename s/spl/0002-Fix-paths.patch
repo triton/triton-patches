@@ -1,4 +1,4 @@
-From 3f92887914bd5b121eb0fe000795093e770c27be Mon Sep 17 00:00:00 2001
+From c5e1acf15b5a5780333b16b5fef80ee18d7e3d45 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Wed, 19 Oct 2016 16:54:18 -0700
 Subject: [PATCH 2/2] Fix paths
@@ -9,7 +9,7 @@ Subject: [PATCH 2/2] Fix paths
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/module/splat/splat-linux.c b/module/splat/splat-linux.c
-index 1565d74..fb09ab8 100644
+index b5a1f14..54ebe80 100644
 --- a/module/splat/splat-linux.c
 +++ b/module/splat/splat-linux.c
 @@ -120,7 +120,7 @@ splat_linux_drop_slab(struct file *file)
@@ -22,7 +22,7 @@ index 1565d74..fb09ab8 100644
  	int rc;
  
 diff --git a/module/splat/splat-vnode.c b/module/splat/splat-vnode.c
-index 4ccf24f..588452c 100644
+index 9160003..519ee2a 100644
 --- a/module/splat/splat-vnode.c
 +++ b/module/splat/splat-vnode.c
 @@ -67,7 +67,7 @@ splat_vnode_user_cmd(struct file *file, void *arg,
@@ -35,5 +35,5 @@ index 4ccf24f..588452c 100644
  	int rc;
  
 -- 
-2.17.0.484.g0c8726318c-goog
+2.21.0.352.gf09ad66450-goog
 
