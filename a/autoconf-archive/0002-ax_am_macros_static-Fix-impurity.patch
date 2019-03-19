@@ -1,0 +1,24 @@
+From cb6efc3d1c07c8eaf6ecfbe14c504d86ca36364d Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 18 Mar 2019 17:45:27 -0700
+Subject: [PATCH 2/2] ax_am_macros_static: Fix impurity
+
+---
+ m4/ax_am_macros_static.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4/ax_am_macros_static.m4 b/m4/ax_am_macros_static.m4
+index f4cee8c..7fba5b2 100644
+--- a/m4/ax_am_macros_static.m4
++++ b/m4/ax_am_macros_static.m4
+@@ -33,6 +33,6 @@ AC_DEFUN([AX_AM_MACROS_STATIC],
+ [
+ AX_AC_PRINT_TO_FILE(AMINCLUDE_STATIC,[
+ # ]AMINCLUDE_STATIC[ generated automatically by Autoconf
+-# from AX_AM_MACROS_STATIC on ]m4_esyscmd([LC_ALL=C date])[
++# from AX_AM_MACROS_STATIC
+ ])
+ ])
+-- 
+2.21.0.225.g810b269d1ac-goog
+
