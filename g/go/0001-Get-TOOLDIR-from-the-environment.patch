@@ -1,0 +1,33 @@
+From 08e7edf842800a2f5aca91bc5f73cacfbb1cec11 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Tue, 2 Apr 2019 20:24:01 -0700
+Subject: [PATCH] Get TOOLDIR from the environment
+
+---
+ src/go/build/gc.go | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/go/build/gc.go b/src/go/build/gc.go
+index 3025cd5681..081b8ce2fb 100644
+--- a/src/go/build/gc.go
++++ b/src/go/build/gc.go
+@@ -7,11 +7,16 @@
+ package build
+ 
+ import (
++	"os"
+ 	"path/filepath"
+ 	"runtime"
+ )
+ 
+ // getToolDir returns the default value of ToolDir.
+ func getToolDir() string {
++	s := os.Getenv("GOTOOLDIR")
++	if s != "" {
++		return s
++	}
+ 	return filepath.Join(runtime.GOROOT(), "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
+ }
+-- 
+2.21.0.392.gf8f6787159e-goog
+
