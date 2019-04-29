@@ -1,0 +1,68 @@
+diff --git a/common/Makefile.in b/common/Makefile.in
+index 7c01d87..8215baa 100644
+--- a/common/Makefile.in
++++ b/common/Makefile.in
+@@ -2960,13 +2960,13 @@ uninstall-am:
+ @MAINTAINER_MODE_TRUE@audit-events.h: Makefile.am mkstrtable.awk exaudit.awk audit.h
+ @MAINTAINER_MODE_TRUE@	$(AWK) -f $(srcdir)/exaudit.awk $(srcdir)/audit.h \
+ @MAINTAINER_MODE_TRUE@	  | $(AWK) -f $(srcdir)/mkstrtable.awk -v textidx=3 -v nogettext=1 \
+-@MAINTAINER_MODE_TRUE@		   -v namespace=eventstr_  > $(srcdir)/audit-events.h
++@MAINTAINER_MODE_TRUE@		   -v pkg_namespace=eventstr_  > $(srcdir)/audit-events.h
+ 
+ # Create the status-codes.h include file from status.h
+ @MAINTAINER_MODE_TRUE@status-codes.h: Makefile.am mkstrtable.awk exstatus.awk status.h
+ @MAINTAINER_MODE_TRUE@	$(AWK) -f $(srcdir)/exstatus.awk $(srcdir)/status.h \
+ @MAINTAINER_MODE_TRUE@	  | $(AWK) -f $(srcdir)/mkstrtable.awk -v textidx=3 -v nogettext=1 \
+-@MAINTAINER_MODE_TRUE@		   -v namespace=statusstr_  > $(srcdir)/status-codes.h
++@MAINTAINER_MODE_TRUE@		   -v pkg_namespace=statusstr_  > $(srcdir)/status-codes.h
+ 
+ # All programs should depend on the created libs.
+ $(PROGRAMS) : libcommon.a libcommonpth.a
+diff --git a/common/mkstrtable.awk b/common/mkstrtable.awk
+index b5d4ef0..60efce8 100644
+--- a/common/mkstrtable.awk
++++ b/common/mkstrtable.awk
+@@ -76,7 +76,7 @@
+ #
+ # The variable prefix can be used to prepend a string to each message.
+ #
+-# The variable namespace can be used to prepend a string to each
++# The variable pkg_namespace can be used to prepend a string to each
+ # variable and macro name.
+ 
+ BEGIN {
+@@ -101,7 +101,7 @@ header {
+       print "/* The purpose of this complex string table is to produce";
+       print "   optimal code with a minimum of relocations.  */";
+       print "";
+-      print "static const char " namespace "msgstr[] = ";
++      print "static const char " pkg_namespace "msgstr[] = ";
+       header = 0;
+     }
+   else
+@@ -109,7 +109,7 @@ header {
+ }
+ 
+ !header {
+-  sub (/\#.+/, "");
++  sub (/#.+/, "");
+   sub (/[ 	]+$/, ""); # Strip trailing space and tab characters.
+ 
+   if (/^$/)
+@@ -149,14 +149,14 @@ END {
+   else
+     print "  gettext_noop (\"" prefix last_msgstr "\");";
+   print "";
+-  print "static const int " namespace "msgidx[] =";
++  print "static const int " pkg_namespace "msgidx[] =";
+   print "  {";
+   for (i = 0; i < coded_msgs; i++)
+     print "    " pos[i] ",";
+   print "    " pos[coded_msgs];
+   print "  };";
+   print "";
+-  print "#define " namespace "msgidxof(code) (0 ? -1 \\";
++  print "#define " pkg_namespace "msgidxof(code) (0 ? -1 \\";
+ 
+ # Gather the ranges.
+   skip = code[0];
