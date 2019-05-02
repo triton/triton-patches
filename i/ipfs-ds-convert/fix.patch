@@ -1,0 +1,29 @@
+diff --git a/convert/copy.go b/convert/copy.go
+index 2bff661..0bafd51 100644
+--- a/convert/copy.go
++++ b/convert/copy.go
+@@ -196,11 +196,7 @@ func CopyKeys(fromDs repo.Datastore, toDs repo.Datastore) error {
+ 
+ 		curBatch.Put(ds.RawKey(entry.Key), val)
+ 		curEntries++
+-
+-		bval, ok := val.([]byte)
+-		if ok {
+-			curSize += len(bval)
+-		}
++		curSize += len(val)
+ 
+ 		if curEntries == maxBatchEntries || curSize >= maxBatchSize {
+ 			err := curBatch.Commit()
+diff --git a/repo/open.go b/repo/open.go
+index d885af4..6d4e7d6 100644
+--- a/repo/open.go
++++ b/repo/open.go
+@@ -27,7 +27,6 @@ import (
+ 
+ type Datastore interface {
+ 	ds.Batching
+-	io.Closer
+ }
+ 
+ type Retry struct {
