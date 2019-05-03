@@ -1,0 +1,32 @@
+From 5a8b436a1765c4fc41d25871954ab87cf64b1b7f Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Tue, 3 Jan 2017 19:49:45 -0800
+Subject: [PATCH 3/4] gcc: Don't hardcode startfile locations
+
+crt{1,0,i,n}.o among other binaries are presumed to exist
+in a hardcoded location on most systems. This is not true for our build
+system.
+---
+ gcc/gcc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/gcc.c b/gcc/gcc.c
+index 4f57765b012..93dc23413e0 100644
+--- a/gcc/gcc.c
++++ b/gcc/gcc.c
+@@ -1468,10 +1468,10 @@ static const char *gcc_libexec_prefix;
+ /* Default prefixes to attach to command names.  */
+ 
+ #ifndef STANDARD_STARTFILE_PREFIX_1
+-#define STANDARD_STARTFILE_PREFIX_1 "/lib/"
++#define STANDARD_STARTFILE_PREFIX_1 "/no-such-path/"
+ #endif
+ #ifndef STANDARD_STARTFILE_PREFIX_2
+-#define STANDARD_STARTFILE_PREFIX_2 "/usr/lib/"
++#define STANDARD_STARTFILE_PREFIX_2 "/no-such-path/"
+ #endif
+ 
+ #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
+-- 
+2.21.0.1020.gf2820cf01a-goog
+
