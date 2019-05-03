@@ -1,0 +1,25 @@
+From 7e1e236ee5546a3b9c39e1b3e454ad448175189e Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Thu, 25 Oct 2018 03:48:37 -0700
+Subject: [PATCH 4/4] cppdefault: Don't add a default @local_prefix@/include
+
+---
+ gcc/cppdefault.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gcc/cppdefault.c b/gcc/cppdefault.c
+index c4796385643..adffd6b1b16 100644
+--- a/gcc/cppdefault.c
++++ b/gcc/cppdefault.c
+@@ -35,6 +35,8 @@
+ # undef CROSS_INCLUDE_DIR
+ #endif
+ 
++#undef LOCAL_INCLUDE_DIR
++
+ const struct default_include cpp_include_defaults[]
+ #ifdef INCLUDE_DEFAULTS
+ = INCLUDE_DEFAULTS;
+-- 
+2.21.0.1020.gf2820cf01a-goog
+
