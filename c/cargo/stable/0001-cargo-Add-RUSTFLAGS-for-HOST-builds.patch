@@ -1,0 +1,32 @@
+From e812450dc057401265812321c1db8ea4df0322df Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Fri, 17 May 2019 17:55:27 -0700
+Subject: [PATCH] cargo: Add RUSTFLAGS for HOST builds
+
+---
+ src/cargo/core/compiler/build_context/mod.rs | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/cargo/core/compiler/build_context/mod.rs b/src/cargo/core/compiler/build_context/mod.rs
+index 789acc8a..50731851 100644
+--- a/src/cargo/core/compiler/build_context/mod.rs
++++ b/src/cargo/core/compiler/build_context/mod.rs
+@@ -332,6 +332,15 @@ fn env_args(
+     let is_target_kind = kind == Kind::Target;
+ 
+     if compiling_with_target && !is_target_kind {
++        if let Ok(a) = env::var(format!("{}_HOST", name)) {
++            let args = a
++                .split(' ')
++                .map(str::trim)
++                .filter(|s| !s.is_empty())
++                .map(str::to_string);
++            return Ok(args.collect());
++        }
++
+         // This is probably a build script or plugin and we're
+         // compiling with --target. In this scenario there are
+         // no rustflags we can apply.
+-- 
+2.21.0.1020.gf2820cf01a-goog
+
