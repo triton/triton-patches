@@ -1,17 +1,17 @@
-From e812450dc057401265812321c1db8ea4df0322df Mon Sep 17 00:00:00 2001
+From d6f3f818f2734b0f80fae7df17581a08a1973ca5 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
-Date: Fri, 17 May 2019 17:55:27 -0700
+Date: Sat, 6 Jul 2019 22:31:00 -0700
 Subject: [PATCH] cargo: Add RUSTFLAGS for HOST builds
 
 ---
- src/cargo/core/compiler/build_context/mod.rs | 9 +++++++++
+ src/cargo/core/compiler/build_context/target_info.rs | 9 +++++++++
  1 file changed, 9 insertions(+)
 
-diff --git a/src/cargo/core/compiler/build_context/mod.rs b/src/cargo/core/compiler/build_context/mod.rs
-index 789acc8a..50731851 100644
---- a/src/cargo/core/compiler/build_context/mod.rs
-+++ b/src/cargo/core/compiler/build_context/mod.rs
-@@ -332,6 +332,15 @@ fn env_args(
+diff --git a/src/cargo/core/compiler/build_context/target_info.rs b/src/cargo/core/compiler/build_context/target_info.rs
+index 8abc579e..cf115533 100644
+--- a/src/cargo/core/compiler/build_context/target_info.rs
++++ b/src/cargo/core/compiler/build_context/target_info.rs
+@@ -363,6 +363,15 @@ fn env_args(
      let is_target_kind = kind == Kind::Target;
  
      if compiling_with_target && !is_target_kind {
@@ -28,5 +28,5 @@ index 789acc8a..50731851 100644
          // compiling with --target. In this scenario there are
          // no rustflags we can apply.
 -- 
-2.21.0.1020.gf2820cf01a-goog
+2.21.0
 
