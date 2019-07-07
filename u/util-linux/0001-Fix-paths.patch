@@ -1,17 +1,17 @@
-From 28e22eb161639ca2d259f1b7c88c94e82f540200 Mon Sep 17 00:00:00 2001
+From 07585b4d5cafbe9ac6bb397a2c99ac0284d8d2d8 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
-Date: Thu, 19 Oct 2017 12:09:48 -0700
+Date: Sat, 6 Jul 2019 18:08:16 -0700
 Subject: [PATCH] Fix paths
 
 ---
- include/pathnames.h | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ include/pathnames.h | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/include/pathnames.h b/include/pathnames.h
-index 0778d4f20..c9947dceb 100644
+index ee470ee4b..1646ca5d9 100644
 --- a/include/pathnames.h
 +++ b/include/pathnames.h
-@@ -22,17 +22,17 @@
+@@ -21,17 +21,17 @@
  #undef _PATH_DEFPATH
  
  #ifdef USE_USRDIR_PATHS_ONLY
@@ -33,7 +33,15 @@ index 0778d4f20..c9947dceb 100644
  #endif
  
  #define	_PATH_HUSHLOGIN		".hushlogin"
-@@ -50,9 +50,9 @@
+@@ -42,17 +42,17 @@
+ #ifndef _PATH_MAILDIR
+ # define _PATH_MAILDIR		"/var/spool/mail"
+ #endif
+-#define	_PATH_MOTDFILE		"/usr/share/misc/motd:/run/motd:/etc/motd"
++#define	_PATH_MOTDFILE		"/run/current-system/sw/share/misc/motd:/usr/share/misc/motd:/run/motd:/etc/motd"
+ #ifndef _PATH_NOLOGIN
+ # define _PATH_NOLOGIN		"/etc/nologin"
+ #endif
  #define	_PATH_VAR_NOLOGIN	"/var/run/nologin"
  
  #ifndef _PATH_LOGIN
@@ -41,13 +49,15 @@ index 0778d4f20..c9947dceb 100644
 +# define _PATH_LOGIN		"/run/current-system/sw/bin/login"
  #endif
 -#define _PATH_SHUTDOWN		"/sbin/shutdown"
+-#define _PATH_POWEROFF		"/sbin/poweroff"
 +#define _PATH_SHUTDOWN		"/run/current-system/sw/bin/shutdown"
++#define _PATH_POWEROFF		"/run/current-system/sw/bin/poweroff"
  
  #define _PATH_TERMCOLORS_DIRNAME "terminal-colors.d"
  #define _PATH_TERMCOLORS_DIR	"/etc/" _PATH_TERMCOLORS_DIRNAME
-@@ -70,13 +70,13 @@
+@@ -72,13 +72,13 @@
+ #define _PATH_ISSUEDIR		_PATH_ISSUE ".d"
  
- #define _PATH_ISSUE		"/etc/issue"
  #define _PATH_OS_RELEASE_ETC	"/etc/os-release"
 -#define _PATH_OS_RELEASE_USR	"/usr/lib/os-release"
 +#define _PATH_OS_RELEASE_USR	"/run/current-system/etc/os-release"
@@ -63,5 +73,5 @@ index 0778d4f20..c9947dceb 100644
  /* mount paths */
  #define _PATH_FILESYSTEMS	"/etc/filesystems"
 -- 
-2.14.2
+2.21.0
 
