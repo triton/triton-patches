@@ -1,0 +1,61 @@
+From 34fa824e6b30a83e997b746250b2992774da609a Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 29 Jul 2019 13:09:19 -0700
+Subject: [PATCH] Makefile: Fix argument list too long
+
+---
+ Makefile                    | 10 ++++++----
+ templates/Makefile.template | 10 ++++++----
+ 2 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 896287bb22..3a8bfb0ced 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3036,13 +3036,15 @@ install-headers: install-headers_c install-headers_cxx
+ 
+ install-headers_c:
+ 	$(E) "[INSTALL] Installing public C headers"
+-	$(Q) $(foreach h, $(PUBLIC_HEADERS_C), $(INSTALL) -d $(prefix)/$(dir $(h)) && ) exit 0 || exit 1
+-	$(Q) $(foreach h, $(PUBLIC_HEADERS_C), $(INSTALL) $(h) $(prefix)/$(h) && ) exit 0 || exit 1
++	$(Q) for h in $(PUBLIC_HEADERS_C); do \
++	$(INSTALL) -D $$h $(prefix)/$$h ; \
++	done
+ 
+ install-headers_cxx:
+ 	$(E) "[INSTALL] Installing public C++ headers"
+-	$(Q) $(foreach h, $(PUBLIC_HEADERS_CXX), $(INSTALL) -d $(prefix)/$(dir $(h)) && ) exit 0 || exit 1
+-	$(Q) $(foreach h, $(PUBLIC_HEADERS_CXX), $(INSTALL) $(h) $(prefix)/$(h) && ) exit 0 || exit 1
++	$(Q) for h in $(PUBLIC_HEADERS_CXX); do \
++	$(INSTALL) -D $$h $(prefix)/$$h ; \
++	done
+ 
+ install-static: install-static_c install-static_cxx
+ 
+diff --git a/templates/Makefile.template b/templates/Makefile.template
+index a46a27061a..e143bcd135 100644
+--- a/templates/Makefile.template
++++ b/templates/Makefile.template
+@@ -1343,13 +1343,15 @@
+ 
+   install-headers_c:
+   	$(E) "[INSTALL] Installing public C headers"
+-  	$(Q) $(foreach h, $(PUBLIC_HEADERS_C), $(INSTALL) -d $(prefix)/$(dir $(h)) && ) exit 0 || exit 1
+-  	$(Q) $(foreach h, $(PUBLIC_HEADERS_C), $(INSTALL) $(h) $(prefix)/$(h) && ) exit 0 || exit 1
++  	$(Q) for h in $(PUBLIC_HEADERS_C); do \
++  	$(INSTALL) -D $$h $(prefix)/$$h ; \
++  	done
+ 
+   install-headers_cxx:
+   	$(E) "[INSTALL] Installing public C++ headers"
+-  	$(Q) $(foreach h, $(PUBLIC_HEADERS_CXX), $(INSTALL) -d $(prefix)/$(dir $(h)) && ) exit 0 || exit 1
+-  	$(Q) $(foreach h, $(PUBLIC_HEADERS_CXX), $(INSTALL) $(h) $(prefix)/$(h) && ) exit 0 || exit 1
++  	$(Q) for h in $(PUBLIC_HEADERS_CXX); do \
++  	$(INSTALL) -D $$h $(prefix)/$$h ; \
++  	done
+ 
+   install-static: install-static_c install-static_cxx
+ 
+-- 
+2.22.0.709.g102302147b-goog
+
