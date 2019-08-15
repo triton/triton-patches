@@ -1,0 +1,73 @@
+From ca630fc76c39671929f9c26d209ffd121a94b275 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Thu, 15 Aug 2019 11:47:54 -0700
+Subject: [PATCH] bfd: No bundled bfd-plugin support
+
+---
+ bfd/plugin.c | 45 ++-------------------------------------------
+ 1 file changed, 2 insertions(+), 43 deletions(-)
+
+diff --git a/bfd/plugin.c b/bfd/plugin.c
+index f99c4e156b3..a1594b53a17 100644
+--- a/bfd/plugin.c
++++ b/bfd/plugin.c
+@@ -364,54 +364,13 @@ register_ld_plugin_object_p (const bfd_target *(*object_p) (bfd *))
+ static int
+ load_plugin (bfd *abfd)
+ {
+-  char *plugin_dir;
+-  char *p;
+-  DIR *d;
+-  struct dirent *ent;
+-  int found = 0;
+-
+   if (!has_plugin)
+-    return found;
++    return 0;
+ 
+   if (plugin_name)
+     return try_load_plugin (plugin_name, abfd, &has_plugin);
+ 
+-  if (plugin_program_name == NULL)
+-    return found;
+-
+-  plugin_dir = concat (BINDIR, "/../lib/bfd-plugins", NULL);
+-  p = make_relative_prefix (plugin_program_name,
+-			    BINDIR,
+-			    plugin_dir);
+-  free (plugin_dir);
+-  plugin_dir = NULL;
+-
+-  d = opendir (p);
+-  if (!d)
+-    goto out;
+-
+-  while ((ent = readdir (d)))
+-    {
+-      char *full_name;
+-      struct stat s;
+-      int valid_plugin;
+-
+-      full_name = concat (p, "/", ent->d_name, NULL);
+-      if (stat (full_name, &s) == 0 && S_ISREG (s.st_mode))
+-	found = try_load_plugin (full_name, abfd, &valid_plugin);
+-      if (has_plugin <= 0)
+-	has_plugin = valid_plugin;
+-      free (full_name);
+-      if (found)
+-	break;
+-    }
+-
+- out:
+-  free (p);
+-  if (d)
+-    closedir (d);
+-
+-  return found;
++  return 0;
+ }
+ 
+ 
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+
