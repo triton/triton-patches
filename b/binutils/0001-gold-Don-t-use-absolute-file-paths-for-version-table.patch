@@ -1,4 +1,4 @@
-From 7b0faa21f468f453167c24c453ac78f61aa34bee Mon Sep 17 00:00:00 2001
+From 994e96e58f6c1cc4eafd593b87b8ce7e102b3bf1 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 2 Sep 2019 02:31:49 -0700
 Subject: [PATCH] gold: Don't use absolute file paths for version table
@@ -8,14 +8,22 @@ for the output file name of the executable. In shared libraries, this
 gets saved into the version table. Use the basename instead as it should
 be sufficiently distinct.
 ---
- gold/dynobj.cc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ gold/dynobj.cc | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/gold/dynobj.cc b/gold/dynobj.cc
-index 0a8d897c65c..b7a73b6f695 100644
+index 0a8d897c65c..37b2d1ed9cf 100644
 --- a/gold/dynobj.cc
 +++ b/gold/dynobj.cc
-@@ -1493,7 +1493,7 @@ Versions::define_base_version(Stringpool* dynpool)
+@@ -26,6 +26,7 @@
+ #include <cstring>
+ 
+ #include "elfcpp.h"
++#include "libiberty.h"
+ #include "parameters.h"
+ #include "script.h"
+ #include "symtab.h"
+@@ -1493,7 +1494,7 @@ Versions::define_base_version(Stringpool* dynpool)
    gold_assert(this->defs_.empty());
    const char* name = parameters->options().soname();
    if (name == NULL)
