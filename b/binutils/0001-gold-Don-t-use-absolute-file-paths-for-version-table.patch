@@ -1,0 +1,29 @@
+From 7b0faa21f468f453167c24c453ac78f61aa34bee Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Mon, 2 Sep 2019 02:31:49 -0700
+Subject: [PATCH] gold: Don't use absolute file paths for version table
+
+Executables often get linked with absolute paths to the build directory
+for the output file name of the executable. In shared libraries, this
+gets saved into the version table. Use the basename instead as it should
+be sufficiently distinct.
+---
+ gold/dynobj.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gold/dynobj.cc b/gold/dynobj.cc
+index 0a8d897c65c..b7a73b6f695 100644
+--- a/gold/dynobj.cc
++++ b/gold/dynobj.cc
+@@ -1493,7 +1493,7 @@ Versions::define_base_version(Stringpool* dynpool)
+   gold_assert(this->defs_.empty());
+   const char* name = parameters->options().soname();
+   if (name == NULL)
+-    name = parameters->options().output_file_name();
++    name = lbasename(parameters->options().output_file_name());
+   name = dynpool->add(name, false, NULL);
+   Verdef* vdbase = new Verdef(name, std::vector<std::string>(),
+                               true, false, false, true);
+-- 
+2.23.0.187.g17f5b7556c-goog
+
