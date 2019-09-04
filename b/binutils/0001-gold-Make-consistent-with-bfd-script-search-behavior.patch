@@ -1,0 +1,53 @@
+From 0f73c8433ff39eca04eca9e2e2a68271f4dc9187 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Wed, 4 Sep 2019 11:40:32 -0700
+Subject: [PATCH] gold: Make consistent with bfd script search behavior
+
+If a linkscript lives in .libs/main.lnkscript and contains
+  INPUT (
+    .libs/main.o
+    .libs/lib.o
+  )
+
+bfd tries to read the files from the current working directory, gold
+tries to read them from the script directory. This is a discrepandcy:
+    bfd -> .libs/main.o .libs/lib.o
+    gold -> .libs/.libs/main.o .libs/.libs/lib.o
+---
+ gold/script.cc | 13 -------------
+ 1 file changed, 13 deletions(-)
+
+diff --git a/gold/script.cc b/gold/script.cc
+index 0f42d484969..d0ddcb51bc0 100644
+--- a/gold/script.cc
++++ b/gold/script.cc
+@@ -2686,7 +2686,6 @@ script_add_file(void* closurev, const char* name, size_t length)
+   // libc.so, which refers to /lib/libc.so.6.
+   std::string name_string(name, length);
+   const char* extra_search_path = ".";
+-  std::string script_directory;
+   if (IS_ABSOLUTE_PATH(name_string.c_str()))
+     {
+       if (closure->is_in_sysroot())
+@@ -2696,18 +2695,6 @@ script_add_file(void* closurev, const char* name, size_t length)
+ 	  name_string = sysroot + name_string;
+ 	}
+     }
+-  else
+-    {
+-      // In addition to checking the normal library search path, we
+-      // also want to check in the script-directory.
+-      const char* slash = strrchr(closure->filename(), '/');
+-      if (slash != NULL)
+-	{
+-	  script_directory.assign(closure->filename(),
+-				  slash - closure->filename() + 1);
+-	  extra_search_path = script_directory.c_str();
+-	}
+-    }
+ 
+   Input_file_argument file(name_string.c_str(),
+ 			   Input_file_argument::INPUT_FILE_TYPE_FILE,
+-- 
+2.23.0.187.g17f5b7556c-goog
+
