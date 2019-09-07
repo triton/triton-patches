@@ -1,7 +1,7 @@
-From 8e872723a7f0222254947b01b760de2f13d753f9 Mon Sep 17 00:00:00 2001
+From 1e3c0e5846bf13bbed77e53de6eb8ef3dc9dd9c2 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 7 Jul 2019 15:15:55 -0700
-Subject: [PATCH] build: Support for 'any' system type
+Subject: [PATCH 10/11] build: Support for 'any' system type
 
 ---
  src/build-remote/build-remote.cc   | 3 ++-
@@ -9,21 +9,21 @@ Subject: [PATCH] build: Support for 'any' system type
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/src/build-remote/build-remote.cc b/src/build-remote/build-remote.cc
-index abf3669b..1c1f7eb7 100644
+index 279ae62f..243c73c2 100644
 --- a/src/build-remote/build-remote.cc
 +++ b/src/build-remote/build-remote.cc
-@@ -99,7 +99,8 @@ static int _main(int argc, char * * argv)
+@@ -105,7 +105,8 @@ static int _main(int argc, char * * argv)
  
-             auto canBuildLocally = amWilling
-                 &&  (  neededSystem == settings.thisSystem
--                    || settings.extraPlatforms.get().count(neededSystem) > 0);
-+                    || settings.extraPlatforms.get().count(neededSystem) > 0
-+                    || neededSystem == "any");
+              auto canBuildLocally = amWilling
+                  &&  (  neededSystem == settings.thisSystem
+-                     || settings.extraPlatforms.get().count(neededSystem) > 0)
++                     || settings.extraPlatforms.get().count(neededSystem) > 0
++                     || neededSystem == "any")
+                  &&  allSupportedLocally(requiredFeatures);
  
              /* Error ignored here, will be caught later */
-             mkdir(currentLoad.c_str(), 0777);
 diff --git a/src/libstore/parsed-derivations.cc b/src/libstore/parsed-derivations.cc
-index dc328648..4d24aa27 100644
+index 87be8a24..bdb72a0d 100644
 --- a/src/libstore/parsed-derivations.cc
 +++ b/src/libstore/parsed-derivations.cc
 @@ -94,7 +94,7 @@ bool ParsedDerivation::canBuildLocally() const
@@ -36,5 +36,5 @@ index dc328648..4d24aa27 100644
  
      for (auto & feature : getRequiredSystemFeatures())
 -- 
-2.21.0
+2.22.0
 
