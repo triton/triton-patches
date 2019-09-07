@@ -1,7 +1,7 @@
-From c3086fbdc2f7d7ddd15e91999e31ae09c6eced27 Mon Sep 17 00:00:00 2001
+From 2e12a5aca8f146e71148ff4b71b9014f2edff76f Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 10:34:15 -0700
-Subject: [PATCH 1/8] Configurable fixed output paths
+Subject: [PATCH 01/11] Configurable fixed output paths
 
 ---
  src/libstore/build.cc   | 4 ++++
@@ -9,10 +9,10 @@ Subject: [PATCH 1/8] Configurable fixed output paths
  2 files changed, 7 insertions(+)
 
 diff --git a/src/libstore/build.cc b/src/libstore/build.cc
-index 59abae9b..6a0c7690 100644
+index ab725e8e..258298e0 100644
 --- a/src/libstore/build.cc
 +++ b/src/libstore/build.cc
-@@ -1912,6 +1912,10 @@ void DerivationGoal::startBuilder()
+@@ -2011,6 +2011,10 @@ void DerivationGoal::startBuilder()
          PathSet dirs = settings.sandboxPaths;
          PathSet dirs2 = settings.extraSandboxPaths;
          dirs.insert(dirs2.begin(), dirs2.end());
@@ -24,10 +24,10 @@ index 59abae9b..6a0c7690 100644
          dirsInChroot.clear();
  
 diff --git a/src/libstore/globals.hh b/src/libstore/globals.hh
-index 53efc6a9..c2346ca9 100644
+index ab1c09aa..2d81d398 100644
 --- a/src/libstore/globals.hh
 +++ b/src/libstore/globals.hh
-@@ -213,6 +213,9 @@ public:
+@@ -216,6 +216,9 @@ public:
          "Additional paths to make available inside the build sandbox.",
          {"build-extra-chroot-dirs", "build-extra-sandbox-paths"}};
  
@@ -38,5 +38,5 @@ index 53efc6a9..c2346ca9 100644
          "The number of times to repeat a build in order to verify determinism.",
          {"build-repeat"}};
 -- 
-2.20.1
+2.22.0
 
