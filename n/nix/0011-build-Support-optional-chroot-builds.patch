@@ -1,4 +1,4 @@
-From 4d2b326ec466059a69211b1427238a05145da480 Mon Sep 17 00:00:00 2001
+From 19b57bf37d33b7fa3723af8585d091ac0ba37bc8 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Fri, 12 Jul 2019 10:57:06 -0700
 Subject: [PATCH 11/11] build: Support optional chroot builds
@@ -8,10 +8,10 @@ Subject: [PATCH 11/11] build: Support optional chroot builds
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/libstore/build.cc b/src/libstore/build.cc
-index 01e8f373..70d1b3cb 100644
+index 01a85124..04a21ed0 100644
 --- a/src/libstore/build.cc
 +++ b/src/libstore/build.cc
-@@ -1816,6 +1816,7 @@ void DerivationGoal::startBuilder()
+@@ -1915,6 +1915,7 @@ void DerivationGoal::startBuilder()
      /* Are we doing a chroot build? */
      {
          auto noChroot = parsedDrv->getBoolAttr("__noChroot");
@@ -19,7 +19,7 @@ index 01e8f373..70d1b3cb 100644
          if (settings.sandboxMode == smEnabled) {
              if (noChroot)
                  throw Error(format("derivation '%1%' has '__noChroot' set, "
-@@ -1830,7 +1831,7 @@ void DerivationGoal::startBuilder()
+@@ -1929,7 +1930,7 @@ void DerivationGoal::startBuilder()
          else if (settings.sandboxMode == smDisabled)
              useChroot = false;
          else if (settings.sandboxMode == smRelaxed)
@@ -29,5 +29,5 @@ index 01e8f373..70d1b3cb 100644
  
      if (worker.store.storeDir != worker.store.realStoreDir) {
 -- 
-2.22.0.510.g264f2c817a-goog
+2.22.0
 
