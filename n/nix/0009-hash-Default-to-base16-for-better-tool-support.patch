@@ -1,7 +1,7 @@
-From a6f646e5c3f766d839dd04ebe503109fa8c636fa Mon Sep 17 00:00:00 2001
+From a08a0e32a79667948e5adfdad72c9bcb2f9e547e Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 20 Jan 2019 18:54:38 -0800
-Subject: [PATCH 9/9] hash: Default to base16 for better tool support
+Subject: [PATCH 09/11] hash: Default to base16 for better tool support
 
 ---
  src/libutil/hash.hh | 2 +-
@@ -21,5 +21,5 @@ index 2dbc3b63..a40ddb1b 100644
  
  
 -- 
-2.20.1
+2.22.0
 
