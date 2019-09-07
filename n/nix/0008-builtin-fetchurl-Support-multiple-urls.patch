@@ -1,7 +1,7 @@
-From a6e4a9629b9225f1fee17fcad6cfced3d17003d7 Mon Sep 17 00:00:00 2001
+From dec816961dd35c26a6c22182766bb4f00970dc54 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 12 Aug 2018 17:13:24 -0700
-Subject: [PATCH 8/8] builtin:fetchurl: Support multiple urls
+Subject: [PATCH 08/11] builtin:fetchurl: Support multiple urls
 
 ---
  corepkgs/fetchurl.nix             |  7 +++---
@@ -37,7 +37,7 @@ index a84777f5..6ef4c173 100644
 +  urls = (if url != "" then [ url ] else [ ]) ++ urls;
  }
 diff --git a/src/libstore/builtins/fetchurl.cc b/src/libstore/builtins/fetchurl.cc
-index 454ea56c..931482b9 100644
+index 3d9385cd..e91135b6 100644
 --- a/src/libstore/builtins/fetchurl.cc
 +++ b/src/libstore/builtins/fetchurl.cc
 @@ -23,7 +23,6 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
@@ -57,7 +57,7 @@ index 454ea56c..931482b9 100644
              downloader->download(std::move(request), *decompressor);
              decompressor->finish();
          });
-@@ -69,7 +68,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
+@@ -70,7 +69,39 @@ void builtinFetchurl(const BasicDerivation & drv, const std::string & netrcData)
              }
  
      /* Otherwise try the specified URL. */
@@ -99,5 +99,5 @@ index 454ea56c..931482b9 100644
  
  }
 -- 
-2.20.1
+2.22.0
 
