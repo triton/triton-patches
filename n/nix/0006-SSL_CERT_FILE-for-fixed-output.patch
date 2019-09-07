@@ -1,17 +1,17 @@
-From 96628539ef28b7047f7a6fa859485cafbce5f187 Mon Sep 17 00:00:00 2001
+From 34e890f2febed93eaefe423013e8ff0163d25569 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 15:04:41 -0700
-Subject: [PATCH 6/8] SSL_CERT_FILE for fixed output
+Subject: [PATCH 06/11] SSL_CERT_FILE for fixed output
 
 ---
  src/libstore/build.cc | 6 ++++++
  1 file changed, 6 insertions(+)
 
 diff --git a/src/libstore/build.cc b/src/libstore/build.cc
-index 63ba6efa..01e8f373 100644
+index e0357685..01a85124 100644
 --- a/src/libstore/build.cc
 +++ b/src/libstore/build.cc
-@@ -2357,6 +2357,9 @@ void DerivationGoal::initEnv()
+@@ -2516,6 +2516,9 @@ void DerivationGoal::initEnv()
         variable won't be set, so `fetchurl' will do the check. */
      if (fixedOutput) env["NIX_OUTPUT_CHECKED"] = "1";
  
@@ -21,8 +21,8 @@ index 63ba6efa..01e8f373 100644
      /* *Only* if this is a fixed-output derivation, propagate the
         values of the environment variables specified in the
         `impureEnvVars' attribute to the builder.  This allows for
-@@ -2655,6 +2658,9 @@ void DerivationGoal::runChild()
-                 ss.push_back("/etc/nsswitch.conf");
+@@ -2823,6 +2826,9 @@ void DerivationGoal::runChild()
+ 
                  ss.push_back("/etc/services");
                  ss.push_back("/etc/hosts");
 +                if (settings.caFile != "" && !dirsInChroot.count("/etc/ssl/certs/ca-certificates.crt")) {
@@ -32,5 +32,5 @@ index 63ba6efa..01e8f373 100644
                      ss.push_back("/var/run/nscd/socket");
              }
 -- 
-2.20.1
+2.22.0
 
