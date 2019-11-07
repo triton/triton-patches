@@ -1,0 +1,33 @@
+From eabb1840e8f5d23f205099e5cba1d083ce4dd6e1 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Thu, 7 Nov 2019 12:47:36 -0800
+Subject: [PATCH] grep: Interpret argv0 for the default matcher
+
+---
+ src/grep.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/grep.c b/src/grep.c
+index 9fb5e92..e73b276 100644
+--- a/src/grep.c
++++ b/src/grep.c
+@@ -2413,6 +2413,7 @@ try_fgrep_pattern (int matcher, char *keys, size_t *len_p)
+ int
+ main (int argc, char **argv)
+ {
++  char *arg0 = argv[0];
+   char *keys = NULL;
+   size_t keycc = 0, oldcc, keyalloc = 0;
+   int matcher = -1;
+@@ -2856,7 +2857,7 @@ main (int argc, char **argv)
+   initialize_unibyte_mask ();
+ 
+   if (matcher < 0)
+-    matcher = G_MATCHER_INDEX;
++    matcher = setmatcher (basename (arg0), matcher);
+ 
+   /* In a single-byte locale, switch from -F to -G if it is a single
+      pattern that matches words, where -G is typically faster.  In a
+-- 
+2.24.0.rc1.363.gb1bccd3e3d-goog
+
