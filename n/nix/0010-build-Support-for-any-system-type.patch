@@ -1,4 +1,4 @@
-From 1e3c0e5846bf13bbed77e53de6eb8ef3dc9dd9c2 Mon Sep 17 00:00:00 2001
+From d628e4606056551c72d709e5a45cfa13dce1100d Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 7 Jul 2019 15:15:55 -0700
 Subject: [PATCH 10/11] build: Support for 'any' system type
@@ -36,5 +36,5 @@ index 87be8a24..bdb72a0d 100644
  
      for (auto & feature : getRequiredSystemFeatures())
 -- 
-2.22.0
+2.24.0.432.g9d3f5f5b63-goog
 
