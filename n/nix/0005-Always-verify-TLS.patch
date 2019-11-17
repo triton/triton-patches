@@ -1,4 +1,4 @@
-From 81ed9491ff43148c1bbb80b4394e9e08c96b3fe5 Mon Sep 17 00:00:00 2001
+From fced4e6b7d5e141e505728197f9c218086d8555f Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 14:52:56 -0700
 Subject: [PATCH 05/11] Always verify TLS
@@ -26,5 +26,5 @@ index b1af3b4f..3d9385cd 100644
  
              auto decompressor = makeDecompressionSink(
 -- 
-2.22.0
+2.24.0.432.g9d3f5f5b63-goog
 
