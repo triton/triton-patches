@@ -1,4 +1,4 @@
-From 34e890f2febed93eaefe423013e8ff0163d25569 Mon Sep 17 00:00:00 2001
+From 36290afe9a5849d86a5bfb386882ea67a8233fc2 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 15:04:41 -0700
 Subject: [PATCH 06/11] SSL_CERT_FILE for fixed output
@@ -32,5 +32,5 @@ index e0357685..01a85124 100644
                      ss.push_back("/var/run/nscd/socket");
              }
 -- 
-2.22.0
+2.24.0.432.g9d3f5f5b63-goog
 
