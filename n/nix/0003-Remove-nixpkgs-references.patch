@@ -1,57 +1,41 @@
-From b4e953bc504508194b95177b5dbb49ff76b413f3 Mon Sep 17 00:00:00 2001
+From 77d18e8f510da1ef4305a06dca816bc794fcc377 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 11:35:14 -0700
 Subject: [PATCH 03/11] Remove nixpkgs references
 
 ---
- scripts/nix-profile-daemon.sh.in         |  4 ---
- scripts/nix-profile.sh.in                |  6 ----
+ scripts/nix-profile-daemon.sh.in         |  2 +-
+ scripts/nix-profile.sh.in                |  1 -
  src/nix-build/nix-build.cc               | 41 +++---------------------
  src/nix-prefetch-url/nix-prefetch-url.cc | 20 +-----------
  src/nix/repl.cc                          |  8 +----
- 5 files changed, 7 insertions(+), 72 deletions(-)
+ 5 files changed, 8 insertions(+), 64 deletions(-)
 
 diff --git a/scripts/nix-profile-daemon.sh.in b/scripts/nix-profile-daemon.sh.in
-index 23da5e85..2c8cd813 100644
+index 47655080..6a9a9e5e 100644
 --- a/scripts/nix-profile-daemon.sh.in
 +++ b/scripts/nix-profile-daemon.sh.in
-@@ -21,10 +21,6 @@ if test -w $HOME; then
-       fi
-   fi
+@@ -25,5 +25,5 @@ else
+   done
+ fi
  
--  # Subscribe the root user to the NixOS channel by default.
--  if [ "$USER" = root -a ! -e $HOME/.nix-channels ]; then
--      echo "https://nixos.org/channels/nixpkgs-unstable nixpkgs" > $HOME/.nix-channels
--  fi
- 
-   # Create the per-user garbage collector roots directory.
-   NIX_USER_GCROOTS_DIR=@localstatedir@/nix/gcroots/per-user/$USER
+-export NIX_PATH="nixpkgs=@localstatedir@/nix/profiles/per-user/root/channels/nixpkgs:@localstatedir@/nix/profiles/per-user/root/channels"
++export NIX_PATH="@localstatedir@/nix/profiles/per-user/root/channels"
+ export PATH="$HOME/.nix-profile/bin:@localstatedir@/nix/profiles/default/bin:$PATH"
 diff --git a/scripts/nix-profile.sh.in b/scripts/nix-profile.sh.in
-index 85f1d6e5..26025b6d 100644
+index e15f7cd4..7483d2eb 100644
 --- a/scripts/nix-profile.sh.in
 +++ b/scripts/nix-profile.sh.in
-@@ -3,7 +3,6 @@ if [ -n "$HOME" ] && [ -n "$USER" ]; then
-     export PATH=@coreutils@
+@@ -1,7 +1,6 @@
+ if [ -n "$HOME" ] && [ -n "$USER" ]; then
  
      # Set up the per-user profile.
 -    # This part should be kept in sync with nixpkgs:nixos/modules/programs/shell.nix
  
      NIX_LINK=$HOME/.nix-profile
  
-@@ -28,11 +27,6 @@ if [ -n "$HOME" ] && [ -n "$USER" ]; then
-             fi
-         fi
- 
--        # Subscribe the user to the unstable Nixpkgs channel by default.
--        if [ ! -e "$HOME/.nix-channels" ]; then
--            echo "https://nixos.org/channels/nixpkgs-unstable nixpkgs" > "$HOME/.nix-channels"
--        fi
--
-         # Create the per-user garbage collector roots directory.
-         __user_gcroots=@localstatedir@/nix/gcroots/per-user/"$USER"
-         mkdir -m 0755 -p "$__user_gcroots"
 diff --git a/src/nix-build/nix-build.cc b/src/nix-build/nix-build.cc
-index c6a4d416..ac417e06 100755
+index 33ad2870..cad10d91 100755
 --- a/src/nix-build/nix-build.cc
 +++ b/src/nix-build/nix-build.cc
 @@ -237,8 +237,8 @@ static void _main(int argc, char * * argv)
@@ -167,5 +151,5 @@ index f857b2e8..d705e6c3 100644
  
      else if (command == ":b" || command == ":i" || command == ":s") {
 -- 
-2.22.0
+2.24.0.432.g9d3f5f5b63-goog
 
