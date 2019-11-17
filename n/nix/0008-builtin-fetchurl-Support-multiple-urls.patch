@@ -1,4 +1,4 @@
-From dec816961dd35c26a6c22182766bb4f00970dc54 Mon Sep 17 00:00:00 2001
+From 5c59ec636c1ef935ca7708906d6ed15c7ba12bb4 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Sun, 12 Aug 2018 17:13:24 -0700
 Subject: [PATCH 08/11] builtin:fetchurl: Support multiple urls
@@ -99,5 +99,5 @@ index 3d9385cd..e91135b6 100644
  
  }
 -- 
-2.22.0
+2.24.0.432.g9d3f5f5b63-goog
 
