@@ -1,4 +1,4 @@
-From a6ce4f8c4547941a0e41d21acfb2bcb6c586733a Mon Sep 17 00:00:00 2001
+From b1fe9f38de2b1b5c621a8cf19c8f0dfc755db1b0 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 15:24:23 -0700
 Subject: [PATCH 07/11] Output base16 by default
@@ -21,5 +21,5 @@ index 1c14ebb1..3a2a46e5 100644
  
  
 -- 
-2.22.0
+2.24.0.432.g9d3f5f5b63-goog
 
