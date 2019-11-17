@@ -1,4 +1,4 @@
-From 2e12a5aca8f146e71148ff4b71b9014f2edff76f Mon Sep 17 00:00:00 2001
+From 75463ff2af34b62c60c8695c22a3856c079cff96 Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Mon, 6 Aug 2018 10:34:15 -0700
 Subject: [PATCH 01/11] Configurable fixed output paths
@@ -38,5 +38,5 @@ index ab1c09aa..2d81d398 100644
          "The number of times to repeat a build in order to verify determinism.",
          {"build-repeat"}};
 -- 
-2.22.0
+2.24.0.432.g9d3f5f5b63-goog
 
