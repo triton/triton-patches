@@ -1,4 +1,4 @@
-From a67a5c332ef9e7afbd75346cd00b4d4259186253 Mon Sep 17 00:00:00 2001
+From 4e8b031bf2214a751b8ed8c10813f544ba29e69d Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Tue, 31 Jul 2018 02:41:40 -0700
 Subject: [PATCH] Fix binary paths
@@ -13,16 +13,16 @@ Subject: [PATCH] Fix binary paths
  etc/sudoers.d/zfs                       | 2 +-
  etc/systemd/system/zfs-share.service.in | 2 +-
  lib/libshare/nfs.c                      | 6 +++---
- lib/libzfs/libzfs_mount.c               | 4 ++--
- lib/libzfs/libzfs_util.c                | 8 ++++----
+ lib/libzfs/os/linux/libzfs_mount_os.c   | 4 ++--
+ lib/libzfs/os/linux/libzfs_util_os.c    | 8 ++++----
  udev/rules.d/90-zfs.rules.in            | 4 ++--
  12 files changed, 21 insertions(+), 21 deletions(-)
 
 diff --git a/cmd/arc_summary/arc_summary2 b/cmd/arc_summary/arc_summary2
-index ab4a3c574..cbf333e47 100755
+index 8ae35c0db..613d293b3 100755
 --- a/cmd/arc_summary/arc_summary2
 +++ b/cmd/arc_summary/arc_summary2
-@@ -933,7 +933,7 @@ def _tunable_summary(Kstat):
+@@ -937,7 +937,7 @@ def _tunable_summary(Kstat):
  
      if show_tunable_descriptions:
  
@@ -32,10 +32,10 @@ index ab4a3c574..cbf333e47 100755
          try:
              p = Popen(command, stdin=PIPE, stdout=PIPE,
 diff --git a/cmd/arc_summary/arc_summary3 b/cmd/arc_summary/arc_summary3
-index fc5e1e4b6..49f52d133 100755
+index 5d1c5d5b4..a94c0e3c9 100755
 --- a/cmd/arc_summary/arc_summary3
 +++ b/cmd/arc_summary/arc_summary3
-@@ -298,7 +298,7 @@ def get_descriptions(request):
+@@ -326,7 +326,7 @@ def get_descriptions(request):
      # We would prefer to do this with /sys/modules -- see the discussion at
      # get_version() -- but there isn't a way to get the descriptions from
      # there, so we fall back on modinfo
@@ -45,7 +45,7 @@ index fc5e1e4b6..49f52d133 100755
      # The recommended way to do this is with subprocess.run(). However,
      # some installed versions of Python are < 3.5, so we offer them
 diff --git a/cmd/vdev_id/vdev_id b/cmd/vdev_id/vdev_id
-index 3796ab488..8e1aa3b88 100755
+index a79aed3b5..14ade4d63 100755
 --- a/cmd/vdev_id/vdev_id
 +++ b/cmd/vdev_id/vdev_id
 @@ -88,7 +88,7 @@
@@ -71,10 +71,10 @@ index 9927a9deb..5a99fe2a1 100644
  	char **lines = NULL;
  	int lines_cnt = 0;
 diff --git a/cmd/ztest/ztest.c b/cmd/ztest/ztest.c
-index 9c2cf9501..12e01de50 100644
+index dbc5084d0..2fb783f5a 100644
 --- a/cmd/ztest/ztest.c
 +++ b/cmd/ztest/ztest.c
-@@ -922,14 +922,14 @@ process_options(int argc, char **argv)
+@@ -920,14 +920,14 @@ process_options(int argc, char **argv)
  		 * We want to extract <isa> to determine if we should use
  		 * 32 or 64 bit binaries.
  		 */
@@ -93,7 +93,7 @@ index 9c2cf9501..12e01de50 100644
  		if (0 != access(zo->zo_alt_ztest, X_OK)) {
  			ztest_dump_core = B_FALSE;
 diff --git a/etc/init.d/zfs-functions.in b/etc/init.d/zfs-functions.in
-index 490503e91..6d23a065d 100644
+index 043f1b073..98805899f 100644
 --- a/etc/init.d/zfs-functions.in
 +++ b/etc/init.d/zfs-functions.in
 @@ -10,7 +10,7 @@
@@ -116,10 +116,10 @@ index f66ebad21..ce27fb28f 100644
 -# ALL ALL = (root) NOPASSWD: /usr/sbin/smartctl -a /dev/[hsv]d[a-z0-9]*
 +# ALL ALL = (root) NOPASSWD: /run/current-system/sw/bin/smartctl -a /dev/[hsv]d[a-z0-9]*
 diff --git a/etc/systemd/system/zfs-share.service.in b/etc/systemd/system/zfs-share.service.in
-index 75ff6e946..f4cafb4f1 100644
+index 5f4ba411b..f2d0e58c1 100644
 --- a/etc/systemd/system/zfs-share.service.in
 +++ b/etc/systemd/system/zfs-share.service.in
-@@ -11,7 +11,7 @@ PartOf=smb.service
+@@ -12,7 +12,7 @@ PartOf=smb.service
  [Service]
  Type=oneshot
  RemainAfterExit=yes
@@ -129,7 +129,7 @@ index 75ff6e946..f4cafb4f1 100644
  
  [Install]
 diff --git a/lib/libshare/nfs.c b/lib/libshare/nfs.c
-index 5c8976e15..2720523b6 100644
+index 7cc5ae43f..8aae4b5b2 100644
 --- a/lib/libshare/nfs.c
 +++ b/lib/libshare/nfs.c
 @@ -270,7 +270,7 @@ nfs_enable_share_one(const char *sharepath, const char *host,
@@ -141,7 +141,7 @@ index 5c8976e15..2720523b6 100644
  	argv[1] = "-i";
  	argv[2] = "-o";
  	argv[3] = opts;
-@@ -464,7 +464,7 @@ nfs_disable_share_one(const char *sharepath, const char *host,
+@@ -465,7 +465,7 @@ nfs_disable_share_one(const char *sharepath, const char *host,
  	fprintf(stderr, "unsharing %s\n", hostpath);
  #endif
  
@@ -150,7 +150,7 @@ index 5c8976e15..2720523b6 100644
  	argv[1] = "-u";
  	argv[2] = hostpath;
  	argv[3] = NULL;
-@@ -715,7 +715,7 @@ nfs_check_exportfs(void)
+@@ -716,7 +716,7 @@ nfs_check_exportfs(void)
  	if (dup2(nfs_exportfs_temp_fd, STDOUT_FILENO) < 0)
  		exit(1);
  
@@ -159,12 +159,12 @@ index 5c8976e15..2720523b6 100644
  
  	if (rc < 0) {
  		exit(1);
-diff --git a/lib/libzfs/libzfs_mount.c b/lib/libzfs/libzfs_mount.c
-index 649c232aa..2e9ae6fb1 100644
---- a/lib/libzfs/libzfs_mount.c
-+++ b/lib/libzfs/libzfs_mount.c
-@@ -356,7 +356,7 @@ static int
- do_mount(const char *src, const char *mntpt, char *opts)
+diff --git a/lib/libzfs/os/linux/libzfs_mount_os.c b/lib/libzfs/os/linux/libzfs_mount_os.c
+index af1cafd28..908d14d1b 100644
+--- a/lib/libzfs/os/linux/libzfs_mount_os.c
++++ b/lib/libzfs/os/linux/libzfs_mount_os.c
+@@ -302,7 +302,7 @@ int
+ do_mount(const char *src, const char *mntpt, char *opts, int flags)
  {
  	char *argv[9] = {
 -	    "/bin/mount",
@@ -172,7 +172,7 @@ index 649c232aa..2e9ae6fb1 100644
  	    "--no-canonicalize",
  	    "-t", MNTTYPE_ZFS,
  	    "-o", opts,
-@@ -393,7 +393,7 @@ do_unmount(const char *mntpt, int flags)
+@@ -339,7 +339,7 @@ do_unmount(const char *mntpt, int flags)
  	char force_opt[] = "-f";
  	char lazy_opt[] = "-l";
  	char *argv[7] = {
@@ -181,43 +181,43 @@ index 649c232aa..2e9ae6fb1 100644
  	    "-t", MNTTYPE_ZFS,
  	    NULL, NULL, NULL, NULL };
  	int rc, count = 3;
-diff --git a/lib/libzfs/libzfs_util.c b/lib/libzfs/libzfs_util.c
-index 19bb57ad4..8fba67d22 100644
---- a/lib/libzfs/libzfs_util.c
-+++ b/lib/libzfs/libzfs_util.c
-@@ -68,7 +68,7 @@ libzfs_error_init(int error)
+diff --git a/lib/libzfs/os/linux/libzfs_util_os.c b/lib/libzfs/os/linux/libzfs_util_os.c
+index c27dc91bc..ecdca4d4c 100644
+--- a/lib/libzfs/os/linux/libzfs_util_os.c
++++ b/lib/libzfs/os/linux/libzfs_util_os.c
+@@ -56,7 +56,7 @@ libzfs_error_init(int error)
  	switch (error) {
  	case ENXIO:
  		return (dgettext(TEXT_DOMAIN, "The ZFS modules are not "
 -		    "loaded.\nTry running '/sbin/modprobe zfs' as root "
-+		    "loaded.\nTry running '/run/current-system/sw/bin/modprobe zfs' as root "
- 		    "to load them.\n"));
++		    "loaded.\nTry running 'modprobe zfs' as root "
+ 		    "to load them."));
  	case ENOENT:
  		return (dgettext(TEXT_DOMAIN, "/dev/zfs and /proc/self/mounts "
-@@ -76,7 +76,7 @@ libzfs_error_init(int error)
- 		    "-t proc proc /proc' as root.\n"));
+@@ -64,7 +64,7 @@ libzfs_error_init(int error)
+ 		    "-t proc proc /proc' as root."));
  	case ENOEXEC:
  		return (dgettext(TEXT_DOMAIN, "The ZFS modules cannot be "
 -		    "auto-loaded.\nTry running '/sbin/modprobe zfs' as "
-+		    "auto-loaded.\nTry running '/run/current-system/sw/bin/modprobe zfs' as "
- 		    "root to manually load them.\n"));
++		    "auto-loaded.\nTry running 'modprobe zfs' as "
+ 		    "root to manually load them."));
  	case EACCES:
  		return (dgettext(TEXT_DOMAIN, "Permission denied the "
-@@ -909,7 +909,7 @@ libzfs_envvar_is_set(char *envvar)
+@@ -99,7 +99,7 @@ libzfs_module_loaded(const char *module)
  static int
- libzfs_load_module(const char *module)
+ libzfs_load_module_impl(const char *module)
  {
 -	char *argv[4] = {"/sbin/modprobe", "-q", (char *)module, (char *)0};
 +	char *argv[4] = {"/run/current-system/sw/bin/modprobe", "-q", (char *)module, (char *)0};
  	char *load_str, *timeout_str;
  	long timeout = 10; /* seconds */
  	long busy_timeout = 10; /* milliseconds */
-@@ -928,7 +928,7 @@ libzfs_load_module(const char *module)
+@@ -118,7 +118,7 @@ libzfs_load_module_impl(const char *module)
  		}
  
  		if (load) {
 -			if (libzfs_run_process("/sbin/modprobe", argv, 0))
-+			if (libzfs_run_process("/run/current-system/sw/biin/modprobe", argv, 0))
++			if (libzfs_run_process("/run/current-system/sw/bin/modprobe", argv, 0))
  				return (ENOEXEC);
  		}
  
@@ -237,5 +237,5 @@ index 82f8cf1cf..6cf5638a2 100644
  KERNEL=="null", SYMLINK+="root"
  SYMLINK=="null", SYMLINK+="root"
 -- 
-2.21.0
+2.22.0
 
