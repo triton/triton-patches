@@ -1,4 +1,4 @@
-From 7a572c601e0a65c7855dd53a46f7aca73217f6d4 Mon Sep 17 00:00:00 2001
+From 56177e2a8dc97f57d0543e58005967b54196e51a Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Wed, 28 Sep 2016 12:25:04 -0700
 Subject: [PATCH 1/3] Add pem support
@@ -7,23 +7,23 @@ Subject: [PATCH 1/3] Add pem support
  lib/ckfw/manifest.mn     |    2 +-
  lib/ckfw/pem/Makefile    |  107 ++++
  lib/ckfw/pem/anchor.c    |   50 ++
- lib/ckfw/pem/ckpem.h     |  264 ++++++++++
- lib/ckfw/pem/ckpemver.c  |   59 +++
+ lib/ckfw/pem/ckpem.h     |  264 ++++++++
+ lib/ckfw/pem/ckpemver.c  |   59 ++
  lib/ckfw/pem/config.mk   |   71 +++
  lib/ckfw/pem/constants.c |   77 +++
  lib/ckfw/pem/manifest.mn |   68 +++
- lib/ckfw/pem/nsspem.def  |   58 +++
+ lib/ckfw/pem/nsspem.def  |   58 ++
  lib/ckfw/pem/nsspem.h    |   75 +++
- lib/ckfw/pem/pargs.c     |  162 ++++++
- lib/ckfw/pem/pfind.c     |  435 ++++++++++++++++
- lib/ckfw/pem/pinst.c     |  751 ++++++++++++++++++++++++++++
- lib/ckfw/pem/pobject.c   | 1236 ++++++++++++++++++++++++++++++++++++++++++++++
- lib/ckfw/pem/prsa.c      |  699 ++++++++++++++++++++++++++
- lib/ckfw/pem/psession.c  |  388 +++++++++++++++
- lib/ckfw/pem/pslot.c     |  182 +++++++
- lib/ckfw/pem/ptoken.c    |  333 +++++++++++++
- lib/ckfw/pem/rsawrapr.c  |  823 ++++++++++++++++++++++++++++++
- lib/ckfw/pem/util.c      |  312 ++++++++++++
+ lib/ckfw/pem/pargs.c     |  162 +++++
+ lib/ckfw/pem/pfind.c     |  435 ++++++++++++++
+ lib/ckfw/pem/pinst.c     |  751 +++++++++++++++++++++++
+ lib/ckfw/pem/pobject.c   | 1236 ++++++++++++++++++++++++++++++++++++++
+ lib/ckfw/pem/prsa.c      |  699 +++++++++++++++++++++
+ lib/ckfw/pem/psession.c  |  388 ++++++++++++
+ lib/ckfw/pem/pslot.c     |  182 ++++++
+ lib/ckfw/pem/ptoken.c    |  333 ++++++++++
+ lib/ckfw/pem/rsawrapr.c  |  823 +++++++++++++++++++++++++
+ lib/ckfw/pem/util.c      |  312 ++++++++++
  20 files changed, 6151 insertions(+), 1 deletion(-)
  create mode 100644 lib/ckfw/pem/Makefile
  create mode 100644 lib/ckfw/pem/anchor.c
@@ -46,21 +46,21 @@ Subject: [PATCH 1/3] Add pem support
  create mode 100644 lib/ckfw/pem/util.c
 
 diff --git a/lib/ckfw/manifest.mn b/lib/ckfw/manifest.mn
-index 20bebeb..4f10563 100644
+index 4f798ad61..4f1056384 100644
 --- a/lib/ckfw/manifest.mn
 +++ b/lib/ckfw/manifest.mn
 @@ -5,7 +5,7 @@
  
  CORE_DEPTH = ../..
  
--DIRS = builtins 
+-DIRS = builtins
 +DIRS = builtins pem
  
  PRIVATE_EXPORTS = \
  	ck.h		  \
 diff --git a/lib/ckfw/pem/Makefile b/lib/ckfw/pem/Makefile
 new file mode 100644
-index 0000000..aec3bbd
+index 000000000..aec3bbd9f
 --- /dev/null
 +++ b/lib/ckfw/pem/Makefile
 @@ -0,0 +1,107 @@
@@ -173,7 +173,7 @@ index 0000000..aec3bbd
 +
 diff --git a/lib/ckfw/pem/anchor.c b/lib/ckfw/pem/anchor.c
 new file mode 100644
-index 0000000..621f919
+index 000000000..621f919c3
 --- /dev/null
 +++ b/lib/ckfw/pem/anchor.c
 @@ -0,0 +1,50 @@
@@ -229,7 +229,7 @@ index 0000000..621f919
 +#include "nssck.api"
 diff --git a/lib/ckfw/pem/ckpem.h b/lib/ckfw/pem/ckpem.h
 new file mode 100644
-index 0000000..720525e
+index 000000000..720525e43
 --- /dev/null
 +++ b/lib/ckfw/pem/ckpem.h
 @@ -0,0 +1,264 @@
@@ -499,7 +499,7 @@ index 0000000..720525e
 +#endif /* CKPEM_H */
 diff --git a/lib/ckfw/pem/ckpemver.c b/lib/ckfw/pem/ckpemver.c
 new file mode 100644
-index 0000000..76ab5df
+index 000000000..76ab5df52
 --- /dev/null
 +++ b/lib/ckfw/pem/ckpemver.c
 @@ -0,0 +1,59 @@
@@ -564,7 +564,7 @@ index 0000000..76ab5df
 +        "  " __DATE__ " " __TIME__;
 diff --git a/lib/ckfw/pem/config.mk b/lib/ckfw/pem/config.mk
 new file mode 100644
-index 0000000..ff6cd9a
+index 000000000..ff6cd9acf
 --- /dev/null
 +++ b/lib/ckfw/pem/config.mk
 @@ -0,0 +1,71 @@
@@ -641,7 +641,7 @@ index 0000000..ff6cd9a
 +
 diff --git a/lib/ckfw/pem/constants.c b/lib/ckfw/pem/constants.c
 new file mode 100644
-index 0000000..0ceb443
+index 000000000..0ceb443a4
 --- /dev/null
 +++ b/lib/ckfw/pem/constants.c
 @@ -0,0 +1,77 @@
@@ -724,7 +724,7 @@ index 0000000..0ceb443
 +pem_TokenSerialNumber = (NSSUTF8 *) "1";
 diff --git a/lib/ckfw/pem/manifest.mn b/lib/ckfw/pem/manifest.mn
 new file mode 100644
-index 0000000..8de27d1
+index 000000000..8de27d16b
 --- /dev/null
 +++ b/lib/ckfw/pem/manifest.mn
 @@ -0,0 +1,68 @@
@@ -798,7 +798,7 @@ index 0000000..8de27d1
 +#EXTRA_SHARED_LIBS = -L$(DIST)/lib -lnssckfw -lnssb -lplc4 -lplds4
 diff --git a/lib/ckfw/pem/nsspem.def b/lib/ckfw/pem/nsspem.def
 new file mode 100644
-index 0000000..4978252
+index 000000000..49782520f
 --- /dev/null
 +++ b/lib/ckfw/pem/nsspem.def
 @@ -0,0 +1,58 @@
@@ -862,7 +862,7 @@ index 0000000..4978252
 +;+};
 diff --git a/lib/ckfw/pem/nsspem.h b/lib/ckfw/pem/nsspem.h
 new file mode 100644
-index 0000000..1547bf4
+index 000000000..1547bf432
 --- /dev/null
 +++ b/lib/ckfw/pem/nsspem.h
 @@ -0,0 +1,75 @@
@@ -943,7 +943,7 @@ index 0000000..1547bf4
 +#endif /* NSSCKBI_H */
 diff --git a/lib/ckfw/pem/pargs.c b/lib/ckfw/pem/pargs.c
 new file mode 100644
-index 0000000..f292a8b
+index 000000000..f292a8b72
 --- /dev/null
 +++ b/lib/ckfw/pem/pargs.c
 @@ -0,0 +1,162 @@
@@ -1111,7 +1111,7 @@ index 0000000..f292a8b
 +}
 diff --git a/lib/ckfw/pem/pfind.c b/lib/ckfw/pem/pfind.c
 new file mode 100644
-index 0000000..30b1174
+index 000000000..30b117460
 --- /dev/null
 +++ b/lib/ckfw/pem/pfind.c
 @@ -0,0 +1,435 @@
@@ -1552,7 +1552,7 @@ index 0000000..30b1174
 +}
 diff --git a/lib/ckfw/pem/pinst.c b/lib/ckfw/pem/pinst.c
 new file mode 100644
-index 0000000..13d3b88
+index 000000000..13d3b8804
 --- /dev/null
 +++ b/lib/ckfw/pem/pinst.c
 @@ -0,0 +1,751 @@
@@ -2309,7 +2309,7 @@ index 0000000..13d3b88
 +};
 diff --git a/lib/ckfw/pem/pobject.c b/lib/ckfw/pem/pobject.c
 new file mode 100644
-index 0000000..eaf7943
+index 000000000..eaf79432a
 --- /dev/null
 +++ b/lib/ckfw/pem/pobject.c
 @@ -0,0 +1,1236 @@
@@ -3551,7 +3551,7 @@ index 0000000..eaf7943
 +}
 diff --git a/lib/ckfw/pem/prsa.c b/lib/ckfw/pem/prsa.c
 new file mode 100644
-index 0000000..f0e069c
+index 000000000..f0e069c4b
 --- /dev/null
 +++ b/lib/ckfw/pem/prsa.c
 @@ -0,0 +1,699 @@
@@ -4256,7 +4256,7 @@ index 0000000..f0e069c
 +};
 diff --git a/lib/ckfw/pem/psession.c b/lib/ckfw/pem/psession.c
 new file mode 100644
-index 0000000..70c5407
+index 000000000..70c540790
 --- /dev/null
 +++ b/lib/ckfw/pem/psession.c
 @@ -0,0 +1,388 @@
@@ -4650,7 +4650,7 @@ index 0000000..70c5407
 +}
 diff --git a/lib/ckfw/pem/pslot.c b/lib/ckfw/pem/pslot.c
 new file mode 100644
-index 0000000..1a7d062
+index 000000000..1a7d062e7
 --- /dev/null
 +++ b/lib/ckfw/pem/pslot.c
 @@ -0,0 +1,182 @@
@@ -4838,7 +4838,7 @@ index 0000000..1a7d062
 +};
 diff --git a/lib/ckfw/pem/ptoken.c b/lib/ckfw/pem/ptoken.c
 new file mode 100644
-index 0000000..67b5f10
+index 000000000..67b5f1032
 --- /dev/null
 +++ b/lib/ckfw/pem/ptoken.c
 @@ -0,0 +1,333 @@
@@ -5177,7 +5177,7 @@ index 0000000..67b5f10
 +#endif
 diff --git a/lib/ckfw/pem/rsawrapr.c b/lib/ckfw/pem/rsawrapr.c
 new file mode 100644
-index 0000000..103eeda
+index 000000000..103eeda48
 --- /dev/null
 +++ b/lib/ckfw/pem/rsawrapr.c
 @@ -0,0 +1,823 @@
@@ -6006,7 +6006,7 @@ index 0000000..103eeda
 +#endif
 diff --git a/lib/ckfw/pem/util.c b/lib/ckfw/pem/util.c
 new file mode 100644
-index 0000000..6a7495f
+index 000000000..6a7495fd6
 --- /dev/null
 +++ b/lib/ckfw/pem/util.c
 @@ -0,0 +1,312 @@
@@ -6323,5 +6323,5 @@ index 0000000..6a7495f
 +#endif
 +}
 -- 
-2.11.0
+2.24.0.432.g9d3f5f5b63-goog
 
