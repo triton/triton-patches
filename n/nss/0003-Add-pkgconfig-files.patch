@@ -1,38 +1,39 @@
-From 989f66f6c0f48a1dba968a0a9b57035809a40726 Mon Sep 17 00:00:00 2001
+From e32535b08b6ad99c02d52dff8b7e9171d1d56d8c Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <wak@google.com>
 Date: Wed, 28 Sep 2016 12:26:15 -0700
 Subject: [PATCH 3/3] Add pkgconfig files
 
 ---
- Makefile             |  11 +---
- config/Makefile      |  39 ++++++++++++++
- config/nss-config.in | 144 +++++++++++++++++++++++++++++++++++++++++++++++++++
- config/nss.pc.in     |  12 +++++
+ Makefile             |  12 +---
+ config/Makefile      |  39 ++++++++++++
+ config/nss-config.in | 144 +++++++++++++++++++++++++++++++++++++++++++
+ config/nss.pc.in     |  12 ++++
  manifest.mn          |   2 +-
- 5 files changed, 197 insertions(+), 11 deletions(-)
+ 5 files changed, 197 insertions(+), 12 deletions(-)
  create mode 100644 config/Makefile
  create mode 100644 config/nss-config.in
  create mode 100644 config/nss.pc.in
 
 diff --git a/Makefile b/Makefile
-index c824ba2..2446be5 100644
+index 2dc8de112..47e206d02 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -46,7 +46,7 @@ include $(CORE_DEPTH)/coreconf/rules.mk
+@@ -47,7 +47,7 @@ include $(CORE_DEPTH)/coreconf/rules.mk
  # (7) Execute "local" rules. (OPTIONAL).                              #
  #######################################################################
-
+ 
 -nss_build_all: build_nspr all latest
 +nss_build_all: all latest
-
+ 
  nss_clean_all: clobber_nspr clobber
-
-@@ -143,15 +143,6 @@ $(NSPR_CONFIG_STATUS): $(NSPR_CONFIGURE)
+ 
+@@ -133,16 +133,6 @@ $(NSPR_CONFIG_STATUS): $(NSPR_CONFIGURE)
  	--prefix='$(NSS_GYP_PREFIX)'
  endif
-
+ 
 -build_nspr: $(NSPR_CONFIG_STATUS)
 -	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME)
+-	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME)/pr/tests
 -
 -install_nspr: build_nspr
 -	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME) install
@@ -42,10 +43,10 @@ index c824ba2..2446be5 100644
 -
  build_docs:
  	$(MAKE) -C $(CORE_DEPTH)/doc
-
+ 
 diff --git a/config/Makefile b/config/Makefile
 new file mode 100644
-index 0000000..9f6afb7
+index 000000000..9f6afb799
 --- /dev/null
 +++ b/config/Makefile
 @@ -0,0 +1,39 @@
@@ -90,7 +91,7 @@ index 0000000..9f6afb7
 +
 diff --git a/config/nss-config.in b/config/nss-config.in
 new file mode 100644
-index 0000000..50a0012
+index 000000000..50a00120a
 --- /dev/null
 +++ b/config/nss-config.in
 @@ -0,0 +1,144 @@
@@ -240,7 +241,7 @@ index 0000000..50a0012
 +fi
 diff --git a/config/nss.pc.in b/config/nss.pc.in
 new file mode 100644
-index 0000000..b2d1735
+index 000000000..b2d1735bd
 --- /dev/null
 +++ b/config/nss.pc.in
 @@ -0,0 +1,12 @@
@@ -257,15 +258,15 @@ index 0000000..b2d1735
 +Cflags: -I${includedir}
 +
 diff --git a/manifest.mn b/manifest.mn
-index 32086bf..ad4c33b 100644
+index 500a5ad64..bbff3eb0b 100644
 --- a/manifest.mn
 +++ b/manifest.mn
 @@ -10,4 +10,4 @@ IMPORTS =	nspr20/v4.8 \
-
+ 
  RELEASE = nss
-
+ 
 -DIRS = coreconf lib cmd cpputil gtests
 +DIRS = coreconf lib cmd config cpputil gtests
---
-2.11.0
+-- 
+2.24.0.432.g9d3f5f5b63-goog
 
