@@ -1021,7 +1021,7 @@ index 8ddbde7729..016b253858 100644
       * calls.
 diff --git a/ssl/ssl_quic.c b/ssl/ssl_quic.c
 new file mode 100644
-index 0000000000..e8cfae107d
+index 0000000000..5e21477586
 --- /dev/null
 +++ b/ssl/ssl_quic.c
 @@ -0,0 +1,302 @@
@@ -1034,7 +1034,7 @@ index 0000000000..e8cfae107d
 + * https://www.openssl.org/source/license.html
 + */
 +
-+#include "ssl_locl.h"
++#include "ssl_local.h"
 +#include "internal/cryptlib.h"
 +#include "internal/refcount.h"
 +
@@ -1704,7 +1704,7 @@ index e27c0c13a2..1551dac952 100644
  
 diff --git a/ssl/statem/statem_quic.c b/ssl/statem/statem_quic.c
 new file mode 100644
-index 0000000000..771ccd4df4
+index 0000000000..eb1a76ec9d
 --- /dev/null
 +++ b/ssl/statem/statem_quic.c
 @@ -0,0 +1,109 @@
@@ -1717,8 +1717,8 @@ index 0000000000..771ccd4df4
 + * https://www.openssl.org/source/license.html
 + */
 +
-+#include "../ssl_locl.h"
-+#include "statem_locl.h"
++#include "../ssl_local.h"
++#include "statem_local.h"
 +#include "internal/cryptlib.h"
 +
 +#ifdef OPENSSL_NO_QUIC
