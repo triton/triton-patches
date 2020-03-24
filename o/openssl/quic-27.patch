@@ -1,8 +1,8 @@
 diff --git a/CHANGES b/CHANGES
-index c6ca343948..427ff4a4c7 100644
+index 0250e4ef02..38dc30eee5 100644
 --- a/CHANGES
 +++ b/CHANGES
-@@ -9,6 +9,9 @@
+@@ -76,6 +76,9 @@
  
   Changes between 1.1.1c and 1.1.1d [10 Sep 2019]
  
@@ -13,10 +13,10 @@ index c6ca343948..427ff4a4c7 100644
       number generator (RNG). This was intended to include protection in the
       event of a fork() system call in order to ensure that the parent and child
 diff --git a/Configure b/Configure
-index 5a699836f3..aa5f528ed3 100755
+index 2e9efaa5f3..79a60d0cb5 100755
 --- a/Configure
 +++ b/Configure
-@@ -378,6 +378,7 @@ my @disablables = (
+@@ -391,6 +391,7 @@ my @disablables = (
      "poly1305",
      "posix-io",
      "psk",
@@ -24,7 +24,7 @@ index 5a699836f3..aa5f528ed3 100755
      "rc2",
      "rc4",
      "rc5",
-@@ -494,6 +495,8 @@ my @disable_cascades = (
+@@ -507,6 +508,8 @@ my @disable_cascades = (
      sub { !$disabled{"unit-test"} } => [ "heartbeats" ],
  
      sub { !$disabled{"msan"} } => [ "asm" ],
@@ -34,10 +34,10 @@ index 5a699836f3..aa5f528ed3 100755
  
  # Avoid protocol support holes.  Also disable all versions below N, if version
 diff --git a/INSTALL b/INSTALL
-index 2119cbae9e..56fcf9c459 100644
+index 328ad2baf4..dd0c6c23db 100644
 --- a/INSTALL
 +++ b/INSTALL
-@@ -453,6 +453,9 @@
+@@ -456,6 +456,9 @@
    no-psk
                     Don't build support for Pre-Shared Key based ciphersuites.
  
@@ -48,10 +48,10 @@ index 2119cbae9e..56fcf9c459 100644
                     Don't use hardware RDRAND capabilities.
  
 diff --git a/crypto/err/openssl.txt b/crypto/err/openssl.txt
-index a433b03240..4622f3c3b6 100644
+index f5324c6819..835373dd6c 100644
 --- a/crypto/err/openssl.txt
 +++ b/crypto/err/openssl.txt
-@@ -1186,6 +1186,9 @@ SSL_F_PARSE_CA_NAMES:541:parse_ca_names
+@@ -1189,6 +1189,9 @@ SSL_F_PARSE_CA_NAMES:541:parse_ca_names
  SSL_F_PITEM_NEW:624:pitem_new
  SSL_F_PQUEUE_NEW:625:pqueue_new
  SSL_F_PROCESS_KEY_SHARE_EXT:439:*
@@ -61,7 +61,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_F_READ_STATE_MACHINE:352:read_state_machine
  SSL_F_SET_CLIENT_CIPHERSUITE:540:set_client_ciphersuite
  SSL_F_SRP_GENERATE_CLIENT_MASTER_SECRET:595:srp_generate_client_master_secret
-@@ -1196,7 +1199,9 @@ SSL_F_SSL3_CHECK_CERT_AND_ALGORITHM:130:ssl3_check_cert_and_algorithm
+@@ -1199,7 +1202,9 @@ SSL_F_SSL3_CHECK_CERT_AND_ALGORITHM:130:ssl3_check_cert_and_algorithm
  SSL_F_SSL3_CTRL:213:ssl3_ctrl
  SSL_F_SSL3_CTX_CTRL:133:ssl3_ctx_ctrl
  SSL_F_SSL3_DIGEST_CACHED_RECORDS:293:ssl3_digest_cached_records
@@ -71,7 +71,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_F_SSL3_ENC:608:ssl3_enc
  SSL_F_SSL3_FINAL_FINISH_MAC:285:ssl3_final_finish_mac
  SSL_F_SSL3_FINISH_MAC:587:ssl3_finish_mac
-@@ -1304,6 +1309,8 @@ SSL_F_SSL_PARSE_SERVERHELLO_USE_SRTP_EXT:311:*
+@@ -1307,6 +1312,8 @@ SSL_F_SSL_PARSE_SERVERHELLO_USE_SRTP_EXT:311:*
  SSL_F_SSL_PEEK:270:SSL_peek
  SSL_F_SSL_PEEK_EX:432:SSL_peek_ex
  SSL_F_SSL_PEEK_INTERNAL:522:ssl_peek_internal
@@ -80,7 +80,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_F_SSL_READ:223:SSL_read
  SSL_F_SSL_READ_EARLY_DATA:529:SSL_read_early_data
  SSL_F_SSL_READ_EX:434:SSL_read_ex
-@@ -1353,6 +1360,7 @@ SSL_F_SSL_WRITE_EARLY_DATA:526:SSL_write_early_data
+@@ -1356,6 +1363,7 @@ SSL_F_SSL_WRITE_EARLY_DATA:526:SSL_write_early_data
  SSL_F_SSL_WRITE_EARLY_FINISH:527:*
  SSL_F_SSL_WRITE_EX:433:SSL_write_ex
  SSL_F_SSL_WRITE_INTERNAL:524:ssl_write_internal
@@ -88,7 +88,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_F_STATE_MACHINE:353:state_machine
  SSL_F_TLS12_CHECK_PEER_SIGALG:333:tls12_check_peer_sigalg
  SSL_F_TLS12_COPY_SIGALGS:533:tls12_copy_sigalgs
-@@ -1416,6 +1424,8 @@ SSL_F_TLS_CONSTRUCT_CTOS_POST_HANDSHAKE_AUTH:619:\
+@@ -1419,6 +1427,8 @@ SSL_F_TLS_CONSTRUCT_CTOS_POST_HANDSHAKE_AUTH:619:\
  	tls_construct_ctos_post_handshake_auth
  SSL_F_TLS_CONSTRUCT_CTOS_PSK:501:tls_construct_ctos_psk
  SSL_F_TLS_CONSTRUCT_CTOS_PSK_KEX_MODES:509:tls_construct_ctos_psk_kex_modes
@@ -97,7 +97,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_F_TLS_CONSTRUCT_CTOS_RENEGOTIATE:473:tls_construct_ctos_renegotiate
  SSL_F_TLS_CONSTRUCT_CTOS_SCT:474:tls_construct_ctos_sct
  SSL_F_TLS_CONSTRUCT_CTOS_SERVER_NAME:475:tls_construct_ctos_server_name
-@@ -1457,6 +1467,8 @@ SSL_F_TLS_CONSTRUCT_STOC_KEY_SHARE:456:tls_construct_stoc_key_share
+@@ -1460,6 +1470,8 @@ SSL_F_TLS_CONSTRUCT_STOC_KEY_SHARE:456:tls_construct_stoc_key_share
  SSL_F_TLS_CONSTRUCT_STOC_MAXFRAGMENTLEN:548:tls_construct_stoc_maxfragmentlen
  SSL_F_TLS_CONSTRUCT_STOC_NEXT_PROTO_NEG:457:tls_construct_stoc_next_proto_neg
  SSL_F_TLS_CONSTRUCT_STOC_PSK:504:tls_construct_stoc_psk
@@ -106,7 +106,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_F_TLS_CONSTRUCT_STOC_RENEGOTIATE:458:tls_construct_stoc_renegotiate
  SSL_F_TLS_CONSTRUCT_STOC_SERVER_NAME:459:tls_construct_stoc_server_name
  SSL_F_TLS_CONSTRUCT_STOC_SESSION_TICKET:460:tls_construct_stoc_session_ticket
-@@ -1485,6 +1497,8 @@ SSL_F_TLS_PARSE_CTOS_MAXFRAGMENTLEN:571:tls_parse_ctos_maxfragmentlen
+@@ -1488,6 +1500,8 @@ SSL_F_TLS_PARSE_CTOS_MAXFRAGMENTLEN:571:tls_parse_ctos_maxfragmentlen
  SSL_F_TLS_PARSE_CTOS_POST_HANDSHAKE_AUTH:620:tls_parse_ctos_post_handshake_auth
  SSL_F_TLS_PARSE_CTOS_PSK:505:tls_parse_ctos_psk
  SSL_F_TLS_PARSE_CTOS_PSK_KEX_MODES:572:tls_parse_ctos_psk_kex_modes
@@ -115,7 +115,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_F_TLS_PARSE_CTOS_RENEGOTIATE:464:tls_parse_ctos_renegotiate
  SSL_F_TLS_PARSE_CTOS_SERVER_NAME:573:tls_parse_ctos_server_name
  SSL_F_TLS_PARSE_CTOS_SESSION_TICKET:574:tls_parse_ctos_session_ticket
-@@ -1503,6 +1517,8 @@ SSL_F_TLS_PARSE_STOC_KEY_SHARE:445:tls_parse_stoc_key_share
+@@ -1506,6 +1520,8 @@ SSL_F_TLS_PARSE_STOC_KEY_SHARE:445:tls_parse_stoc_key_share
  SSL_F_TLS_PARSE_STOC_MAXFRAGMENTLEN:581:tls_parse_stoc_maxfragmentlen
  SSL_F_TLS_PARSE_STOC_NPN:582:tls_parse_stoc_npn
  SSL_F_TLS_PARSE_STOC_PSK:502:tls_parse_stoc_psk
@@ -124,7 +124,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_F_TLS_PARSE_STOC_RENEGOTIATE:448:tls_parse_stoc_renegotiate
  SSL_F_TLS_PARSE_STOC_SCT:564:tls_parse_stoc_sct
  SSL_F_TLS_PARSE_STOC_SERVER_NAME:583:tls_parse_stoc_server_name
-@@ -2702,6 +2718,7 @@ SSL_R_INCONSISTENT_EARLY_DATA_ALPN:222:inconsistent early data alpn
+@@ -2706,6 +2722,7 @@ SSL_R_INCONSISTENT_EARLY_DATA_ALPN:222:inconsistent early data alpn
  SSL_R_INCONSISTENT_EARLY_DATA_SNI:231:inconsistent early data sni
  SSL_R_INCONSISTENT_EXTMS:104:inconsistent extms
  SSL_R_INSUFFICIENT_SECURITY:241:insufficient security
@@ -132,7 +132,7 @@ index a433b03240..4622f3c3b6 100644
  SSL_R_INVALID_ALERT:205:invalid alert
  SSL_R_INVALID_CCS_MESSAGE:260:invalid ccs message
  SSL_R_INVALID_CERTIFICATE_OR_ALG:238:invalid certificate or alg
-@@ -2877,6 +2894,7 @@ SSL_R_VERSION_TOO_LOW:396:version too low
+@@ -2882,6 +2899,7 @@ SSL_R_VERSION_TOO_LOW:396:version too low
  SSL_R_WRONG_CERTIFICATE_TYPE:383:wrong certificate type
  SSL_R_WRONG_CIPHER_RETURNED:261:wrong cipher returned
  SSL_R_WRONG_CURVE:378:wrong curve
@@ -141,12 +141,12 @@ index a433b03240..4622f3c3b6 100644
  SSL_R_WRONG_SIGNATURE_SIZE:265:wrong signature size
  SSL_R_WRONG_SIGNATURE_TYPE:370:wrong signature type
 diff --git a/crypto/kdf/hkdf.c b/crypto/kdf/hkdf.c
-index ae46fad609..722b6c036f 100644
+index 25bf4b729f..6d1a32c885 100644
 --- a/crypto/kdf/hkdf.c
 +++ b/crypto/kdf/hkdf.c
 @@ -15,7 +15,7 @@
  #include "internal/cryptlib.h"
- #include "internal/evp_int.h"
+ #include "crypto/evp.h"
  
 -#define HKDF_MAXBUF 1024
 +#define HKDF_MAXBUF 2048
@@ -437,7 +437,7 @@ index 0000000000..60bf704944
 +
 +=cut
 diff --git a/include/openssl/evp.h b/include/openssl/evp.h
-index 545654a98b..073a957ad3 100644
+index a411f3f2f9..275b7a4acc 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
 @@ -1324,6 +1324,10 @@ void EVP_PKEY_asn1_set_security_bits(EVP_PKEY_ASN1_METHOD *ameth,
@@ -452,10 +452,10 @@ index 545654a98b..073a957ad3 100644
  EVP_PKEY_METHOD *EVP_PKEY_meth_new(int id, int flags);
  void EVP_PKEY_meth_get0_info(int *ppkey_id, int *pflags,
 diff --git a/include/openssl/ossl_typ.h b/include/openssl/ossl_typ.h
-index 7993ca28f3..c374713bff 100644
+index e0edfaaf47..d2fdce8fdf 100644
 --- a/include/openssl/ossl_typ.h
 +++ b/include/openssl/ossl_typ.h
-@@ -175,6 +175,8 @@ typedef struct ct_policy_eval_ctx_st CT_POLICY_EVAL_CTX;
+@@ -176,6 +176,8 @@ typedef struct ct_policy_eval_ctx_st CT_POLICY_EVAL_CTX;
  typedef struct ossl_store_info_st OSSL_STORE_INFO;
  typedef struct ossl_store_search_st OSSL_STORE_SEARCH;
  
@@ -523,7 +523,7 @@ index 6724ccf2d2..54694728d4 100644
  }
  # endif
 diff --git a/include/openssl/sslerr.h b/include/openssl/sslerr.h
-index 3d6850dea3..30605c0684 100644
+index 0ef684f3c1..ddf0a80dab 100644
 --- a/include/openssl/sslerr.h
 +++ b/include/openssl/sslerr.h
 @@ -11,9 +11,7 @@
@@ -537,7 +537,7 @@ index 3d6850dea3..30605c0684 100644
  
  # ifdef  __cplusplus
  extern "C"
-@@ -95,6 +93,9 @@ int ERR_load_SSL_strings(void);
+@@ -96,6 +94,9 @@ int ERR_load_SSL_strings(void);
  # define SSL_F_PITEM_NEW                                  624
  # define SSL_F_PQUEUE_NEW                                 625
  # define SSL_F_PROCESS_KEY_SHARE_EXT                      439
@@ -547,7 +547,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_F_READ_STATE_MACHINE                         352
  # define SSL_F_SET_CLIENT_CIPHERSUITE                     540
  # define SSL_F_SRP_GENERATE_CLIENT_MASTER_SECRET          595
-@@ -105,7 +106,9 @@ int ERR_load_SSL_strings(void);
+@@ -106,7 +107,9 @@ int ERR_load_SSL_strings(void);
  # define SSL_F_SSL3_CTRL                                  213
  # define SSL_F_SSL3_CTX_CTRL                              133
  # define SSL_F_SSL3_DIGEST_CACHED_RECORDS                 293
@@ -557,7 +557,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_F_SSL3_ENC                                   608
  # define SSL_F_SSL3_FINAL_FINISH_MAC                      285
  # define SSL_F_SSL3_FINISH_MAC                            587
-@@ -210,6 +213,8 @@ int ERR_load_SSL_strings(void);
+@@ -211,6 +214,8 @@ int ERR_load_SSL_strings(void);
  # define SSL_F_SSL_PEEK                                   270
  # define SSL_F_SSL_PEEK_EX                                432
  # define SSL_F_SSL_PEEK_INTERNAL                          522
@@ -566,7 +566,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_F_SSL_READ                                   223
  # define SSL_F_SSL_READ_EARLY_DATA                        529
  # define SSL_F_SSL_READ_EX                                434
-@@ -259,6 +264,7 @@ int ERR_load_SSL_strings(void);
+@@ -260,6 +265,7 @@ int ERR_load_SSL_strings(void);
  # define SSL_F_SSL_WRITE_EARLY_FINISH                     527
  # define SSL_F_SSL_WRITE_EX                               433
  # define SSL_F_SSL_WRITE_INTERNAL                         524
@@ -574,7 +574,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_F_STATE_MACHINE                              353
  # define SSL_F_TLS12_CHECK_PEER_SIGALG                    333
  # define SSL_F_TLS12_COPY_SIGALGS                         533
-@@ -318,6 +324,7 @@ int ERR_load_SSL_strings(void);
+@@ -319,6 +325,7 @@ int ERR_load_SSL_strings(void);
  # define SSL_F_TLS_CONSTRUCT_CTOS_POST_HANDSHAKE_AUTH     619
  # define SSL_F_TLS_CONSTRUCT_CTOS_PSK                     501
  # define SSL_F_TLS_CONSTRUCT_CTOS_PSK_KEX_MODES           509
@@ -582,7 +582,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_F_TLS_CONSTRUCT_CTOS_RENEGOTIATE             473
  # define SSL_F_TLS_CONSTRUCT_CTOS_SCT                     474
  # define SSL_F_TLS_CONSTRUCT_CTOS_SERVER_NAME             475
-@@ -357,6 +364,7 @@ int ERR_load_SSL_strings(void);
+@@ -358,6 +365,7 @@ int ERR_load_SSL_strings(void);
  # define SSL_F_TLS_CONSTRUCT_STOC_MAXFRAGMENTLEN          548
  # define SSL_F_TLS_CONSTRUCT_STOC_NEXT_PROTO_NEG          457
  # define SSL_F_TLS_CONSTRUCT_STOC_PSK                     504
@@ -590,7 +590,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_F_TLS_CONSTRUCT_STOC_RENEGOTIATE             458
  # define SSL_F_TLS_CONSTRUCT_STOC_SERVER_NAME             459
  # define SSL_F_TLS_CONSTRUCT_STOC_SESSION_TICKET          460
-@@ -382,6 +390,7 @@ int ERR_load_SSL_strings(void);
+@@ -383,6 +391,7 @@ int ERR_load_SSL_strings(void);
  # define SSL_F_TLS_PARSE_CTOS_POST_HANDSHAKE_AUTH         620
  # define SSL_F_TLS_PARSE_CTOS_PSK                         505
  # define SSL_F_TLS_PARSE_CTOS_PSK_KEX_MODES               572
@@ -598,7 +598,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_F_TLS_PARSE_CTOS_RENEGOTIATE                 464
  # define SSL_F_TLS_PARSE_CTOS_SERVER_NAME                 573
  # define SSL_F_TLS_PARSE_CTOS_SESSION_TICKET              574
-@@ -400,6 +409,7 @@ int ERR_load_SSL_strings(void);
+@@ -401,6 +410,7 @@ int ERR_load_SSL_strings(void);
  # define SSL_F_TLS_PARSE_STOC_MAXFRAGMENTLEN              581
  # define SSL_F_TLS_PARSE_STOC_NPN                         582
  # define SSL_F_TLS_PARSE_STOC_PSK                         502
@@ -606,7 +606,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_F_TLS_PARSE_STOC_RENEGOTIATE                 448
  # define SSL_F_TLS_PARSE_STOC_SCT                         564
  # define SSL_F_TLS_PARSE_STOC_SERVER_NAME                 583
-@@ -564,6 +574,7 @@ int ERR_load_SSL_strings(void);
+@@ -565,6 +575,7 @@ int ERR_load_SSL_strings(void);
  # define SSL_R_INCONSISTENT_EARLY_DATA_SNI                231
  # define SSL_R_INCONSISTENT_EXTMS                         104
  # define SSL_R_INSUFFICIENT_SECURITY                      241
@@ -614,7 +614,7 @@ index 3d6850dea3..30605c0684 100644
  # define SSL_R_INVALID_ALERT                              205
  # define SSL_R_INVALID_CCS_MESSAGE                        260
  # define SSL_R_INVALID_CERTIFICATE_OR_ALG                 238
-@@ -761,6 +772,7 @@ int ERR_load_SSL_strings(void);
+@@ -763,6 +774,7 @@ int ERR_load_SSL_strings(void);
  # define SSL_R_WRONG_CERTIFICATE_TYPE                     383
  # define SSL_R_WRONG_CIPHER_RETURNED                      261
  # define SSL_R_WRONG_CURVE                                378
@@ -648,7 +648,7 @@ index bb2f1deb53..eec0d14f2c 100644
 +        statem/statem.c record/ssl3_record_tls13.c \
 +        ssl_quic.c statem/statem_quic.c
 diff --git a/ssl/s3_msg.c b/ssl/s3_msg.c
-index 42382547fb..a06054a0ea 100644
+index 339fb2774a..8d3cd442aa 100644
 --- a/ssl/s3_msg.c
 +++ b/ssl/s3_msg.c
 @@ -1,5 +1,5 @@
@@ -676,7 +676,7 @@ index 42382547fb..a06054a0ea 100644
                        &written);
      if (i <= 0) {
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 27a1b2ec68..8b15616feb 100644
+index 735a483c64..a3fe97597b 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -2162,3 +2162,35 @@ int ssl_cert_is_disabled(size_t idx)
@@ -716,7 +716,7 @@ index 27a1b2ec68..8b15616feb 100644
 +    return NID_undef;
 +}
 diff --git a/ssl/ssl_err.c b/ssl/ssl_err.c
-index 4b12ed1485..f5d5e8eed8 100644
+index a0c7b79659..19600f0485 100644
 --- a/ssl/ssl_err.c
 +++ b/ssl/ssl_err.c
 @@ -122,6 +122,11 @@ static const ERR_STRING_DATA SSL_str_functs[] = {
@@ -806,7 +806,7 @@ index 4b12ed1485..f5d5e8eed8 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_INVALID_ALERT), "invalid alert"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_INVALID_CCS_MESSAGE),
      "invalid ccs message"},
-@@ -1248,6 +1270,8 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
+@@ -1250,6 +1272,8 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_WRONG_CIPHER_RETURNED),
      "wrong cipher returned"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_WRONG_CURVE), "wrong curve"},
@@ -816,7 +816,7 @@ index 4b12ed1485..f5d5e8eed8 100644
      "wrong signature length"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_WRONG_SIGNATURE_SIZE),
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index ac820cf9fe..2cfe0bc7c1 100644
+index 7c7e59789c..f053bb473d 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -839,6 +839,10 @@ SSL *SSL_new(SSL_CTX *ctx)
@@ -888,7 +888,7 @@ index ac820cf9fe..2cfe0bc7c1 100644
      if (s->handshake_func == NULL) {
          SSLerr(SSL_F_SSL_WRITE_INTERNAL, SSL_R_UNINITIALIZED);
          return -1;
-@@ -3511,6 +3545,11 @@ int SSL_get_error(const SSL *s, int i)
+@@ -3565,6 +3599,11 @@ int SSL_get_error(const SSL *s, int i)
      }
  
      if (SSL_want_read(s)) {
@@ -900,7 +900,7 @@ index ac820cf9fe..2cfe0bc7c1 100644
          bio = SSL_get_rbio(s);
          if (BIO_should_read(bio))
              return SSL_ERROR_WANT_READ;
-@@ -3607,6 +3646,23 @@ int SSL_do_handshake(SSL *s)
+@@ -3661,6 +3700,23 @@ int SSL_do_handshake(SSL *s)
              ret = s->handshake_func(s);
          }
      }
@@ -924,7 +924,7 @@ index ac820cf9fe..2cfe0bc7c1 100644
      return ret;
  }
  
-@@ -3889,7 +3945,7 @@ EVP_PKEY *SSL_CTX_get0_privatekey(const SSL_CTX *ctx)
+@@ -3943,7 +3999,7 @@ EVP_PKEY *SSL_CTX_get0_privatekey(const SSL_CTX *ctx)
  
  const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
  {
@@ -933,10 +933,10 @@ index ac820cf9fe..2cfe0bc7c1 100644
          return s->session->cipher;
      return NULL;
  }
-diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index 25875c9f6d..5a7a859119 100644
---- a/ssl/ssl_locl.h
-+++ b/ssl/ssl_locl.h
+diff --git a/ssl/ssl_local.h b/ssl/ssl_local.h
+index 8ddbde7729..016b253858 100644
+--- a/ssl/ssl_local.h
++++ b/ssl/ssl_local.h
 @@ -315,6 +315,13 @@
  /* Flag used on OpenSSL ciphersuite ids to indicate they are for SSLv3+ */
  # define SSL3_CK_CIPHERSUITE_FLAG                0x03000000
@@ -1328,7 +1328,7 @@ index 0000000000..e8cfae107d
 +
 +#endif
 diff --git a/ssl/statem/extensions.c b/ssl/statem/extensions.c
-index 24410991b2..2368ba7818 100644
+index 4ef8b417b8..be09afbe71 100644
 --- a/ssl/statem/extensions.c
 +++ b/ssl/statem/extensions.c
 @@ -56,6 +56,10 @@ static int final_sig_algs(SSL *s, unsigned int context, int sent);
@@ -1379,7 +1379,7 @@ index 24410991b2..2368ba7818 100644
 +}
 +#endif
 diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
-index f0ae642fa0..a5f86d08b0 100644
+index bcce0f1d95..a9f73f07dc 100644
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
 @@ -1214,7 +1214,28 @@ EXT_RETURN tls_construct_ctos_post_handshake_auth(SSL *s, WPACKET *pkt,
@@ -1454,10 +1454,10 @@ index f0ae642fa0..a5f86d08b0 100644
 +}
 +#endif
 diff --git a/ssl/statem/extensions_srvr.c b/ssl/statem/extensions_srvr.c
-index ab5453f63e..a274e86000 100644
+index 3b07c6b940..602c9da314 100644
 --- a/ssl/statem/extensions_srvr.c
 +++ b/ssl/statem/extensions_srvr.c
-@@ -1298,6 +1298,26 @@ int tls_parse_ctos_post_handshake_auth(SSL *s, PACKET *pkt, unsigned int context
+@@ -1303,6 +1303,26 @@ int tls_parse_ctos_post_handshake_auth(SSL *s, PACKET *pkt, unsigned int context
      return 1;
  }
  
@@ -1484,7 +1484,7 @@ index ab5453f63e..a274e86000 100644
  /*
   * Add the server's renegotiation binding
   */
-@@ -1915,12 +1935,20 @@ EXT_RETURN tls_construct_stoc_early_data(SSL *s, WPACKET *pkt,
+@@ -1926,12 +1946,20 @@ EXT_RETURN tls_construct_stoc_early_data(SSL *s, WPACKET *pkt,
                                           size_t chainidx)
  {
      if (context == SSL_EXT_TLS1_3_NEW_SESSION_TICKET) {
@@ -1507,7 +1507,7 @@ index ab5453f63e..a274e86000 100644
                  || !WPACKET_close(pkt)) {
              SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                       SSL_F_TLS_CONSTRUCT_STOC_EARLY_DATA, ERR_R_INTERNAL_ERROR);
-@@ -1961,3 +1989,26 @@ EXT_RETURN tls_construct_stoc_psk(SSL *s, WPACKET *pkt, unsigned int context,
+@@ -1972,3 +2000,26 @@ EXT_RETURN tls_construct_stoc_psk(SSL *s, WPACKET *pkt, unsigned int context,
  
      return EXT_RETURN_SENT;
  }
@@ -1535,7 +1535,7 @@ index ab5453f63e..a274e86000 100644
 +}
 +#endif
 diff --git a/ssl/statem/statem.c b/ssl/statem/statem.c
-index e3c5ec0038..f1bc4b362f 100644
+index 20f5bd584e..0a8acedebf 100644
 --- a/ssl/statem/statem.c
 +++ b/ssl/statem/statem.c
 @@ -575,6 +575,10 @@ static SUB_STATE_RETURN read_state_machine(SSL *s)
@@ -1588,7 +1588,7 @@ index e3c5ec0038..f1bc4b362f 100644
          return 0;
      }
 diff --git a/ssl/statem/statem_clnt.c b/ssl/statem/statem_clnt.c
-index 6410414fb6..3e210867c8 100644
+index 64e392cfbf..aa2f5ad3f4 100644
 --- a/ssl/statem/statem_clnt.c
 +++ b/ssl/statem/statem_clnt.c
 @@ -909,6 +909,14 @@ int ossl_statem_client_construct_message(SSL *s, WPACKET *pkt,
@@ -1607,7 +1607,7 @@ index 6410414fb6..3e210867c8 100644
          *mt = SSL3_MT_END_OF_EARLY_DATA;
          break;
 diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
-index 22e9f0490e..ccaa535363 100644
+index 43d6fd5de9..09e7575832 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
 @@ -42,9 +42,23 @@ int ssl3_do_write(SSL *s, int type)
@@ -1636,7 +1636,7 @@ index 22e9f0490e..ccaa535363 100644
      if (ret < 0)
          return -1;
      if (type == SSL3_RT_HANDSHAKE)
-@@ -1144,6 +1158,7 @@ int tls_get_message_header(SSL *s, int *mt)
+@@ -1157,6 +1171,7 @@ int tls_get_message_header(SSL *s, int *mt)
  
      do {
          while (s->init_num < SSL3_HM_HEADER_LENGTH) {
@@ -1644,10 +1644,10 @@ index 22e9f0490e..ccaa535363 100644
              i = s->method->ssl_read_bytes(s, SSL3_RT_HANDSHAKE, &recvd_type,
                                            &p[s->init_num],
                                            SSL3_HM_HEADER_LENGTH - s->init_num,
-diff --git a/ssl/statem/statem_locl.h b/ssl/statem/statem_locl.h
+diff --git a/ssl/statem/statem_local.h b/ssl/statem/statem_local.h
 index e27c0c13a2..1551dac952 100644
---- a/ssl/statem/statem_locl.h
-+++ b/ssl/statem/statem_locl.h
+--- a/ssl/statem/statem_local.h
++++ b/ssl/statem/statem_local.h
 @@ -93,6 +93,7 @@ WORK_STATE ossl_statem_server_post_process_message(SSL *s, WORK_STATE wst);
  __owur int tls_get_message_header(SSL *s, int *mt);
  __owur int tls_get_message_body(SSL *s, size_t *len);
@@ -1818,10 +1818,10 @@ index 0000000000..771ccd4df4
 +
 +#endif
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index 8cf9c40d15..8e7f08dccc 100644
+index 14cb27e6db..c17d0dec57 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
-@@ -57,7 +57,8 @@ static int ossl_statem_server13_read_transition(SSL *s, int mt)
+@@ -72,7 +72,8 @@ static int ossl_statem_server13_read_transition(SSL *s, int mt)
                  return 1;
              }
              break;
@@ -1831,7 +1831,7 @@ index 8cf9c40d15..8e7f08dccc 100644
              if (mt == SSL3_MT_END_OF_EARLY_DATA) {
                  st->hand_state = TLS_ST_SR_END_OF_EARLY_DATA;
                  return 1;
-@@ -939,6 +940,15 @@ WORK_STATE ossl_statem_server_post_work(SSL *s, WORK_STATE wst)
+@@ -964,6 +965,15 @@ WORK_STATE ossl_statem_server_post_work(SSL *s, WORK_STATE wst)
                          SSL3_CC_APPLICATION | SSL3_CHANGE_CIPHER_SERVER_WRITE))
              /* SSLfatal() already called */
              return WORK_ERROR;
@@ -1848,7 +1848,7 @@ index 8cf9c40d15..8e7f08dccc 100644
          break;
  
 diff --git a/ssl/tls13_enc.c b/ssl/tls13_enc.c
-index b5f57a02f7..8aeecb0038 100644
+index 86754dc967..d93021634f 100644
 --- a/ssl/tls13_enc.c
 +++ b/ssl/tls13_enc.c
 @@ -427,27 +427,203 @@ static int derive_secret_key_and_iv(SSL *s, int sending, const EVP_MD *md,
@@ -2093,156 +2093,6 @@ index b5f57a02f7..8aeecb0038 100644
      ret = 1;
   err:
      OPENSSL_cleanse(secret, sizeof(secret));
-diff --git a/test/sslapitest.c b/test/sslapitest.c
-index 7a142268fa..6c1214c6b0 100644
---- a/test/sslapitest.c
-+++ b/test/sslapitest.c
-@@ -6205,6 +6205,135 @@ static int test_ca_names(int tst)
-     return testresult;
- }
- 
-+#ifndef OPENSSL_NO_QUIC
-+
-+static int test_quic_set_encryption_secrets(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
-+                                            const uint8_t *read_secret,
-+                                            const uint8_t *write_secret, size_t secret_len)
-+{
-+    test_printf_stderr("quic_set_encryption_secrets() %s, lvl=%d, len=%zd\n",
-+                       ssl->server ? "server" : "client", level, secret_len);
-+    return 1;
-+}
-+static int test_quic_add_handshake_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
-+                                        const uint8_t *data, size_t len)
-+{
-+    SSL *peer = (SSL*)SSL_get_app_data(ssl);
-+
-+    test_printf_stderr("quic_add_handshake_data() %s, lvl=%d, *data=0x%02X, len=%zd\n",
-+                       ssl->server ? "server" : "client", level, (int)*data, len);
-+    if (!TEST_ptr(peer))
-+        return 0;
-+
-+    if (!TEST_true(SSL_provide_quic_data(peer, level, data, len))) {
-+        ERR_print_errors_fp(stderr);
-+        return 0;
-+    }
-+
-+    return 1;
-+}
-+static int test_quic_flush_flight(SSL *ssl)
-+{
-+    test_printf_stderr("quic_flush_flight() %s\n", ssl->server ? "server" : "client");
-+    return 1;
-+}
-+static int test_quic_send_alert(SSL *ssl, enum ssl_encryption_level_t level, uint8_t alert)
-+{
-+    test_printf_stderr("quic_send_alert() %s, lvl=%d, alert=%d\n",
-+                       ssl->server ? "server" : "client", level, alert);
-+    return 1;
-+}
-+
-+static SSL_QUIC_METHOD quic_method = {
-+    test_quic_set_encryption_secrets,
-+    test_quic_add_handshake_data,
-+    test_quic_flush_flight,
-+    test_quic_send_alert,
-+};
-+static int test_quic_api(void)
-+{
-+    SSL_CTX *cctx = NULL, *sctx = NULL;
-+    SSL *clientssl = NULL, *serverssl = NULL;
-+    int testresult = 0;
-+    static const char *server_str = "SERVER";
-+    static const char *client_str = "CLIENT";
-+    const uint8_t *peer_str;
-+    size_t peer_str_len;
-+
-+    /* Clean up logging space */
-+    memset(client_log_buffer, 0, sizeof(client_log_buffer));
-+    memset(server_log_buffer, 0, sizeof(server_log_buffer));
-+    client_log_buffer_index = 0;
-+    server_log_buffer_index = 0;
-+    error_writing_log = 0;
-+
-+
-+    if (!TEST_ptr(sctx = SSL_CTX_new(TLS_server_method()))
-+            || !TEST_true(SSL_CTX_set_quic_method(sctx, &quic_method))
-+            || !TEST_ptr(sctx->quic_method)
-+            || !TEST_ptr(serverssl = SSL_new(sctx))
-+            || !TEST_true(SSL_IS_QUIC(serverssl))
-+            || !TEST_true(SSL_set_quic_method(serverssl, NULL))
-+            || !TEST_false(SSL_IS_QUIC(serverssl))
-+            || !TEST_true(SSL_set_quic_method(serverssl, &quic_method))
-+            || !TEST_true(SSL_IS_QUIC(serverssl)))
-+        goto end;
-+
-+    SSL_CTX_free(sctx);
-+    sctx = NULL;
-+    SSL_free(serverssl);
-+    serverssl = NULL;
-+
-+    if (!TEST_true(create_ssl_ctx_pair(TLS_server_method(),
-+                                       TLS_client_method(),
-+                                       TLS1_3_VERSION, 0,
-+                                       &sctx, &cctx, cert, privkey))
-+            || !TEST_true(SSL_CTX_set_quic_method(sctx, &quic_method))
-+            || !TEST_true(SSL_CTX_set_quic_method(cctx, &quic_method))
-+            || !TEST_true(create_ssl_objects(sctx, cctx, &serverssl,
-+                                             &clientssl, NULL, NULL))
-+            || !TEST_true(SSL_set_quic_transport_params(serverssl,
-+                                                        (unsigned char*)server_str,
-+                                                        sizeof(server_str)))
-+            || !TEST_true(SSL_set_quic_transport_params(clientssl,
-+                                                        (unsigned char*)client_str,
-+                                                        sizeof(client_str)))
-+            || !TEST_true(SSL_set_app_data(serverssl, clientssl))
-+            || !TEST_true(SSL_set_app_data(clientssl, serverssl))
-+            || !TEST_true(create_ssl_connection(serverssl, clientssl,
-+                                                SSL_ERROR_NONE))
-+            || !TEST_true(SSL_version(serverssl) == TLS1_3_VERSION)
-+            || !TEST_true(SSL_version(clientssl) == TLS1_3_VERSION)
-+            || !(TEST_int_eq(SSL_quic_read_level(clientssl), ssl_encryption_application))
-+            || !(TEST_int_eq(SSL_quic_read_level(serverssl), ssl_encryption_application))
-+            || !(TEST_int_eq(SSL_quic_write_level(clientssl), ssl_encryption_application))
-+            || !(TEST_int_eq(SSL_quic_write_level(serverssl), ssl_encryption_application)))
-+        goto end;
-+
-+    SSL_get_peer_quic_transport_params(serverssl, &peer_str, &peer_str_len);
-+    if (!TEST_mem_eq(peer_str, peer_str_len, client_str, sizeof(client_str)))
-+        goto end;
-+    SSL_get_peer_quic_transport_params(clientssl, &peer_str, &peer_str_len);
-+    if (!TEST_mem_eq(peer_str, peer_str_len, server_str, sizeof(server_str)))
-+        goto end;
-+
-+    /* Deal with two NewSessionTickets */
-+    if (!TEST_true(SSL_process_quic_post_handshake(clientssl))
-+            || !TEST_true(SSL_process_quic_post_handshake(clientssl)))
-+        goto end;
-+
-+    testresult = 1;
-+
-+end:
-+    SSL_free(serverssl);
-+    SSL_free(clientssl);
-+    SSL_CTX_free(sctx);
-+    SSL_CTX_free(cctx);
-+
-+    return testresult;
-+}
-+#endif
-+
- int setup_tests(void)
- {
-     if (!TEST_ptr(certsdir = test_get_argument(0))
-@@ -6322,6 +6451,9 @@ int setup_tests(void)
-     ADD_ALL_TESTS(test_cert_cb, 6);
-     ADD_ALL_TESTS(test_client_cert_cb, 2);
-     ADD_ALL_TESTS(test_ca_names, 3);
-+#ifndef OPENSSL_NO_QUIC
-+    ADD_TEST(test_quic_api);
-+#endif
-     return 1;
- }
- 
 diff --git a/test/ssltestlib.c b/test/ssltestlib.c
 index 456afdf471..5f61e63390 100644
 --- a/test/ssltestlib.c
@@ -2260,7 +2110,7 @@ index 456afdf471..5f61e63390 100644
       * We attempt to read some data on the client side which we expect to fail.
       * This will ensure we have received the NewSessionTicket in TLSv1.3 where
 diff --git a/test/tls13secretstest.c b/test/tls13secretstest.c
-index 9368b1cdc5..9651260454 100644
+index 52fc2b6673..970c2f4aae 100644
 --- a/test/tls13secretstest.c
 +++ b/test/tls13secretstest.c
 @@ -216,6 +216,13 @@ int ossl_statem_export_early_allowed(SSL *s)
@@ -2298,10 +2148,10 @@ index 297522c363..07f9c4755e 100644
 +SSL_provide_quic_data                   10104	1_1_1d	EXIST::FUNCTION:QUIC
 +SSL_set_quic_early_data_enabled         11000	1_1_1d	EXIST::FUNCTION:QUIC
 diff --git a/util/private.num b/util/private.num
-index a6ef44e4a6..51fb81c0df 100644
+index bc7d967b5d..eb3d409f6e 100644
 --- a/util/private.num
 +++ b/util/private.num
-@@ -87,6 +87,8 @@ custom_ext_free_cb                      datatype
+@@ -91,6 +91,8 @@ custom_ext_free_cb                      datatype
  custom_ext_parse_cb                     datatype
  pem_password_cb                         datatype
  ssl_ct_validation_cb                    datatype
