@@ -1,0 +1,24 @@
+From 4d1b437f68bd1edbf421de74b3962ef19c5c8fc7 Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <william@wkennington.com>
+Date: Sun, 29 Mar 2020 18:32:00 -0700
+Subject: [PATCH] lib: hwdb: Add triton path
+
+---
+ src/libsystemd/sd-hwdb/sd-hwdb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/libsystemd/sd-hwdb/sd-hwdb.c b/src/libsystemd/sd-hwdb/sd-hwdb.c
+index b3febdbb31..e8620b33b2 100644
+--- a/src/libsystemd/sd-hwdb/sd-hwdb.c
++++ b/src/libsystemd/sd-hwdb/sd-hwdb.c
+@@ -299,6 +299,7 @@ static int trie_search_f(sd_hwdb *hwdb, const char *search) {
+ static const char hwdb_bin_paths[] =
+         "/etc/systemd/hwdb/hwdb.bin\0"
+         "/etc/udev/hwdb.bin\0"
++        "/run/current-system/sw/lib/systemd/hwdb/hwdb.bin\0"
+         "/usr/lib/systemd/hwdb/hwdb.bin\0"
+ #if HAVE_SPLIT_USR
+         "/lib/systemd/hwdb/hwdb.bin\0"
+-- 
+2.25.0
+
