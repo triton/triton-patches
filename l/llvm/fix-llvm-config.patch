@@ -1,5 +1,5 @@
 diff --git a/tools/llvm-config/CMakeLists.txt b/tools/llvm-config/CMakeLists.txt
-index 16ba54c0..79939955 100644
+index 16ba54c0..dbb15d5b 100644
 --- a/tools/llvm-config/CMakeLists.txt
 +++ b/tools/llvm-config/CMakeLists.txt
 @@ -11,6 +11,7 @@ add_llvm_tool(llvm-config
@@ -10,15 +10,19 @@ index 16ba54c0..79939955 100644
  foreach(l ${SUPPORT_SYSTEM_LIBS} ${WINDOWSMANIFEST_SYSTEM_LIBS})
    if(MSVC)
      set(SYSTEM_LIBS ${SYSTEM_LIBS} "${l}.lib")
-@@ -23,7 +24,10 @@ foreach(l ${SUPPORT_SYSTEM_LIBS} ${WINDOWSMANIFEST_SYSTEM_LIBS})
+@@ -23,7 +24,14 @@ foreach(l ${SUPPORT_SYSTEM_LIBS} ${WINDOWSMANIFEST_SYSTEM_LIBS})
        if(IS_ABSOLUTE ${l})
          set(SYSTEM_LIBS ${SYSTEM_LIBS} "${l}")
        else()
 -        set(SYSTEM_LIBS ${SYSTEM_LIBS} "-l${l}")
++        message(STATUS "LIB: ${l}")
 +        find_library(ABSOLUTE_LIB "${l}")
++        message(STATUS "ABSOLUTE_LIB: ${ABSOLUTE_LIB}")
 +        get_filename_component(LIBDIR "${ABSOLUTE_LIB}" DIRECTORY)
++        message(STATUS "LIBDIR: ${LIBDIR}")
 +        set(SYSTEM_LIBS ${SYSTEM_LIBS} "-L${LIBDIR} -l${l}")
-+        unset(ABSOLUTE_LIB LIBDIR CACHE)
++        unset(LIBDIR CACHE)
++		unset(ABSOLUTE_LIB CACHE)
        endif()
      endif()
    endif()
