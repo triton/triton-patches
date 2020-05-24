@@ -1,20 +1,12 @@
-From d6f3f818f2734b0f80fae7df17581a08a1973ca5 Mon Sep 17 00:00:00 2001
-From: "William A. Kennington III" <william@wkennington.com>
-Date: Sat, 6 Jul 2019 22:31:00 -0700
-Subject: [PATCH] cargo: Add RUSTFLAGS for HOST builds
-
----
- src/cargo/core/compiler/build_context/target_info.rs | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
 diff --git a/src/cargo/core/compiler/build_context/target_info.rs b/src/cargo/core/compiler/build_context/target_info.rs
-index 8abc579e..cf115533 100644
+index 80f1d51c3..255f7342c 100644
 --- a/src/cargo/core/compiler/build_context/target_info.rs
 +++ b/src/cargo/core/compiler/build_context/target_info.rs
-@@ -363,6 +363,15 @@ fn env_args(
-     let is_target_kind = kind == Kind::Target;
- 
-     if compiling_with_target && !is_target_kind {
+@@ -420,6 +420,16 @@ fn env_args(
+     // same as the host, build scripts in plugins won't get
+     // RUSTFLAGS.
+     if !requested_kind.is_host() && kind.is_host() {
++        // First try RUSTFLAGS_HOST from the environment
 +        if let Ok(a) = env::var(format!("{}_HOST", name)) {
 +            let args = a
 +                .split(' ')
@@ -27,6 +19,3 @@ index 8abc579e..cf115533 100644
          // This is probably a build script or plugin and we're
          // compiling with --target. In this scenario there are
          // no rustflags we can apply.
--- 
-2.21.0
-
