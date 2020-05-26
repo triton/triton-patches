@@ -1,4 +1,4 @@
-From 96e7b5af5e20b65474feec639130c6931c9c1466 Mon Sep 17 00:00:00 2001
+From bfdd09955b79957fd9fdd0e69003199689070c6d Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Tue, 31 Jul 2018 02:41:40 -0700
 Subject: [PATCH] Fix binary paths
@@ -9,14 +9,15 @@ Subject: [PATCH] Fix binary paths
  cmd/vdev_id/vdev_id                     | 2 +-
  cmd/zpool/zpool_iter.c                  | 2 +-
  cmd/ztest/ztest.c                       | 6 +++---
- etc/init.d/zfs-functions.in             | 2 +-
  etc/sudoers.d/zfs                       | 2 +-
  etc/systemd/system/zfs-share.service.in | 2 +-
+ etc/zfs/zfs-functions.in                | 2 +-
  lib/libshare/nfs.c                      | 6 +++---
+ lib/libshare/smb.h                      | 2 +-
  lib/libzfs/libzfs_mount.c               | 4 ++--
  lib/libzfs/libzfs_util.c                | 8 ++++----
  udev/rules.d/90-zfs.rules.in            | 4 ++--
- 12 files changed, 21 insertions(+), 21 deletions(-)
+ 13 files changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/cmd/arc_summary/arc_summary2 b/cmd/arc_summary/arc_summary2
 index 1326d9e62..6c0eb2682 100755
@@ -71,7 +72,7 @@ index 9927a9deb..5a99fe2a1 100644
  	char **lines = NULL;
  	int lines_cnt = 0;
 diff --git a/cmd/ztest/ztest.c b/cmd/ztest/ztest.c
-index 8fe412672..3bc4a1004 100644
+index 77cab28f2..907d20484 100644
 --- a/cmd/ztest/ztest.c
 +++ b/cmd/ztest/ztest.c
 @@ -923,14 +923,14 @@ process_options(int argc, char **argv)
@@ -92,19 +93,6 @@ index 8fe412672..3bc4a1004 100644
  
  		if (0 != access(zo->zo_alt_ztest, X_OK)) {
  			ztest_dump_core = B_FALSE;
-diff --git a/etc/init.d/zfs-functions.in b/etc/init.d/zfs-functions.in
-index 043f1b073..98805899f 100644
---- a/etc/init.d/zfs-functions.in
-+++ b/etc/init.d/zfs-functions.in
-@@ -10,7 +10,7 @@
- # licensing stansa) in the commit dated Mar 24, 2011:
- #   https://github.com/zfsonlinux/pkg-zfs/commit/80a3ae582b59c0250d7912ba794dca9e669e605a
- 
--PATH=/sbin:/bin:/usr/bin:/usr/sbin
-+PATH=/run/current-system/sw/bin:/sbin:/bin:/usr/bin:/usr/sbin
- 
- # Source function library
- if [ -f /etc/rc.d/init.d/functions ]; then
 diff --git a/etc/sudoers.d/zfs b/etc/sudoers.d/zfs
 index f66ebad21..ce27fb28f 100644
 --- a/etc/sudoers.d/zfs
@@ -128,6 +116,19 @@ index 5f4ba411b..f2d0e58c1 100644
  ExecStart=@sbindir@/zfs share -a
  
  [Install]
+diff --git a/etc/zfs/zfs-functions.in b/etc/zfs/zfs-functions.in
+index 043f1b073..98805899f 100644
+--- a/etc/zfs/zfs-functions.in
++++ b/etc/zfs/zfs-functions.in
+@@ -10,7 +10,7 @@
+ # licensing stansa) in the commit dated Mar 24, 2011:
+ #   https://github.com/zfsonlinux/pkg-zfs/commit/80a3ae582b59c0250d7912ba794dca9e669e605a
+ 
+-PATH=/sbin:/bin:/usr/bin:/usr/sbin
++PATH=/run/current-system/sw/bin:/sbin:/bin:/usr/bin:/usr/sbin
+ 
+ # Source function library
+ if [ -f /etc/rc.d/init.d/functions ]; then
 diff --git a/lib/libshare/nfs.c b/lib/libshare/nfs.c
 index 7cc5ae43f..8aae4b5b2 100644
 --- a/lib/libshare/nfs.c
@@ -159,6 +160,19 @@ index 7cc5ae43f..8aae4b5b2 100644
  
  	if (rc < 0) {
  		exit(1);
+diff --git a/lib/libshare/smb.h b/lib/libshare/smb.h
+index 8ea44677f..3ad4d3a49 100644
+--- a/lib/libshare/smb.h
++++ b/lib/libshare/smb.h
+@@ -32,7 +32,7 @@
+ #define	SMB_COMMENT_MAX		255
+ 
+ #define	SHARE_DIR		"/var/lib/samba/usershares"
+-#define	NET_CMD_PATH		"/usr/bin/net"
++#define	NET_CMD_PATH		"/run/current-system/sw/bin/net"
+ #define	NET_CMD_ARG_HOST	"127.0.0.1"
+ 
+ typedef struct smb_share_s {
 diff --git a/lib/libzfs/libzfs_mount.c b/lib/libzfs/libzfs_mount.c
 index d62801cfd..3cfd7d359 100644
 --- a/lib/libzfs/libzfs_mount.c
@@ -237,5 +251,5 @@ index 82f8cf1cf..6cf5638a2 100644
  KERNEL=="null", SYMLINK+="root"
  SYMLINK=="null", SYMLINK+="root"
 -- 
-2.24.1
+2.25.0
 
