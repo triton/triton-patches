@@ -1,28 +1,28 @@
-From 4e8b031bf2214a751b8ed8c10813f544ba29e69d Mon Sep 17 00:00:00 2001
+From f7013609618384710d3cd08a57a407f03f59745c Mon Sep 17 00:00:00 2001
 From: "William A. Kennington III" <william@wkennington.com>
 Date: Tue, 31 Jul 2018 02:41:40 -0700
 Subject: [PATCH] Fix binary paths
 
 ---
  cmd/arc_summary/arc_summary2            | 2 +-
- cmd/arc_summary/arc_summary3            | 2 +-
  cmd/vdev_id/vdev_id                     | 2 +-
  cmd/zpool/zpool_iter.c                  | 2 +-
  cmd/ztest/ztest.c                       | 6 +++---
- etc/init.d/zfs-functions.in             | 2 +-
  etc/sudoers.d/zfs                       | 2 +-
  etc/systemd/system/zfs-share.service.in | 2 +-
+ etc/zfs/zfs-functions.in                | 2 +-
  lib/libshare/nfs.c                      | 6 +++---
- lib/libzfs/os/linux/libzfs_mount_os.c   | 4 ++--
+ lib/libshare/smb.h                      | 2 +-
+ lib/libzfs/os/linux/libzfs_mount_os.c   | 2 +-
  lib/libzfs/os/linux/libzfs_util_os.c    | 8 ++++----
  udev/rules.d/90-zfs.rules.in            | 4 ++--
- 12 files changed, 21 insertions(+), 21 deletions(-)
+ 12 files changed, 20 insertions(+), 20 deletions(-)
 
 diff --git a/cmd/arc_summary/arc_summary2 b/cmd/arc_summary/arc_summary2
-index 8ae35c0db..613d293b3 100755
+index 5dc40d759..acfe65bca 100755
 --- a/cmd/arc_summary/arc_summary2
 +++ b/cmd/arc_summary/arc_summary2
-@@ -937,7 +937,7 @@ def _tunable_summary(Kstat):
+@@ -950,7 +950,7 @@ def _tunable_summary(Kstat):
  
      if show_tunable_descriptions:
  
@@ -31,19 +31,6 @@ index 8ae35c0db..613d293b3 100755
  
          try:
              p = Popen(command, stdin=PIPE, stdout=PIPE,
-diff --git a/cmd/arc_summary/arc_summary3 b/cmd/arc_summary/arc_summary3
-index 5d1c5d5b4..a94c0e3c9 100755
---- a/cmd/arc_summary/arc_summary3
-+++ b/cmd/arc_summary/arc_summary3
-@@ -326,7 +326,7 @@ def get_descriptions(request):
-     # We would prefer to do this with /sys/modules -- see the discussion at
-     # get_version() -- but there isn't a way to get the descriptions from
-     # there, so we fall back on modinfo
--    command = ["/sbin/modinfo", request, "-0"]
-+    command = ["/run/current-system/sw/bin/modinfo", request, "-0"]
- 
-     # The recommended way to do this is with subprocess.run(). However,
-     # some installed versions of Python are < 3.5, so we offer them
 diff --git a/cmd/vdev_id/vdev_id b/cmd/vdev_id/vdev_id
 index a79aed3b5..14ade4d63 100755
 --- a/cmd/vdev_id/vdev_id
@@ -71,10 +58,10 @@ index 9927a9deb..5a99fe2a1 100644
  	char **lines = NULL;
  	int lines_cnt = 0;
 diff --git a/cmd/ztest/ztest.c b/cmd/ztest/ztest.c
-index dbc5084d0..2fb783f5a 100644
+index 92b46c296..daccf71cf 100644
 --- a/cmd/ztest/ztest.c
 +++ b/cmd/ztest/ztest.c
-@@ -920,14 +920,14 @@ process_options(int argc, char **argv)
+@@ -925,14 +925,14 @@ process_options(int argc, char **argv)
  		 * We want to extract <isa> to determine if we should use
  		 * 32 or 64 bit binaries.
  		 */
@@ -92,25 +79,12 @@ index dbc5084d0..2fb783f5a 100644
  
  		if (0 != access(zo->zo_alt_ztest, X_OK)) {
  			ztest_dump_core = B_FALSE;
-diff --git a/etc/init.d/zfs-functions.in b/etc/init.d/zfs-functions.in
-index 043f1b073..98805899f 100644
---- a/etc/init.d/zfs-functions.in
-+++ b/etc/init.d/zfs-functions.in
-@@ -10,7 +10,7 @@
- # licensing stansa) in the commit dated Mar 24, 2011:
- #   https://github.com/zfsonlinux/pkg-zfs/commit/80a3ae582b59c0250d7912ba794dca9e669e605a
- 
--PATH=/sbin:/bin:/usr/bin:/usr/sbin
-+PATH=/run/current-system/sw/bin:/sbin:/bin:/usr/bin:/usr/sbin
- 
- # Source function library
- if [ -f /etc/rc.d/init.d/functions ]; then
 diff --git a/etc/sudoers.d/zfs b/etc/sudoers.d/zfs
-index f66ebad21..ce27fb28f 100644
+index 82a25ba81..f12b4cd1d 100644
 --- a/etc/sudoers.d/zfs
 +++ b/etc/sudoers.d/zfs
-@@ -5,4 +5,4 @@
- ## CAUTION: Any syntax error introduced here will break sudo.
+@@ -6,4 +6,4 @@
+ ## Editing with 'visudo' is recommended: visudo -f  /etc/sudoers.d/zfs 
  ##
  
 -# ALL ALL = (root) NOPASSWD: /usr/sbin/smartctl -a /dev/[hsv]d[a-z0-9]*
@@ -128,6 +102,19 @@ index 5f4ba411b..f2d0e58c1 100644
  ExecStart=@sbindir@/zfs share -a
  
  [Install]
+diff --git a/etc/zfs/zfs-functions.in b/etc/zfs/zfs-functions.in
+index 043f1b073..98805899f 100644
+--- a/etc/zfs/zfs-functions.in
++++ b/etc/zfs/zfs-functions.in
+@@ -10,7 +10,7 @@
+ # licensing stansa) in the commit dated Mar 24, 2011:
+ #   https://github.com/zfsonlinux/pkg-zfs/commit/80a3ae582b59c0250d7912ba794dca9e669e605a
+ 
+-PATH=/sbin:/bin:/usr/bin:/usr/sbin
++PATH=/run/current-system/sw/bin:/sbin:/bin:/usr/bin:/usr/sbin
+ 
+ # Source function library
+ if [ -f /etc/rc.d/init.d/functions ]; then
 diff --git a/lib/libshare/nfs.c b/lib/libshare/nfs.c
 index 7cc5ae43f..8aae4b5b2 100644
 --- a/lib/libshare/nfs.c
@@ -159,20 +146,24 @@ index 7cc5ae43f..8aae4b5b2 100644
  
  	if (rc < 0) {
  		exit(1);
+diff --git a/lib/libshare/smb.h b/lib/libshare/smb.h
+index 8ea44677f..3ad4d3a49 100644
+--- a/lib/libshare/smb.h
++++ b/lib/libshare/smb.h
+@@ -32,7 +32,7 @@
+ #define	SMB_COMMENT_MAX		255
+ 
+ #define	SHARE_DIR		"/var/lib/samba/usershares"
+-#define	NET_CMD_PATH		"/usr/bin/net"
++#define	NET_CMD_PATH		"/run/current-system/sw/bin/net"
+ #define	NET_CMD_ARG_HOST	"127.0.0.1"
+ 
+ typedef struct smb_share_s {
 diff --git a/lib/libzfs/os/linux/libzfs_mount_os.c b/lib/libzfs/os/linux/libzfs_mount_os.c
-index af1cafd28..908d14d1b 100644
+index 04252e421..99d1600bd 100644
 --- a/lib/libzfs/os/linux/libzfs_mount_os.c
 +++ b/lib/libzfs/os/linux/libzfs_mount_os.c
-@@ -302,7 +302,7 @@ int
- do_mount(const char *src, const char *mntpt, char *opts, int flags)
- {
- 	char *argv[9] = {
--	    "/bin/mount",
-+	    "/run/current-system/sw/bin/mount",
- 	    "--no-canonicalize",
- 	    "-t", MNTTYPE_ZFS,
- 	    "-o", opts,
-@@ -339,7 +339,7 @@ do_unmount(const char *mntpt, int flags)
+@@ -614,7 +614,7 @@ do_unmount(const char *mntpt, int flags)
  	char force_opt[] = "-f";
  	char lazy_opt[] = "-l";
  	char *argv[7] = {
@@ -182,10 +173,10 @@ index af1cafd28..908d14d1b 100644
  	    NULL, NULL, NULL, NULL };
  	int rc, count = 3;
 diff --git a/lib/libzfs/os/linux/libzfs_util_os.c b/lib/libzfs/os/linux/libzfs_util_os.c
-index c27dc91bc..ecdca4d4c 100644
+index 918a43f7d..38e2cf1f3 100644
 --- a/lib/libzfs/os/linux/libzfs_util_os.c
 +++ b/lib/libzfs/os/linux/libzfs_util_os.c
-@@ -56,7 +56,7 @@ libzfs_error_init(int error)
+@@ -57,7 +57,7 @@ libzfs_error_init(int error)
  	switch (error) {
  	case ENXIO:
  		return (dgettext(TEXT_DOMAIN, "The ZFS modules are not "
@@ -194,7 +185,7 @@ index c27dc91bc..ecdca4d4c 100644
  		    "to load them."));
  	case ENOENT:
  		return (dgettext(TEXT_DOMAIN, "/dev/zfs and /proc/self/mounts "
-@@ -64,7 +64,7 @@ libzfs_error_init(int error)
+@@ -65,7 +65,7 @@ libzfs_error_init(int error)
  		    "-t proc proc /proc' as root."));
  	case ENOEXEC:
  		return (dgettext(TEXT_DOMAIN, "The ZFS modules cannot be "
@@ -203,7 +194,7 @@ index c27dc91bc..ecdca4d4c 100644
  		    "root to manually load them."));
  	case EACCES:
  		return (dgettext(TEXT_DOMAIN, "Permission denied the "
-@@ -99,7 +99,7 @@ libzfs_module_loaded(const char *module)
+@@ -100,7 +100,7 @@ libzfs_module_loaded(const char *module)
  static int
  libzfs_load_module_impl(const char *module)
  {
@@ -212,7 +203,7 @@ index c27dc91bc..ecdca4d4c 100644
  	char *load_str, *timeout_str;
  	long timeout = 10; /* seconds */
  	long busy_timeout = 10; /* milliseconds */
-@@ -118,7 +118,7 @@ libzfs_load_module_impl(const char *module)
+@@ -119,7 +119,7 @@ libzfs_load_module_impl(const char *module)
  		}
  
  		if (load) {
@@ -237,5 +228,5 @@ index 82f8cf1cf..6cf5638a2 100644
  KERNEL=="null", SYMLINK+="root"
  SYMLINK=="null", SYMLINK+="root"
 -- 
-2.22.0
+2.25.0
 
